@@ -16,11 +16,10 @@ function TopLoadingBar({ skip }) {
     NProgress.start();
     NProgress.set(0.3);
 
-    const timeout = setTimeout(() => {
+    return () => {
       NProgress.done();
-    }, 400);
+    };
 
-    return () => clearTimeout(timeout);
   }, [location.pathname, navType]);
 
   return null;

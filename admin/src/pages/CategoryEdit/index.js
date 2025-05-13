@@ -114,7 +114,9 @@ const CategoryEdit = () => {
 
   return (
     <div className="right-content w-100 product-upload">
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+      <div style={{ position: "fixed", left: "20px", bottom: "20px", zIndex: 9999, display: "flex", flexDirection: "column-reverse", gap: "5px", }}>
+        {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+      </div>
 
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Edit Category</h5>

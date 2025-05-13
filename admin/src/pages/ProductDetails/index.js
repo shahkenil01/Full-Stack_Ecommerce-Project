@@ -1,18 +1,13 @@
-import React, { useRef } from "react";
-import { Breadcrumbs, Typography, Link as MuiLink, Button, Rating } from '@mui/material';
+import React, { useEffect, useRef } from "react";
 import { Link } from 'react-router-dom';
+import { Breadcrumbs, Typography, Link as MuiLink, Button, Rating } from '@mui/material';
+import { FaPalette, FaTag, FaShoppingCart, FaStar, FaShieldAlt, FaReply } from "react-icons/fa";
 import { IoMdHome } from "react-icons/io";
-import Slider from "react-slick";
+import { FiSettings } from "react-icons/fi";
+import { FiFileText } from "react-icons/fi";
 import { MdBrandingWatermark } from "react-icons/md";
 import { BiSolidCategoryAlt } from "react-icons/bi";
-import { FiSettings } from "react-icons/fi";
-import { FaPalette } from "react-icons/fa";
-import { FiFileText } from "react-icons/fi";
-import { FaTag } from "react-icons/fa";
-import { FaShoppingCart } from "react-icons/fa"	;
-import { FaStar } from "react-icons/fa";
-import { FaShieldAlt } from "react-icons/fa";
-import { FaReply } from "react-icons/fa";
+import Slider from "react-slick";
 import UserAvatarImgComponent from "../../components/userAvatarImg";
 
 const ProductDetails = () => {

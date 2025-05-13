@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes, useLocation, matchRoutes, useParams } from 'react-router-dom';
+import { createContext, useEffect, useState } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css';
 import ScrollToTop from './components/ScrollToTop';
 import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
-import { createContext, useEffect, useState } from 'react';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
@@ -24,7 +24,6 @@ const MyContext = createContext();
 
 function AppWrapper() {
   const location = useLocation();
-  const { id } = useParams();
 
   const [isToggleSidebar, setIsToggleSidebar] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
@@ -55,52 +54,28 @@ function AppWrapper() {
     setThemeMode
   };
 
-  const routes = [
-    { path: "/" },
-    { path: "/dashboard" },
-    { path: "/login" },
-    { path: "/signup" },
-    { path: "/products" },
-    { path: "/product/details" },
-    { path: "/product/upload" },
-    { path: "/productRAMS/add" },
-    { path: "/productWEIGHT/add" },
-    { path: "/productSIZE/add" },
-    { path: "/category" },
-    { path: "/category/add" },
-    { path: "/category/edit/:id" }
+  const routes = [ { path: "/" }, { path: "/dashboard" }, { path: "/login" }, { path: "/signup" }, { path: "/products" }, { path: "/product/details" },
+    { path: "/product/upload" }, { path: "/productRAMS/add" }, { path: "/productWEIGHT/add" }, { path: "/productSIZE/add" },
+    { path: "/category" }, { path: "/category/add" },  { path: "/subCategory" }, { path: "/subCategory/add" }, { path: "/category/edit/:id" }
   ];
-  
 
   const matchedRoutes = matchRoutes(routes, location);
   const skipLoaderRoutes = [
-    '/login',
-    '/signup',
-    '/category/add',
-    '/product/upload',
-    '/productRAMS/add',
-    '/productWEIGHT/add',
-    '/productSIZE/add'
+    '/login', '/signup', '/category/add', '/product/upload', '/productRAMS/add', '/productWEIGHT/add', '/productSIZE/add'
   ];
-  const dynamicSkipRoutes = [
-    '/category/edit/',
-    '/product/edit/',
-  ];
+  const dynamicSkipRoutes = [ '/category/edit/', '/product/edit/', ];
 
   const hideLayout = !matchedRoutes || ['/login', '/signup'].includes(location.pathname);
   
   const isNotFoundPage = !matchedRoutes;
   const skipLoader =
-    isNotFoundPage ||
-    skipLoaderRoutes.includes(location.pathname) ||
+    isNotFoundPage || skipLoaderRoutes.includes(location.pathname) ||
     dynamicSkipRoutes.some(path => location.pathname.startsWith(path));
 
   return (
     <MyContext.Provider value={values}>
     <TopLoadingBar skip={skipLoader} />
-      {
-        !hideLayout && <Header />
-      }
+      { !hideLayout && <Header /> }
       <div className='main d-flex'>
         {
           !hideLayout && 
@@ -123,6 +98,8 @@ function AppWrapper() {
             <Route path="/productSIZE/add" element={<ProductsSize />} />
             <Route path="/category" element={<Category />} />
             <Route path="/category/add" element={<CategoryAdd />} />
+            <Route path="/subCategory" element={<CategoryEdit />} />
+            <Route path="/subCategory/add" element={<CategoryEdit />} />
             <Route path="/category/edit/:id" element={<CategoryEdit />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

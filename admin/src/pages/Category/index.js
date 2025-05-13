@@ -6,7 +6,6 @@ import { MdDelete } from "react-icons/md";
 
 import { Button, Breadcrumbs, Typography, Link as MuiLink, Pagination } from '@mui/material';
 import { useEffect, useState } from 'react';
-import NProgress from 'nprogress';
 import { fetchDataFromApi, deleteData } from '../../utils/api';
 import Toast from "../../components/Toast";
 
@@ -17,27 +16,16 @@ const Category = () => {
   const location = useLocation();
 
   useEffect(() => {
-  const fetchAllData = async () => {
-    try {
-      NProgress.start();
-
-      const res = await fetchDataFromApi('/api/category');
-
+    window.scrollTo(0, 0);
+    fetchDataFromApi('/api/category').then((res) => {
       if (res?.categoryList && Array.isArray(res.categoryList)) {
         setCatData(res);
       } else {
+        console.error("Failed to fetch categories:", res);
         setCatData({ categoryList: [], totalPages: 1, page: 1 });
       }
-
-    } catch (error) {
-      setToast({ type: "error", message: "Failed to fetch categories"});
-    } finally {
-      NProgress.done();
-    }
-  };
-
-  fetchAllData();
-}, []);
+    });
+  }, []);
 
   useEffect(() => {
     if (location.state?.toast) {

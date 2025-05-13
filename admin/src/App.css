@@ -411,7 +411,7 @@ body.dark .imgUploadBox .uploadBox * { color: #ffffffb3 !important; }
   width: 100%;
   list-style: none;}
 .main .sidebarWrapper .sidebar ul .submenu li a{
-  color: #5e5d72!important;
+  color: #5e5d72;
   text-decoration: none;
   display: block;
   padding: 6px 0px;
@@ -421,7 +421,16 @@ body.dark .imgUploadBox .uploadBox * { color: #ffffffb3 !important; }
 .main .sidebarWrapper .sidebar ul .submenu li a:hover{
   color: #0858f7 !important;}
 
-.main .sidebarWrapper .sidebar ul .submenuWrapper{
+body.dark .main .sidebarWrapper .sidebar ul .submenu li a.active-submenu {
+  color: #0088ff !important;}
+.sidebarWrapper .submenu li a.active-submenu {
+  color: #0088ff !important;
+  border-left: 2px solid #0088ff !important;
+  padding-left: 18px !important;
+  margin-left: -21px !important;
+  transition: ease-in-out 0s !important;}
+
+main .sidebarWrapper .sidebar ul .submenuWrapper{
   transition: all 0.3s ease-in-out;
   height: 0px;
   overflow: hidden;}

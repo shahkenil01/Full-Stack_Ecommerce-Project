@@ -41,7 +41,7 @@ const ProductsRam = () => {
           </div>
         </div>
       </form>
-      <div className="card p-4 mt-0" style={{ width: '60%'}}>
+      <div className="card p-4 mt-0" style={{ width: '55%'}}>
         <div className='table-responsive mt-3'>
           <table className="table table-bordered table-striped v-align">
             <thead className="thead-dark">

@@ -10,7 +10,6 @@ import { MdShoppingBag, MdDelete } from "react-icons/md";
 import { Button, FormControl, Pagination,  Breadcrumbs, Typography, Link as MuiLink, Rating } from '@mui/material';
 
 const Products = () => {
-  const showBy = '';
   const categoryBy = '';
 
   return (

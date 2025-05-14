@@ -129,7 +129,7 @@ const ProductUpload = () => {
       if (!formFields.price) missingFields.push('Price');
       if (!formFields.category) missingFields.push('Category');
       if (!formFields.countInStock) missingFields.push('Product Stock');
-      if (!formFields.images || formFields.images.length === 0) missingFields.push('Image');
+      if (!imagesData || imagesData.length === 0) missingFields.push('Image');
 
       if (missingFields.length > 0) {
          setLoading(false);
@@ -156,13 +156,16 @@ const ProductUpload = () => {
     setLoading(false);
 
     if (res && res._id) {
-      showToasts([{ type: "success", message: "Product uploaded successfully!" }]);
       setFormFields({
         name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
         category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0,
       });
       setTimeout(() => {
-        navigate('/products');
+        navigate('/products', {
+          state: {
+            toast: { type: "success", message: "Product uploaded successfully!" }
+          }
+        });
       }, 2000);
     } else {
       setToast({ type: "error", message: res?.message || "Failed to upload product." });
@@ -355,10 +358,10 @@ const ProductUpload = () => {
             <div className="imagesUploadSec mt-3">
               <h5 className="mb-3">Upload Image(s)</h5>
               <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
-                {imagesData.map((src, idx) => (
+                {imagesData.map((img, idx) => (
                   <div className="uploadBox" key={idx}>
                     <span className="remove" onClick={() => removeImage(idx)}><IoCloseSharp /></span>
-                    <div className="box"><img className="w-100" src={src} alt="preview" /></div>
+                    <div className="box"><img className="w-100" src={img.src} alt="preview" /></div>
                   </div>
                 ))}
                 <div className="uploadBox">

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import DashboardBox from '../Dashboard/components/dashboardBox';
 import CustomDropdown from '../../components/CustomDropdown';
@@ -22,6 +22,14 @@ const Products = () => {
       setProductList(res)
     })
   })
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.toast) {
+      setToast({ id: Date.now(), ...location.state.toast });
+    }
+  }, [location.state]);
 
   const [toast, setToast] = useState(null);
 

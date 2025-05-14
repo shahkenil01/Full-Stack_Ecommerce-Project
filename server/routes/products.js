@@ -5,6 +5,7 @@ const router = express.Router();
 
 const pLimit = require('p-limit').default;
 const cloudinary = require('cloudinary').v2;
+const { uploadImage } = require('../utils/cloudinary');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -23,16 +24,31 @@ router.get(`/`, async (req, res) => {
 
 router.post('/create', async (req, res) => {
   try {
+    const limit = pLimit(2);
     const { name, description, images, brand, price, oldPrice, category, countInStock, rating, isFeatured, numReviews } = req.body;
+    console.log("Images received from frontend:", images);
 
     if (!name || !description || !brand || !price || !category || !countInStock || !images || images.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Please fill all required fields: name, description, brand, price, category, countInStock, and at least one image.'
+        message: 'Please fill all required fields.'
       });
     }
 
-    const product = new Product({ name, description, images, brand, price, oldPrice, category, countInStock, rating, isFeatured, numReviews });
+    const imagesToUpload = images
+      .filter((img) => typeof img === 'string' && img.startsWith('data:image') || img.startsWith('http'))
+      .map((image) => limit(() => uploadImage(image)));
+    const uploadStatus = await Promise.all(imagesToUpload);
+    const imgUrls = uploadStatus.map((item) => item.secure_url);
+
+    if (!uploadStatus || imgUrls.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: 'Images could not be uploaded!'
+      });
+    }
+
+    const product = new Product({ name, description, images: imgUrls, brand, price, oldPrice, category, countInStock, rating, isFeatured, numReviews });
 
     const savedProduct = await product.save();
     res.status(201).json(savedProduct);

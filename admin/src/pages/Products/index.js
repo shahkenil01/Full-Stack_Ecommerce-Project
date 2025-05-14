@@ -8,11 +8,37 @@ import { IoMdCart, IoMdHome } from "react-icons/io";
 import { MdShoppingBag, MdDelete } from "react-icons/md";
 
 import { Button, FormControl, Pagination,  Breadcrumbs, Typography, Link as MuiLink, Rating } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { fetchDataFromApi, deleteData } from '../../utils/api';
+import Toast from "../../components/Toast";
 
 const Products = () => {
   const categoryBy = '';
 
+  const[productList, setProductList] = useState([]);
+
+  useEffect(()=>{
+    fetchDataFromApi("/api/products").then((res)=>{
+      setProductList(res)
+    })
+  })
+
+  const [toast, setToast] = useState(null);
+
+  const handleDelete = async (id) => {
+    const res = await deleteData(`/api/products/${id}`);
+    if (res?.message === "Product deleted successfully") {
+      const updated = await fetchDataFromApi("/api/products");
+      setProductList(updated);
+
+      setToast({ id: Date.now(), type: "success", message: "Product deleted successfully!" });
+    } else {
+      setToast({ id: Date.now(), type: "error", message: res?.message || "Failed to delete product." });
+    }
+  };
+
   return (
+  <>
     <div className="right-content w-100">
 
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
@@ -80,45 +106,49 @@ const Products = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center productBox">
-                    <div class="imgWrapper">
-                      <div class="img card shadow m-0">
-                        <img src="https://mironcoder-hotash.netlify.app/images/product/01.webp" alt="Product" className="w-100" />
+              { productList?.length!==0 && productList?.map((item,index)=>{
+                return(
+                  <tr key={item._id}>
+                    <td>
+                      <div class="d-flex align-items-center productBox">
+                        <div class="imgWrapper">
+                          <div class="img card shadow m-0">
+                            <img src={item.images[0]} alt={item.name} className="w-100" />
+                          </div>
+                        </div>
+                        <div class="info pl-3">
+                          <h6>{item.name}</h6>
+                          <p>{item.description}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="info pl-3">
-                      <h6>Tops and skirt set for Female...</h6>
-                      <p>Women's exclusive summer Tops and skirt set for Female Tops and skirt set</p>
-                    </div>
-                  </div>
-                </td>
-                <td>women</td>
-                <td>richman</td>
-                <td>
-                  <span class="badge badge-secondary">Lay's</span>
-                </td>
-                <td>
-                  <div style={{ width: "70px" }}>
-                    <del class="old">₹210</del>
-                    <span class="new text-danger">₹200</span>
-                  </div>
-                </td>
-                <td>
-                  <Rating name="read-only-rating" value={4.5} precision={0.5} size="small" readOnly />
-                </td>
-                <td>
-                  <div class="actions d-flex align-items-center">
-                    <Link to="/product/details">
-                      <Button className='secondary' color="secondary"><FaEye /></Button>
-                    </Link>
-                    <Button className='success' color="success"><FaPencilAlt /></Button>
-                    <Button className='error' color="error"><MdDelete /></Button>
-                    <span class="MuiTouchRipple-root css-w0pj6f"></span>
-                  </div>
-                </td>
-              </tr>
+                    </td>
+                    <td>{item.category?.name || "No Category"}</td>
+                    <td>richman</td>
+                    <td>
+                      <span class="badge badge-secondary">{item.brand}</span>
+                    </td>
+                    <td>
+                      <div style={{ width: "70px" }}>
+                        <del class="old">Rs {item.oldPrice || "No Old Price"}</del>
+                        <span class="new text-danger">Rs {item.price || "No Price"}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <Rating name="read-only-rating" value={item.rating || 0} precision={0.5} size="small" readOnly />
+                    </td>
+                    <td>
+                      <div class="actions d-flex align-items-center">
+                        <Link to="/product/details">
+                          <Button className='secondary' color="secondary"><FaEye /></Button>
+                        </Link>
+                        <Button className='success' color="success"><FaPencilAlt /></Button>
+                        <Button className='error' color="error" onClick={() => handleDelete(item._id)}><MdDelete /></Button>
+                        <span class="MuiTouchRipple-root css-w0pj6f"></span>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              }) }
             </tbody>
           </table>
           <div class="d-flex tableFooter">
@@ -127,6 +157,10 @@ const Products = () => {
         </div>
       </div>
     </div>
+    <div style={{ position: "fixed", left: "20px", bottom: "20px", zIndex: 9999, display: "flex", flexDirection: "column-reverse", gap: "5px", }}>
+      {toast && <Toast key={toast.id} type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+    </div>
+  </>
   );
 };
 

@@ -9,10 +9,15 @@ const Toast = ({ type, message, onClose }) => {
     setVisible(true);
     const timer = setTimeout(() => {
       setVisible(false);
-      setTimeout(onClose, 400);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
+    }, 2800);
+    const removeTimer = setTimeout(() => {
+      onClose(); 
+    }, 3000);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
 
   const isError = type === "error";
 

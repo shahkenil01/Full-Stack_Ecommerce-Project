@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Breadcrumbs, Typography, Link as MuiLink, Button, Rating } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoMdHome } from "react-icons/io";
 import FormControl from '@mui/material/FormControl';
 import CustomDropdown from '../../components/CustomDropdown';
@@ -9,6 +9,7 @@ import { IoCloseSharp } from 'react-icons/io5';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { fetchDataFromApi, postData } from '../../utils/api';
 import Toast from "../../components/Toast";
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 
 const ProductUpload = () => {
   const [toast, setToast] = useState(null);
@@ -72,33 +73,51 @@ const ProductUpload = () => {
 
   // IMAGE HANDLING
   const [inputType, setInputType] = useState('url');
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [imagesData, setImagesData] = useState([]);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
   const removeImage = (index) => {
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    const removed = imagesData[index];
+
+    setImagesData(prev => prev.filter((_, i) => i !== index));
+
+    if (removed.type === 'url') {
+      setFormFields(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    }
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const previews = files.map(file => URL.createObjectURL(file));
-    setImagePreviews(prev => [...prev, ...previews]);
-    setUploadedFiles(prev => [...prev, ...files]);
+
+    const images = files.map((file) => ({
+      src: URL.createObjectURL(file),
+      type: 'file',
+      file
+    }));
+
+    setImagesData(prev => [...prev, ...images]);
   };
 
   const handleImageUrlInput = () => {
     if (!imageUrlInput.trim()) return;
+
+    setImagesData(prev => [
+      ...prev,
+      { src: imageUrlInput.trim(), type: 'url' }
+    ]);
+
     setFormFields(prev => ({
       ...prev,
       images: [...prev.images, imageUrlInput.trim()]
     }));
-    setImagePreviews(prev => [...prev, imageUrlInput.trim()]);
     setImageUrlInput('');
   };
 
   // ADD Product Logic HANDLING
+  const navigate = useNavigate();
   const addProduct = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -110,7 +129,7 @@ const ProductUpload = () => {
       if (!formFields.price) missingFields.push('Price');
       if (!formFields.category) missingFields.push('Category');
       if (!formFields.countInStock) missingFields.push('Product Stock');
-      if (formFields.images.length === 0) missingFields.push('Image');
+      if (!formFields.images || formFields.images.length === 0) missingFields.push('Image');
 
       if (missingFields.length > 0) {
          setLoading(false);
@@ -120,32 +139,35 @@ const ProductUpload = () => {
 
     const finalData = { ...formFields, images: [], numReviews: 0 };
 
-    if (inputType === 'file') {
-      const toBase64 = (file) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-      });
+    const cloudinaryUrls = [];
 
-      const base64Images = await Promise.all(uploadedFiles.map(toBase64));
-      finalData.images = base64Images;
+    for (const img of imagesData) {
+      if (img.type === 'file') {
+        const url = await uploadToCloudinary(img.file);
+        if (url) cloudinaryUrls.push(url);
+      } else if (img.type === 'url') {
+        const url = await uploadToCloudinary(img.src);
+        if (url) cloudinaryUrls.push(url);
+      }
     }
+    finalData.images = cloudinaryUrls;
 
     const res = await postData('/api/products/create', finalData);
     setLoading(false);
-      if (res && res._id) {
-        setToast({ type: "success", message: "Product uploaded successfully!" });
-        setFormFields({
-          name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
-          category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0,
-        });
-        setImagePreviews([]);
-        setUploadedFiles([]);
-      } else {
-        setToast({ type: "error", message: res?.message || "Failed to upload product." });
-      }
-    };
+
+    if (res && res._id) {
+      showToasts([{ type: "success", message: "Product uploaded successfully!" }]);
+      setFormFields({
+        name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
+        category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0,
+      });
+      setTimeout(() => {
+        navigate('/products');
+      }, 2000);
+    } else {
+      setToast({ type: "error", message: res?.message || "Failed to upload product." });
+    }
+  };
 
     // Toast Error HANDLING
     const [toasts, setToasts] = useState([]);
@@ -153,10 +175,11 @@ const ProductUpload = () => {
     const showToasts = (messages) => {
       let delay = 0;
       messages.forEach((msg, index) => {
+        const toastObj = typeof msg === "string" ? { type: "error", message: msg } : msg;
         setTimeout(() => {
           setToasts((prev) => [
             ...prev,
-            { id: Date.now() + index, type: "error", message: msg },
+            { id: Date.now() + index, ...toastObj },
           ]);
         }, delay);
         delay += 300;
@@ -318,9 +341,9 @@ const ProductUpload = () => {
               </div>
 
               <div className="imgGrid d-flex mt-3">
-                {imagePreviews.map((src, idx) => (
+                {imagesData.map((img, idx) => (
                   <div className="img position-relative me-2" key={idx}>
-                    <img src={src} alt="preview" className="w-100" />
+                    <img src={img.src} alt="preview" className="w-100" />
                     <span className="remove" onClick={() => removeImage(idx)}><IoCloseSharp /></span>
                   </div>
                 ))}
@@ -332,7 +355,7 @@ const ProductUpload = () => {
             <div className="imagesUploadSec mt-3">
               <h5 className="mb-3">Upload Image(s)</h5>
               <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
-                {imagePreviews.map((src, idx) => (
+                {imagesData.map((src, idx) => (
                   <div className="uploadBox" key={idx}>
                     <span className="remove" onClick={() => removeImage(idx)}><IoCloseSharp /></span>
                     <div className="box"><img className="w-100" src={src} alt="preview" /></div>

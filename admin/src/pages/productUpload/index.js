@@ -6,19 +6,34 @@ import FormControl from '@mui/material/FormControl';
 import CustomDropdown from '../../components/CustomDropdown';
 import { FaCloudUploadAlt, FaRegImage } from 'react-icons/fa';
 import { IoCloseSharp } from 'react-icons/io5';
-import 'react-lazy-load-image-component/src/effects/blur.css';
 import { fetchDataFromApi, postData } from '../../utils/api';
 import Toast from "../../components/Toast";
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 
 const ProductUpload = () => {
+  const [toasts, setToasts] = useState([]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [category, setCategory] = useState('');
   const [formFields, setFormFields] = useState({
     name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
-    category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0
+    category: '', countInStock: 0, rating: 0, isFeatured: false
   });
+  const [rating, setRating] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetchDataFromApi(`/api/category?page=1`);
+      const all = res?.categoryList || [];
+      setCategories(all.map(cat => ({ value: cat._id, label: cat.name })));
+    })();
+  }, []);
+
+  useEffect(() => {
+    setFormFields((prev) => ({ ...prev, category, rating }));
+  }, [category, rating]);
 
   const inputChange = (e) => {
     const { name, value } = e.target;
@@ -29,7 +44,6 @@ const ProductUpload = () => {
   };
 
   // CATEGORY
-  const [category, setCategory] = useState('');
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     (async () => {
@@ -97,7 +111,17 @@ const ProductUpload = () => {
     setImagesData(prev => prev.filter((_, i) => i !== index));
   };
 
-  const navigate = useNavigate();
+  const showToasts = (messages) => {
+    let delay = 0;
+    messages.forEach((msg, index) => {
+      const toastObj = typeof msg === "string" ? { type: "error", message: msg } : msg;
+      setTimeout(() => {
+        setToast((prev) => [...prev, { id: Date.now() + index, ...toastObj }]);
+      }, delay);
+      delay += 300;
+    });
+  };
+
   const addProduct = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -111,14 +135,13 @@ const ProductUpload = () => {
       return;
     }
 
-    const finalData = { ...formFields, images: [], numReviews: 0 };
-
+    const finalData = { ...formFields, images: [] };
     const cloudinaryUrls = [];
     const uploadedSet = new Set();
 
     for (const img of imagesData) {
       let url = '';
-      if (img.type === 'file' && img.file) {
+      if (img.type === 'file') {
         const key = `${img.file.name}-${img.file.lastModified}`;
         if (uploadedSet.has(key)) continue;
         uploadedSet.add(key);
@@ -136,29 +159,16 @@ const ProductUpload = () => {
     }
 
     finalData.images = cloudinaryUrls;
-    console.log("Uploading these URLs to backend:", cloudinaryUrls);
     const res = await postData('/api/products/create', finalData);
     setLoading(false);
 
     if (res && res._id) {
-      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0 });
+      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false });
       setImagesData([]);
       navigate('/products', { state: { toast: { type: "success", message: "Product uploaded successfully!" } } });
     } else {
       setToast({ type: "error", message: res?.message || "Failed to upload product." });
     }
-  };
-
-  const [toasts, setToasts] = useState([]);
-  const showToasts = (messages) => {
-    let delay = 0;
-    messages.forEach((msg, index) => {
-      const toastObj = typeof msg === "string" ? { type: "error", message: msg } : msg;
-      setTimeout(() => {
-        setToasts((prev) => [...prev, { id: Date.now() + index, ...toastObj }]);
-      }, delay);
-      delay += 300;
-    });
   };
 
   return (

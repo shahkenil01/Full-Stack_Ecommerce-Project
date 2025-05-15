@@ -1,18 +1,25 @@
-export const uploadToCloudinary = async (file) => {
+export const uploadToCloudinary = async (fileOrUrl) => {
   const data = new FormData();
-  data.append("file", file);
-  data.append("upload_preset", "ecommerce");   // 🔁 replace this
-  data.append("cloud_name", "dksz8hsb4");      // 🔁 replace this
+
+  if (typeof fileOrUrl === 'string') {
+    const response = await fetch(fileOrUrl);
+    const blob = await response.blob();
+    fileOrUrl = new File([blob], "image.jpg", { type: blob.type });
+  }
+
+  data.append("file", fileOrUrl);
 
   try {
-    const res = await fetch("https://api.cloudinary.com/v1_1/dksz8hsb4/image/upload", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cloudinary/upload`, {
       method: "POST",
       body: data
     });
+
+    if (!res.ok) throw new Error("Upload failed");
     const json = await res.json();
     return json.secure_url;
   } catch (err) {
-    console.error("Cloudinary upload failed:", err);
+    console.error("Upload error:", err);
     return null;
   }
 };

@@ -16,17 +16,8 @@ const ProductUpload = () => {
   const [loading, setLoading] = useState(false);
 
   const [formFields, setFormFields] = useState({
-    name: '',
-    description: '',
-    images: [],
-    brand: '',
-    price: 0,
-    oldPrice: 0,
-    category: '',
-    countInStock: 0,
-    rating: 0,
-    isFeatured: false,
-    numReviews: 0,
+    name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
+    category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0
   });
 
   const inputChange = (e) => {
@@ -76,19 +67,6 @@ const ProductUpload = () => {
   const [imagesData, setImagesData] = useState([]);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
-  const removeImage = (index) => {
-    const removed = imagesData[index];
-
-    setImagesData(prev => prev.filter((_, i) => i !== index));
-
-    if (removed.type === 'url') {
-      setFormFields(prev => ({
-        ...prev,
-        images: prev.images.filter((_, i) => i !== index)
-      }));
-    }
-  };
-
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
 
@@ -98,107 +76,99 @@ const ProductUpload = () => {
       file
     }));
 
-    setImagesData(prev => [...prev, ...images]);
+    setImagesData(prev => {
+      const existingKeys = new Set(prev.map(img => `${img.file?.name}-${img.file?.lastModified}`));
+      const newUnique = images.filter(img => {
+        const key = `${img.file?.name}-${img.file?.lastModified}`;
+        return !existingKeys.has(key);
+      });
+      return [...prev, ...newUnique];
+    });
   };
 
   const handleImageUrlInput = () => {
-    if (!imageUrlInput.trim()) return;
-
-    setImagesData(prev => [
-      ...prev,
-      { src: imageUrlInput.trim(), type: 'url' }
-    ]);
-
-    setFormFields(prev => ({
-      ...prev,
-      images: [...prev.images, imageUrlInput.trim()]
-    }));
+    const url = imageUrlInput.trim();
+    if (!url || imagesData.some(img => img.src === url)) return;
+    setImagesData(prev => [...prev, { src: url, type: 'url' }]);
     setImageUrlInput('');
   };
 
-  // ADD Product Logic HANDLING
+  const removeImage = (index) => {
+    setImagesData(prev => prev.filter((_, i) => i !== index));
+  };
+
   const navigate = useNavigate();
   const addProduct = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const missingFields = [];
-      if (!formFields.name) missingFields.push('Product Name');
-      if (!formFields.description) missingFields.push('Description');
-      if (!formFields.brand) missingFields.push('Brand');
-      if (!formFields.price) missingFields.push('Price');
-      if (!formFields.category) missingFields.push('Category');
-      if (!formFields.countInStock) missingFields.push('Product Stock');
-      if (!imagesData || imagesData.length === 0) missingFields.push('Image');
-
-      if (missingFields.length > 0) {
-         setLoading(false);
-         showToasts(missingFields.map(field => `Please fill ${field}`));
-        return;
-      }
+    const requiredFields = ['name', 'description', 'brand', 'price', 'category', 'countInStock'];
+    const missingFields = requiredFields.filter(f => !formFields[f]);
+    if (imagesData.length === 0) missingFields.push('Image');
+    if (missingFields.length > 0) {
+      setLoading(false);
+      showToasts(missingFields.map(f => `Please fill ${f}`));
+      return;
+    }
 
     const finalData = { ...formFields, images: [], numReviews: 0 };
 
     const cloudinaryUrls = [];
+    const uploadedSet = new Set();
 
     for (const img of imagesData) {
-      if (img.type === 'file') {
-        const url = await uploadToCloudinary(img.file);
-        if (url) cloudinaryUrls.push(url);
+      let url = '';
+      if (img.type === 'file' && img.file) {
+        const key = `${img.file.name}-${img.file.lastModified}`;
+        if (uploadedSet.has(key)) continue;
+        uploadedSet.add(key);
+        url = await uploadToCloudinary(img.file);
       } else if (img.type === 'url') {
-        const url = await uploadToCloudinary(img.src);
-        if (url) cloudinaryUrls.push(url);
+        if (img.src.includes('res.cloudinary.com')) {
+          url = img.src;
+        } else {
+          if (uploadedSet.has(img.src)) continue;
+          uploadedSet.add(img.src);
+          url = await uploadToCloudinary(img.src);
+        }
       }
+      if (url && !cloudinaryUrls.includes(url)) cloudinaryUrls.push(url);
     }
-    finalData.images = cloudinaryUrls;
 
+    finalData.images = cloudinaryUrls;
+    console.log("Uploading these URLs to backend:", cloudinaryUrls);
     const res = await postData('/api/products/create', finalData);
     setLoading(false);
 
     if (res && res._id) {
-      setFormFields({
-        name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
-        category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0,
-      });
-      setTimeout(() => {
-        navigate('/products', {
-          state: {
-            toast: { type: "success", message: "Product uploaded successfully!" }
-          }
-        });
-      }, 2000);
+      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, numReviews: 0 });
+      setImagesData([]);
+      navigate('/products', { state: { toast: { type: "success", message: "Product uploaded successfully!" } } });
     } else {
       setToast({ type: "error", message: res?.message || "Failed to upload product." });
     }
   };
 
-    // Toast Error HANDLING
-    const [toasts, setToasts] = useState([]);
-
-    const showToasts = (messages) => {
-      let delay = 0;
-      messages.forEach((msg, index) => {
-        const toastObj = typeof msg === "string" ? { type: "error", message: msg } : msg;
-        setTimeout(() => {
-          setToasts((prev) => [
-            ...prev,
-            { id: Date.now() + index, ...toastObj },
-          ]);
-        }, delay);
-        delay += 300;
-      });
-    };
+  const [toasts, setToasts] = useState([]);
+  const showToasts = (messages) => {
+    let delay = 0;
+    messages.forEach((msg, index) => {
+      const toastObj = typeof msg === "string" ? { type: "error", message: msg } : msg;
+      setTimeout(() => {
+        setToasts((prev) => [...prev, { id: Date.now() + index, ...toastObj }]);
+      }, delay);
+      delay += 300;
+    });
+  };
 
   return (
     <div className="right-content w-100 product-upload">
-    <div
-      style={{ position: "fixed", left: "20px", bottom: "20px", zIndex: 9999, display: "flex", flexDirection: "column-reverse", gap: "5px", }}>
-      {toasts.map((toastObj) => (
-        <Toast key={toastObj.id} type={toastObj.type} message={toastObj.message}
-          onClose={() => setToasts((prev) => prev.filter((t) => t.id !== toastObj.id)) }/>
-      ))}
-    </div>
-
+      <div style={{ position: "fixed", left: "20px", bottom: "20px", zIndex: 9999, display: "flex", flexDirection: "column-reverse", gap: "5px" }}>
+        {toasts.map((toastObj) => (
+          <Toast key={toastObj.id} type={toastObj.type} message={toastObj.message} onClose={() => setToasts((prev) => prev.filter((t) => t.id !== toastObj.id))} />
+        ))}
+      </div>
+      {/* BREADCRUMB */}
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Product Upload</h5>
         <Breadcrumbs aria-label="breadcrumb">
@@ -330,16 +300,10 @@ const ProductUpload = () => {
           </div>
 
           {inputType === 'url' && (
-            <div className="form-group mt-3 be">
+            <div className="form-group mt-3">
               <h6 className="text-uppercase">Product Image</h6>
               <div className="position-relative inputBtn">
-                <input
-                  type="text"
-                  value={imageUrlInput}
-                  onChange={(e) => setImageUrlInput(e.target.value)}
-                  placeholder="Enter image URL"
-                  style={{ paddingRight: '80px' }}
-                />
+                <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" style={{ paddingRight: '80px' }} />
                 <Button className="btn-blue" type="button" onClick={handleImageUrlInput}>Add</Button>
               </div>
 
@@ -373,9 +337,7 @@ const ProductUpload = () => {
           )}
 
           <Button type="submit" className="btn-blue btn-lg btn-big w-100 mt-4" disabled={loading}>
-            <FaCloudUploadAlt />
-            &nbsp;
-            {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}
+            <FaCloudUploadAlt /> &nbsp; {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}
           </Button>
         </div>
       </form>

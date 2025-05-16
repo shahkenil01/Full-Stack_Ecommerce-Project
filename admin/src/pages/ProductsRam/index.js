@@ -11,7 +11,7 @@ const ProductsRam = () => {
     <div className="right-content w-100 product-upload">
 
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
-        <h5 className="mb-0">Add Category</h5>
+        <h5 className="mb-0">Add Product RAM</h5>
         <Breadcrumbs aria-label="breadcrumb">
           <MuiLink component={Link} to="/" underline="hover" color="inherit" className="breadcrumb-link">
             <IoMdHome />Dashboard

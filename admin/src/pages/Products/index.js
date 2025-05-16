@@ -15,7 +15,7 @@ import Toast from "../../components/Toast";
 const Products = () => {
   const categoryBy = '';
 
-  const[productList, setProductList] = useState([]);
+  const [productList, setProductList] = useState([]);
 
   useEffect(()=>{
     fetchDataFromApi("/api/products").then((res)=>{

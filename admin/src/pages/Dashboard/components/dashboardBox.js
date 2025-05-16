@@ -22,16 +22,10 @@ const DashboardBox = ({ title, value, icon, grow, color, noFooter }) => {
   };
 
   return (
-    <div
-      className="dashboardBox"
-      style={{
-        backgroundImage: `linear-gradient(to right, ${color?.[0]}, ${color?.[1]})`,
-        border: "none",
-        padding: "16px",
-        borderRadius: "12px",
-        cursor: "pointer",
-      }}
-    >
+    <div className="dashboardBox"
+      style={{ backgroundImage: `linear-gradient(to right, ${color?.[0]}, ${color?.[1]})`,
+        border: "none", padding: "16px", borderRadius: "12px", cursor: "pointer",
+      }}>
       <span className="chart">
         {grow ? <TrendingUpIcon /> : <TrendingDownIcon />}
       </span>

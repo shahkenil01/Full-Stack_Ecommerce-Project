@@ -4,7 +4,6 @@ import logo from '../../assets/images/logo.png';
 import Button from '@mui/material/Button';
 import { MdMenuOpen } from 'react-icons/md';
 import { MdOutlineMenu } from 'react-icons/md';
-import SearchBox from '../SearchBox';
 import { MdOutlineLightMode } from 'react-icons/md';
 import { IoIosMoon } from "react-icons/io";
 import { FaRegBell } from 'react-icons/fa6';
@@ -57,7 +56,6 @@ const Header = () => {
                   context.isToggleSidebar===false ? <MdMenuOpen /> : <MdOutlineMenu/>
                 }
               </Button>
-              <SearchBox />
             </div>
 
             <div className="col-sm-7 d-flex align-items-center justify-content-end part3">

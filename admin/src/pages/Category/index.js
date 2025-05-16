@@ -121,7 +121,7 @@ const Category = () => {
             </tbody>
 
           </table>
-          <div class="d-flex tableFooter">
+          <div className="d-flex tableFooter">
             <Pagination count={catData?.totalPages} color="primary" className='pagination' onChange={handleChange} />
           </div>
         </div>

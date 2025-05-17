@@ -18,9 +18,9 @@ const Footer = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-6">
-                            <p class="text-white mb-1">20% discount for your first order</p>
-                            <h3 class="text-white">Join our newsletter and get...</h3>
-                            <p class="text-light">Join our email subscription now to get updates on <br /> promotions and coupons.</p><br/>
+                            <p className="text-white mb-1">20% discount for your first order</p>
+                            <h3 className="text-white">Join our newsletter and get...</h3>
+                            <p className="text-light">Join our email subscription now to get updates on <br /> promotions and coupons.</p><br/>
                             <form>
                                 <IoMailOutline/>
                                 <input type="text" placeholder="Your Email Address"/>

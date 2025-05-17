@@ -46,7 +46,7 @@ const ProductDetails = () =>{
                                 <span className="oldPrice">Rs: 1000</span>
                                 <span className="netPrice text-danger ml-2">Rs: 500</span>
                             </div>
-                            <span class="badge bg-success mt-3">IN STOCK</span>
+                            <span className="badge bg-success mt-3">IN STOCK</span>
                             <p className="mt-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                             </p>
@@ -120,79 +120,79 @@ const ProductDetails = () =>{
                                 <div className="table-responsive">
                                     <table className="table table-bordered mb-5">
                                         <tbody>
-                                        <tr class="stand-up">
+                                        <tr className="stand-up">
                                           <th>Stand Up</th>
                                           <td>
                                             <p>35”L x 24”W x 37-45”H (front to back wheel)</p>
                                           </td>
                                         </tr>
-                                        <tr class="folded-wo-wheels">
+                                        <tr className="folded-wo-wheels">
                                           <th>Folded (w/o wheels)</th>
                                           <td>
                                             <p>32.5"L x 18.5”W x 16.5”H</p>
                                           </td>
                                         </tr>
-                                        <tr class="folded-w-wheels">
+                                        <tr className="folded-w-wheels">
                                           <th>Folded (w/ wheels)</th>
                                           <td>
                                             <p>32.5"L x 24”W x 18.5”H</p>
                                           </td>
                                         </tr>
-                                        <tr class="door-pass-through">
+                                        <tr className="door-pass-through">
                                           <th>Door Pass Through</th>
                                           <td>
                                             <p>24"</p>
                                           </td>
                                         </tr>
-                                        <tr class="weight-wo-wheels">
+                                        <tr className="weight-wo-wheels">
                                           <th>Weight (w/o wheels)</th>
                                           <td>
                                             <p>20 LBS</p>
                                           </td>
                                         </tr>
-                                        <tr class="weight-capacity">
+                                        <tr className="weight-capacity">
                                           <th>Weight Capacity</th>
                                           <td>
                                             <p>60 LBS</p>
                                           </td>
                                         </tr>
-                                        <tr class="width">
+                                        <tr className="width">
                                           <th>Width</th>
                                           <td>
                                             <p>24"</p>
                                           </td>
                                         </tr>
-                                        <tr class="handle-height-ground-to-handle">
+                                        <tr className="handle-height-ground-to-handle">
                                           <th>Handle height (ground to handle)</th>
                                           <td>
                                             <p>37-45"</p>
                                           </td>
                                         </tr>
-                                        <tr class="wheels">
+                                        <tr className="wheels">
                                           <th>Wheels</th>
                                           <td>
                                             <p>12” air / wide track slick tread</p>
                                           </td>
                                         </tr>
-                                        <tr class="seat-back-height">
+                                        <tr className="seat-back-height">
                                           <th>Seat back height</th>
                                           <td>
                                             <p>21.5"</p>
                                           </td>
                                         </tr>
-                                        <tr class="head-room">
+                                        <tr className="head-room">
                                           <th>Head room (inside canopy)</th>
                                           <td>
                                             <p>25"</p>
                                           </td>
                                         </tr>
-                                        <tr class="pa_color">
+                                        <tr className="pa_color">
                                           <th>Color</th>
                                           <td>
                                             <p>Black, Blue, Red, White</p>
                                           </td>
                                         </tr>
-                                        <tr class="pa_size">
+                                        <tr className="pa_size">
                                           <th>Size</th>
                                           <td>
                                             <p>M, S</p>
@@ -234,8 +234,8 @@ const ProductDetails = () =>{
 
                                     <form className='reviewForm'>
                                         <h4>Add a review</h4>
-                                        <div class="form-group">
-                                            <textarea class="form-control shadow" placeholder="Write a Review" name="review"></textarea>
+                                        <div className="form-group">
+                                            <textarea className="form-control shadow" placeholder="Write a Review" name="review"></textarea>
                                         </div>
 
                                             <div className='row'>

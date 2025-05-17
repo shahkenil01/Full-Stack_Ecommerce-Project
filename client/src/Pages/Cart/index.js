@@ -12,7 +12,7 @@ const Cart = () => {
         <div className="container">
           <h2 className="hd mb-1">Your Cart</h2>
           <p>
-            There are <b class="text-red">3</b> products in your cart
+            There are <b className="text-red">3</b> products in your cart
           </p>
           <div className="row">
             <div className="col-md-9 pr-5">

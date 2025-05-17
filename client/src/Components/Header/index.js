@@ -25,7 +25,7 @@ const Header= ()=>{
                     <div className="container">
                         <div className="row">
                             <div className="logoWrapper col-sm-2 d-flex align-items-center ">
-                                <Link class="logo" to={'/'}><img src={Logo} alt='Logo' /></Link>
+                                <Link className="logo" to={'/'}><img src={Logo} alt='Logo' /></Link>
                             </div>
 
                             <div className='part2 col-sm-10 d-flex align-items-center'>

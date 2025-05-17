@@ -11,7 +11,7 @@ const HomeCat = () => {
         <div className="container">
             <section className="homeCat">
             <div className="container">
-                <h3 class="mb-3 hd">Featured Categories</h3>
+                <h3 className="mb-3 hd">Featured Categories</h3>
                 <Swiper
                     slidesPerView={8}
                     spaceBetween={8}

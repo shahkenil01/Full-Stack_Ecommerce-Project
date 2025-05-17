@@ -118,13 +118,13 @@ const Products = () => {
                 return(
                   <tr key={item._id}>
                     <td>
-                      <div class="d-flex align-items-center productBox">
-                        <div class="imgWrapper">
-                          <div class="img card shadow m-0">
+                      <div className="d-flex align-items-center productBox">
+                        <div className="imgWrapper">
+                          <div className="img card shadow m-0">
                             <img src={item.images[0]} alt={item.name} className="w-100" />
                           </div>
                         </div>
-                        <div class="info pl-3">
+                        <div className="info pl-3">
                           <h6>{item.name}</h6>
                           <p>{item.description}</p>
                         </div>
@@ -133,25 +133,25 @@ const Products = () => {
                     <td>{item.category?.name || "No Category"}</td>
                     <td>richman</td>
                     <td>
-                      <span class="badge badge-secondary">{item.brand}</span>
+                      <span className="badge badge-secondary">{item.brand}</span>
                     </td>
                     <td>
                       <div style={{ width: "70px" }}>
-                        <del class="old">Rs {item.oldPrice || "No Old Price"}</del>
-                        <span class="new text-danger">Rs {item.price || "No Price"}</span>
+                        <del className="old">Rs {item.oldPrice || "No Old Price"}</del>
+                        <span className="new text-danger">Rs {item.price || "No Price"}</span>
                       </div>
                     </td>
                     <td>
                       <Rating name="read-only-rating" value={item.rating || 0} precision={0.5} size="small" readOnly />
                     </td>
                     <td>
-                      <div class="actions d-flex align-items-center">
+                      <div className="actions d-flex align-items-center">
                         <Link to="/product/details">
                           <Button className='secondary' color="secondary"><FaEye /></Button>
                         </Link>
                         <Button className='success' color="success"><FaPencilAlt /></Button>
                         <Button className='error' color="error" onClick={() => handleDelete(item._id)}><MdDelete /></Button>
-                        <span class="MuiTouchRipple-root css-w0pj6f"></span>
+                        <span className="MuiTouchRipple-root css-w0pj6f"></span>
                       </div>
                     </td>
                   </tr>
@@ -159,7 +159,7 @@ const Products = () => {
               }) }
             </tbody>
           </table>
-          <div class="d-flex tableFooter">
+          <div className="d-flex tableFooter">
             <Pagination count={10} color="primary" className='pagination'/>
           </div>
         </div>

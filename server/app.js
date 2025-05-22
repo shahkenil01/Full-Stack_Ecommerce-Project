@@ -12,12 +12,12 @@ app.options('*', cors());
 app.use(bodyParser.json());
 
 //Routes
-const categoryRoutes = require('./routes/categories')
+const categoryRoutes = require('./routes/categories');
 const productRoutes = require('./routes/products');
 const uploadRoutes = require('./routes/upload');
 
-app.use(`/api/category`, categoryRoutes)
-app.use(`/api/products`, productRoutes)
+app.use(`/api/category`, categoryRoutes);
+app.use(`/api/products`, productRoutes);
 app.use('/api/cloudinary', uploadRoutes);
 
 // Database

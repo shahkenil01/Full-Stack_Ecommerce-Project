@@ -13,12 +13,20 @@ cloudinary.config({
 
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
-    const fileBuffer = req.file.buffer;
-    const base64 = fileBuffer.toString("base64");
-    const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+    let dataUri;
+
+    if (req.file) {
+      const fileBuffer = req.file.buffer;
+      const base64 = fileBuffer.toString("base64");
+      dataUri = `data:${req.file.mimetype};base64,${base64}`;
+    } else if (req.body.url) {
+      dataUri = req.body.url;
+    } else {
+      return res.status(400).json({ message: "No image provided." });
+    }
 
     const result = await cloudinary.uploader.upload(dataUri, {
-      upload_preset: "ecommerce"
+      upload_preset: "ecommerce",
     });
 
     res.status(200).json({ secure_url: result.secure_url });
@@ -27,5 +35,6 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     res.status(500).json({ message: "Upload failed", error: err.message });
   }
 });
+
 
 module.exports = router;

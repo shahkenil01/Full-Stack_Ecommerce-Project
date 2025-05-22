@@ -1052,6 +1052,10 @@ textarea {
 
 .form .form-group{
   margin-bottom: 25px;}
+.bottom{
+  margin-bottom: -5px !important;}
+.top{
+  margin-top: -20px;}
 .form .form-group h6 {
   font-size: 13px;
   margin-bottom: 10px;}
@@ -1163,6 +1167,22 @@ textarea {
 @keyframes spin {
   to {
     transform: rotate(360deg); }}
+
+.dot-loader-sm {
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+.dot-loader-sm {
+  width: 14px;
+  height: 14px;
+}
 
 #nprogress {
   pointer-events: none;}

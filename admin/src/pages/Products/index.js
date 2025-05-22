@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import DashboardBox from '../Dashboard/components/dashboardBox';
 import CustomDropdown from '../../components/CustomDropdown';
@@ -8,7 +9,6 @@ import { IoMdCart, IoMdHome } from "react-icons/io";
 import { MdShoppingBag, MdDelete } from "react-icons/md";
 
 import { Button, FormControl, Pagination,  Breadcrumbs, Typography, Link as MuiLink, Rating } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { fetchDataFromApi, deleteData } from '../../utils/api';
 import Toast from "../../components/Toast";
 
@@ -24,14 +24,14 @@ const Products = () => {
   })
 
   const location = useLocation();
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (location.state?.toast) {
       setToast({ id: Date.now(), ...location.state.toast });
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [location.state]);
-
-  const [toast, setToast] = useState(null);
 
   const handleDelete = async (id) => {
     const res = await deleteData(`/api/products/${id}`);
@@ -149,7 +149,7 @@ const Products = () => {
                         <Link to="/product/details">
                           <Button className='secondary' color="secondary"><FaEye /></Button>
                         </Link>
-                        <Button className='success' color="success"><FaPencilAlt /></Button>
+                        <Link to={`/product/edit/${item._id}`}> <Button className='success' color="success"><FaPencilAlt /></Button> </Link>
                         <Button className='error' color="error" onClick={() => handleDelete(item._id)}><MdDelete /></Button>
                         <span className="MuiTouchRipple-root css-w0pj6f"></span>
                       </div>

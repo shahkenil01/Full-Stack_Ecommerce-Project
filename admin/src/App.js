@@ -19,6 +19,7 @@ import TopLoadingBar from './components/TopLoadingBar';
 import ProductsRam from './pages/ProductsRam';
 import ProductsWeight from './pages/ProductsWeight';
 import ProductsSize from './pages/ProductsSize';
+import ProductEdit from './pages/productEdit';
 
 const MyContext = createContext();
 
@@ -55,7 +56,7 @@ function AppWrapper() {
   };
 
   const routes = [ { path: "/" }, { path: "/dashboard" }, { path: "/login" }, { path: "/signup" }, { path: "/products" }, { path: "/product/details" },
-    { path: "/product/upload" }, { path: "/productRAMS/add" }, { path: "/productWEIGHT/add" }, { path: "/productSIZE/add" },
+    { path: "/product/upload" }, { path: "/productRAMS/add" }, { path: "/productWEIGHT/add" }, { path: "/productSIZE/add" }, { path: "/product/edit/:id" },
     { path: "/category" }, { path: "/category/add" },  { path: "/subCategory" }, { path: "/subCategory/add" }, { path: "/category/edit/:id" }
   ];
 
@@ -93,6 +94,7 @@ function AppWrapper() {
             <Route path="/products" element={<Products />} />
             <Route path="/product/details" element={<ProductDetails />} />
             <Route path="/product/upload" element={<ProductUpload />} />
+            <Route path="/product/edit/:id" element={<ProductEdit />} />
             <Route path="/productRAMS/add" element={<ProductsRam />} />
             <Route path="/productWEIGHT/add" element={<ProductsWeight />} />
             <Route path="/productSIZE/add" element={<ProductsSize />} />

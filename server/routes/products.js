@@ -97,7 +97,7 @@ router.put('/:id', async (req, res) => {
     const toDelete = oldUrls.filter(u => !newUrls.includes(u));
 
     // ─── 2) Delete only those removed from Cloudinary ───────────────────────
-    for (const url of removed) {
+    for (const url of toDelete) {
       if (typeof url === 'string' && url.includes('res.cloudinary.com')) {
         const parts = url.split('/');
         const publicId = parts.pop().split('.')[0];

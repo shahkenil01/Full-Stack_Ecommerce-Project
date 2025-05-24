@@ -11,15 +11,15 @@ import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
 import ProductDetails from './pages/ProductDetails';
 import Products from './pages/Products';
-import ProductUpload from './pages/productUpload';
+import ProductUpload from './pages/Products/ProductUpload';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';
 import TopLoadingBar from './components/TopLoadingBar';
-import ProductsRam from './pages/ProductsRam';
-import ProductsWeight from './pages/ProductsWeight';
-import ProductsSize from './pages/ProductsSize';
-import ProductEdit from './pages/productEdit';
+import ProductsRam from './pages/Products/ProductsRam';
+import ProductsWeight from './pages/Products/ProductsWeight';
+import ProductsSize from './pages/Products/ProductsSize';
+import ProductEdit from './pages/Products/ProductEdit';
 
 const MyContext = createContext();
 
@@ -38,8 +38,7 @@ function AppWrapper() {
     document.body.classList.remove('dark');
     document.body.classList.add('light');
     localStorage.setItem('themeMode','light');
-  }
-  else{
+  } else{
     document.body.classList.remove('light');
     document.body.classList.add('dark');
     localStorage.setItem('themeMode','dark');
@@ -55,35 +54,55 @@ function AppWrapper() {
     setThemeMode
   };
 
-  const routes = [ { path: "/" }, { path: "/dashboard" }, { path: "/login" }, { path: "/signup" }, { path: "/products" }, { path: "/product/details" },
-    { path: "/product/upload" }, { path: "/productRAMS/add" }, { path: "/productWEIGHT/add" }, { path: "/productSIZE/add" }, { path: "/product/edit/:id" },
-    { path: "/category" }, { path: "/category/add" },  { path: "/subCategory" }, { path: "/subCategory/add" }, { path: "/category/edit/:id" }
+  const routes = [
+    { path: '/' },
+    { path: '/dashboard' },
+    { path: '/login' },
+    { path: '/signup' },
+    { path: '/products' },
+    { path: '/product/details' },
+    { path: '/product/upload' },
+    { path: '/productRAMS/add' },
+    { path: '/productWEIGHT/add' },
+    { path: '/productSIZE/add' },
+    { path: '/product/edit/:id' },
+    { path: '/category' },
+    { path: '/category/add' },
+    { path: '/subCategory' },
+    { path: '/subCategory/add' },
+    { path: '/category/edit/:id' },
   ];
 
   const matchedRoutes = matchRoutes(routes, location);
   const skipLoaderRoutes = [
-    '/login', '/signup', '/category/add', '/product/upload', '/productRAMS/add', '/productWEIGHT/add', '/productSIZE/add'
+    '/login',
+    '/signup',
+    '/category/add',
+    '/product/upload',
+    '/productRAMS/add',
+    '/productWEIGHT/add',
+    '/productSIZE/add',
   ];
-  const dynamicSkipRoutes = [ '/category/edit/', '/product/edit/', ];
+  const dynamicSkipRoutes = ['/category/edit/', '/product/edit/'];
 
   const hideLayout = !matchedRoutes || ['/login', '/signup'].includes(location.pathname);
   
   const isNotFoundPage = !matchedRoutes;
   const skipLoader =
-    isNotFoundPage || skipLoaderRoutes.includes(location.pathname) ||
-    dynamicSkipRoutes.some(path => location.pathname.startsWith(path));
+    isNotFoundPage ||
+    skipLoaderRoutes.includes(location.pathname) ||
+    dynamicSkipRoutes.some((path) => location.pathname.startsWith(path));
 
   return (
     <MyContext.Provider value={values}>
-    <TopLoadingBar skip={skipLoader} />
-      { !hideLayout && <Header /> }
-      <div className='main d-flex'>
-        {
-          !hideLayout && 
+      <TopLoadingBar skip={skipLoader} />
+      {!hideLayout && <Header />}
+      <div className="main d-flex">
+        {!hideLayout && (
           <div className={`sidebarWrapper ${isToggleSidebar ? 'toggle' : ''}`}>
             <Sidebar />
           </div>
-        }
+        )}
 
         <div className={`content ${hideLayout ? 'full' : ''} ${isToggleSidebar ? 'toggle' : ''}`}>
           <Routes>
@@ -111,7 +130,6 @@ function AppWrapper() {
   );
 }
 
-
 function App() {
   return (
     <BrowserRouter>
@@ -122,4 +140,4 @@ function App() {
 }
 
 export default App;
-export {MyContext}
+export { MyContext };

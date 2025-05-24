@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_URL = process.env.NODE_ENV === "development"
+    ? process.env.REACT_APP_BACKEND_URL
+    : "https://full-stack-ecommerce-project-u0om.onrender.com";
 
 export const fetchDataFromApi = async (url) => {
   try {

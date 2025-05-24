@@ -673,8 +673,7 @@ body.dark .dropdown-item:focus {
 .card{
   margin: 20px 0px;
   border-radius: 10px;
-  overflow: visible !important;
-  overflow: hidden;}
+  overflow: visible !important;}
 .card .hd{
   font-size: 18px;
   font-weight: bold;
@@ -715,6 +714,9 @@ table tbody .actions button.error{
 table.v-align td{
   vertical-align: middle;}
 
+.card .border{
+  overflow: hidden !important;}
+
 table td .imgWrapper{
   width: 20%;
   flex: 0 0 20%;}
@@ -737,7 +739,7 @@ table td .info p{
   color: #5e5d72;
   margin-bottom: 0px;}
 table.v-align td .productBox{
-  width: 270px;}
+  width: 260px;}
 
 table td .new, table td .old {
   display: block;
@@ -751,6 +753,11 @@ table td .new, table td .old {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 0px;}
+
+.MuiTablePagination-actions, .MuiTablePagination-select{
+  margin-top: -14px;}
+body.dark .css-mmygx2-MuiSelect-select-MuiInputBase-input{
+  color: white !important;}
 
 .loginSection{
   width: 100%;

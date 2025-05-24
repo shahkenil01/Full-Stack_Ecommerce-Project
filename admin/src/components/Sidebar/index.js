@@ -1,24 +1,20 @@
-import Button from '@mui/material/Button';
-import { useLocation } from 'react-router-dom';
-import { MdDashboard } from "react-icons/md";
-import { FaAngleRight } from "react-icons/fa";
-import { FaProductHunt } from "react-icons/fa";
-import { TbCategoryFilled } from "react-icons/tb";
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import { MdDashboard } from "react-icons/md";
+import { FaAngleRight, FaProductHunt } from "react-icons/fa";
+import { TbCategoryFilled } from "react-icons/tb";
 import { IoMdLogOut } from "react-icons/io";
 
 const Sidebar = () => {
-
   const [activeTab, setActiveTab] = useState(0);
   const [isOpen, setIsOpen] = useState(Array(12).fill(false));
+  const location = useLocation();
 
   const handleTabClick = (index) => {
     setActiveTab(index);
     setIsOpen(prev => prev.map((state, i) => i === index ? !state : false));
   };
-
-  const location = useLocation();
 
   const isActive = (path) => location.pathname.startsWith(path);
 
@@ -33,12 +29,7 @@ const Sidebar = () => {
     const found = Object.entries(pathToTabIndex).find(([prefix]) =>
       location.pathname.startsWith(prefix)
     );
-
-    if (found) {
-      setActiveTab(found[1]);
-    } else {
-      setActiveTab(0);
-    }
+    setActiveTab(found ? found[1] : 0);
   }, [location.pathname]);
 
   return (
@@ -46,20 +37,16 @@ const Sidebar = () => {
       <ul>
         <li>
           <Link to="/">
-            <Button className={`w-100 ${activeTab === 0 && 
-              !location.pathname.startsWith('/products') && !location.pathname.startsWith('/product/detail') && !location.pathname.startsWith('/product/upload') &&
-              !location.pathname.startsWith('/productRAMS/add') && !location.pathname.startsWith('/productWEIGHT/add') && !location.pathname.startsWith('/productSIZE/add') &&
-              !location.pathname.startsWith('/category') && !location.pathname.startsWith('/category/add') && !location.pathname.startsWith('/subCategory') &&
-              !location.pathname.startsWith('/subCategory') ? 'active' : ''}`} 
-              onClick={() => handleTabClick(0)}>
+            <Button className={`w-100 ${activeTab === 0 && 'active'}`}
+              onClick={() => handleTabClick(0)} >
               <span className='icon'><MdDashboard /></span>
               Dashboard
             </Button>
           </Link>
         </li>
         <li>
-          <Button className={`w-100 ${isActive('/products') || isActive('/product/details') || isActive('/product/upload') || isActive('/product/edit') ||
-            isActive('/productRAMS/add') || isActive('/productWEIGHT/add') || isActive('/productSIZE/add') || activeTab === 1 ? 'active' : ''}`} onClick={() => handleTabClick(1)}>
+          <Button className={`w-100 ${isActive('/products') || activeTab === 1 ? 'active' : ''}`}
+            onClick={() => handleTabClick(1)} >
             <span className='icon'><FaProductHunt /></span>
             Products
             <span className={`arrow ${isOpen[1] ? 'rotate' : ''}`}><FaAngleRight /></span>
@@ -75,8 +62,8 @@ const Sidebar = () => {
           </div>
         </li>
         <li>
-          <Button className={`w-100 ${isActive('/category') || isActive('/category/add') || isActive('/subCategory') || 
-            isActive('/subCategory/add') || activeTab === 2 ? 'active' : ''}`} onClick={() => handleTabClick(2)}>
+          <Button className={`w-100 ${isActive('/category') || activeTab === 2 ? 'active' : ''}`}
+            onClick={() => handleTabClick(2)} >
             <span className='icon'><TbCategoryFilled /></span>
             Category
             <span className={`arrow ${isOpen[2] ? 'rotate' : ''}`}><FaAngleRight /></span>

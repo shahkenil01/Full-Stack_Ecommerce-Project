@@ -1,18 +1,29 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 import { FaUserCircle, FaEye, FaPencilAlt } from "react-icons/fa";
 import { IoMdCart } from "react-icons/io";
 import { MdShoppingBag, MdDelete } from "react-icons/md";
 import { GiStarsStack } from "react-icons/gi";
-import { Button, FormControl, Pagination, Rating } from "@mui/material";
+import { Button, FormControl, Rating, TablePagination } from "@mui/material";
+
+import { fetchDataFromApi } from "../../utils/api";
 
 import DashboardBox from './components/dashboardBox';
 import CustomDropdown from '../../components/CustomDropdown';
-
 import SearchBox from "../../components/SearchBox";
 
 const Dashboard = () => {
   const [categoryBy, setCategoryBy] = useState('');
+  const [productList, setProductList] = useState([]);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  useEffect(() => {
+    fetchDataFromApi("/api/products").then((res) => {
+      setProductList(res || []);
+    });
+  }, []);
 
   return (
     <div className="right-content home w-100">
@@ -59,176 +70,63 @@ const Dashboard = () => {
           <table className="table table-bordered v-align">
             <thead className="thead-dark">
               <tr>
-                <th>UID</th>
-                <th style={{ width: "300px" }}>PRODUCT</th>
-                <th>CATEGORY</th>
-                <th>BRAND</th>
+                <th>PRODUCT</th>
+                <th style={{ width: "100px" }}>CATEGORY</th>
+                <th style={{ width: "150px" }}>SUB CATEGORY</th>
+                <th style={{ width: "120px" }}>BRAND</th>
                 <th>PRICE</th>
-                <th>STOCK</th>
                 <th>RATING</th>
-                <th>ORDER</th>
-                <th>SALES</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>#1</td>
-                <td>
-                  <div className="d-flex align-items-center productBox">
-                    <div className="imgWrapper">
-                      <div className="img card shadow m-0">
-                        <img src="https://mironcoder-hotash.netlify.app/images/product/01.webp" alt="product" className="w-100"/>
+              {productList?.length > 0 ? productList
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) .map((item, index) => (
+                <tr key={item._id}>
+                  <td>
+                    <div className="d-flex align-items-center productBox">
+                      <div className="imgWrapper">
+                        <div className="img card border shadow m-0">
+                          <img src={item.images[0]} alt={item.name} className="w-100" />
+                        </div>
+                      </div>
+                      <div className="info pl-3">
+                        <h6>{item.name}</h6>
+                        <p>{item.description}</p>
                       </div>
                     </div>
-                    <div className="info pl-3">
-                      <h6>Tops and skirt set for Female...</h6>
-                      <p>Women's exclusive summer Tops and skirt set for Female Tops and skirt set</p>
+                  </td>
+                  <td>{item.category?.name || "No Category"}</td>
+                  <td>Men Bags</td>
+                  <td><span className="badge badge-secondary">{item.brand}</span></td>
+                  <td>
+                    <div style={{ width: "70px" }}>
+                      <del className="old">₹{item.oldPrice || "0"}</del>
+                      <span className="new text-danger">₹{item.price || "0"}</span>
                     </div>
-                  </div>
-                </td>
-                <td>women</td>
-                <td>richman</td>
-                <td>
-                  <div style={{ width: "70px" }}>
-                    <del className="old">₹210</del>
-                    <span className="new text-danger">₹200</span>
-                  </div>
-                </td>
-                <td>
-                  <Rating name="read-only-rating" value={4.5} precision={0.5} size="small" readOnly />
-                </td>
-                <td>4.9(16)</td>
-                <td>380</td>
-                <td>₹38k</td>
-                <td>
-                  <div className="actions d-flex align-items-center">
-                    <Button className='secondary' color="secondary"><FaEye/></Button>
-                    <Button className='success' color="success"><FaPencilAlt/></Button>
-                    <Button className='error' color="error"><MdDelete/></Button>
-                  <span className="MuiTouchRipple-root css-w0pj6f"></span>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>#1</td>
-                <td>
-                  <div className="d-flex align-items-center productBox">
-                    <div className="imgWrapper">
-                      <div className="img card shadow m-0">
-                        <img src="https://mironcoder-hotash.netlify.app/images/product/01.webp" alt="product" className="w-100"/>
-                      </div>
+                  </td>
+                  <td>
+                    <Rating name="read-only-rating" value={item.rating || 0} precision={0.5} size="small" readOnly />
+                  </td>
+                  <td>
+                    <div className="actions d-flex align-items-center">
+                      <Button className='secondary' color="secondary"><FaEye /></Button>
+                      <Button className='success' color="success"><FaPencilAlt /></Button>
+                      <Button className='error' color="error"><MdDelete /></Button>
                     </div>
-                    <div className="info pl-3">
-                      <h6>Tops and skirt set for Female...</h6>
-                      <p>Women's exclusive summer Tops and skirt set for Female Tops and skirt set</p>
-                    </div>
-                  </div>
-                </td>
-                <td>Women</td>
-                <td>richman</td>
-                <td>
-                  <div style={{ width: "70px" }}>
-                    <del className="old">₹210</del>
-                    <span className="new text-danger">₹200</span>
-                  </div>
-                </td>
-                <td>
-                  <Rating name="read-only-rating" value={4.5} precision={0.5} size="small" readOnly />
-                </td>
-                <td>4.9(16)</td>
-                <td>380</td>
-                <td>₹38k</td>
-                <td>
-                  <div className="actions d-flex align-items-center">
-                    <Button className='secondary' color="secondary"><FaEye/></Button>
-                    <Button className='success' color="success"><FaPencilAlt/></Button>
-                    <Button className='error' color="error"><MdDelete/></Button>
-                  <span className="MuiTouchRipple-root css-w0pj6f"></span>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>#1</td>
-                <td>
-                  <div className="d-flex align-items-center productBox">
-                    <div className="imgWrapper">
-                      <div className="img card shadow m-0">
-                        <img src="https://mironcoder-hotash.netlify.app/images/product/01.webp" alt="product"  className="w-100"/>
-                      </div>
-                    </div>
-                    <div className="info pl-3">
-                      <h6>Tops and skirt set for Female...</h6>
-                      <p>Women's exclusive summer Tops and skirt set for Female Tops and skirt set</p>
-                    </div>
-                  </div>
-                </td>
-                <td>Women</td>
-                <td>richman</td>
-                <td>
-                  <div style={{ width: "70px" }}>
-                    <del className="old">₹210</del>
-                    <span className="new text-danger">₹200</span>
-                  </div>
-                </td>
-                <td>
-                  <Rating name="read-only-rating" value={4.5} precision={0.5} size="small" readOnly />
-                </td>
-                <td>4.9(16)</td>
-                <td>380</td>
-                <td>₹38k</td>
-                <td>
-                  <div className="actions d-flex align-items-center">
-                    <Button className='secondary' color="secondary"><FaEye/></Button>
-                    <Button className='success' color="success"><FaPencilAlt/></Button>
-                    <Button className='error' color="error"><MdDelete/></Button>
-                  <span className="MuiTouchRipple-root css-w0pj6f"></span>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>#1</td>
-                <td>
-                  <div className="d-flex align-items-center productBox">
-                    <div className="imgWrapper">
-                      <div className="img card shadow m-0">
-                        <img src="https://mironcoder-hotash.netlify.app/images/product/01.webp" alt="product" className="w-100"/>
-                      </div>
-                    </div>
-                    <div className="info pl-3">
-                      <h6>Tops and skirt set for Female...</h6>
-                      <p>Women's exclusive summer Tops and skirt set for Female Tops and skirt set</p>
-                    </div>
-                  </div>
-                </td>
-                <td>Women</td>
-                <td>richman</td>
-                <td>
-                  <div style={{ width: "70px" }}>
-                    <del className="old">₹210</del>
-                    <span className="new text-danger">₹200</span>
-                  </div>
-                </td>
-                <td>
-                  <Rating name="read-only-rating" value={4.5} precision={0.5} size="small" readOnly />
-                </td>
-                <td>4.9(16)</td>
-                <td>380</td>
-                <td>₹38k</td>
-                <td>
-                  <div className="actions d-flex align-items-center">
-                    <Button className='secondary' color="secondary"><FaEye/></Button>
-                    <Button className='success' color="success"><FaPencilAlt/></Button>
-                    <Button className='error' color="error"><MdDelete/></Button>
-                  <span className="MuiTouchRipple-root css-w0pj6f"></span>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                </tr>
+              )) : (
+                <tr><td colSpan="10">No products found</td></tr>
+              )}
             </tbody>
           </table>
-          <div className="d-flex tableFooter" >
-            <Pagination count={10} color="primary" className='pagination'/>
-          </div>
+          <TablePagination 
+            component="div"
+            count={productList.length} 
+            page={page} onPageChange={(event, newPage) => setPage(newPage)} rowsPerPage={rowsPerPage} 
+            onRowsPerPageChange={(event) => { setRowsPerPage(parseInt(event.target.value, 10));   setPage(0); }} 
+            rowsPerPageOptions={[5, 10, 25]} />
         </div>
 
       </div>

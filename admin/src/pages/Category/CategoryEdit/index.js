@@ -5,8 +5,8 @@ import { IoMdHome } from "react-icons/io";
 import { FaCloudUploadAlt, FaRegImage } from "react-icons/fa";
 import { IoCloseSharp } from 'react-icons/io5';
 
-import { fetchDataFromApi, putData } from '../../utils/api';
-import Toast from "../../components/Toast";
+import { fetchDataFromApi, putData } from '../../../utils/api';
+import Toast from "../../../components/Toast";
 
 const CategoryEdit = () => {
   const { id } = useParams();

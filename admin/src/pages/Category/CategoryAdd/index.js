@@ -6,8 +6,8 @@ import { FaCloudUploadAlt, FaRegImage } from "react-icons/fa";
 import { IoCloseSharp } from 'react-icons/io5';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
-import { postData } from '../../utils/api';
-import Toast from "../../components/Toast";
+import { postData } from '../../../utils/api';
+import Toast from "../../../components/Toast";
 
 const CategoryAdd = () => {
   const navigate = useNavigate();

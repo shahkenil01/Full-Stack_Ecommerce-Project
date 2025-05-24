@@ -103,8 +103,12 @@ const updateProduct = async (e) => {
   }
 
   const res = await putData(`/api/products/${id}`, formFields);
-  if (res?.message === "Product updated") {
-    navigate('/products', { state: { toast: { type: "success", message: "Product updated successfully!" } } });
+  if (res?.message?.toLowerCase().includes("updated")) {
+    setLoadingSubmit(false);
+    setTimeout(() => { navigate('/products', {
+        state: { toast: { type: "success", message: "Product updated successfully!" } }
+      });
+    }, 300);
   } else {
     setToast({ type: "error", message: res?.message || "Update failed" });
     setLoadingSubmit(false);

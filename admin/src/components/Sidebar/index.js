@@ -5,7 +5,7 @@ import { FaAngleRight } from "react-icons/fa";
 import { FaProductHunt } from "react-icons/fa";
 import { TbCategoryFilled } from "react-icons/tb";
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoMdLogOut } from "react-icons/io";
 
 const Sidebar = () => {
@@ -21,6 +21,25 @@ const Sidebar = () => {
   const location = useLocation();
 
   const isActive = (path) => location.pathname.startsWith(path);
+
+  const pathToTabIndex = {
+    '/products': 1,
+    '/product': 1,
+    '/category': 2,
+    '/subCategory': 2,
+  };
+
+  useEffect(() => {
+    const found = Object.entries(pathToTabIndex).find(([prefix]) =>
+      location.pathname.startsWith(prefix)
+    );
+
+    if (found) {
+      setActiveTab(found[1]);
+    } else {
+      setActiveTab(0);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="sidebar">
@@ -39,7 +58,7 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Button className={`w-100 ${isActive('/products') || isActive('/product/details') || isActive('/product/upload') || 
+          <Button className={`w-100 ${isActive('/products') || isActive('/product/details') || isActive('/product/upload') || isActive('/product/edit') ||
             isActive('/productRAMS/add') || isActive('/productWEIGHT/add') || isActive('/productSIZE/add') || activeTab === 1 ? 'active' : ''}`} onClick={() => handleTabClick(1)}>
             <span className='icon'><FaProductHunt /></span>
             Products

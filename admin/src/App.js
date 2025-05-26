@@ -15,6 +15,8 @@ import ProductUpload from './pages/Products/ProductUpload';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';
+import SubCategory from './pages/Category/ListSubCat';
+import SubCategoryAdd from './pages/Category/AddSubCat';
 import TopLoadingBar from './components/TopLoadingBar';
 import ProductsRam from './pages/Products/ProductsRam';
 import ProductsWeight from './pages/Products/ProductsWeight';
@@ -119,8 +121,8 @@ function AppWrapper() {
             <Route path="/productSIZE/add" element={<ProductsSize />} />
             <Route path="/category" element={<Category />} />
             <Route path="/category/add" element={<CategoryAdd />} />
-            <Route path="/subCategory" element={<CategoryEdit />} />
-            <Route path="/subCategory/add" element={<CategoryEdit />} />
+            <Route path="/subCategory" element={<SubCategory />} />
+            <Route path="/subCategory/add" element={<SubCategoryAdd />} />
             <Route path="/category/edit/:id" element={<CategoryEdit />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

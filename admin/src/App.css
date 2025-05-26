@@ -65,7 +65,7 @@ body:not(.dark) .main .sidebarWrapper .sidebar ul li button:hover {
   width: 100% !important;}
 
 h1, h2, h3, h4, h5, h6, p {
-  color: #403e57;}
+  color: #201f2f;}
 p {
   font-size: 15px;
   font-weight: 300;
@@ -691,6 +691,14 @@ body.dark .dropdown-item:focus {
   background-color: #1866ee;
   border-color: rgba(255,255,255,0.1);
   font-size: 13px;}
+.table.page .thead-dark  th {
+  background-color: #1866ee !important;
+  border-color: #ffffff1a !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  padding: 9px 16px !important;}
+
 .table tbody td {
   color: #2f2d3e;
   font-size: 14px;
@@ -963,6 +971,14 @@ body.light .productDetailsSEction .productInfo .icon svg {
 .badge-secondary {
   background-color: #6c757d;
   color: #fff;}
+.badge-primary {
+  background-color: #007bff;
+  color: #fff;
+  padding: 5px !important;
+  font-size: 13.5px !important;}
+
+.cursor {
+  cursor: pointer;}
 
 .tags li span {
   background: #d8d8d8 !important;

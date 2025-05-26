@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Breadcrumbs,
-  Typography,
-  Link as MuiLink,
-  Button,
-  Rating,
-} from '@mui/material';
+import { Breadcrumbs, Typography, Link as MuiLink, Button, Rating } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoMdHome } from 'react-icons/io';
 import FormControl from '@mui/material/FormControl';
@@ -23,16 +17,7 @@ const ProductUpload = () => {
 
   const [category, setCategory] = useState('');
   const [formFields, setFormFields] = useState({
-    name: '',
-    description: '',
-    images: [],
-    brand: '',
-    price: 0,
-    oldPrice: 0,
-    category: '',
-    countInStock: 0,
-    rating: 0,
-    isFeatured: false,
+    name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false,
   });
   const [rating, setRating] = useState(0);
   const navigate = useNavigate();
@@ -63,9 +48,7 @@ const ProductUpload = () => {
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     (async () => {
-      let page = 1,
-        all = [],
-        hasMore = true;
+      let page = 1, all = [], hasMore = true;
       while (hasMore) {
         const res = await fetchDataFromApi(`/api/category?page=${page}`);
         hasMore = res?.categoryList?.length > 0 && page < res.totalPages;
@@ -147,14 +130,7 @@ const ProductUpload = () => {
     e.preventDefault();
     setLoading(true);
 
-    const requiredFields = [
-      'name',
-      'description',
-      'brand',
-      'price',
-      'category',
-      'countInStock',
-    ];
+    const requiredFields = [ 'name', 'description', 'brand', 'price', 'category', 'countInStock', ];
     const missingFields = requiredFields.filter((f) => !formFields[f]);
     if (imagesData.length === 0) missingFields.push('Image');
     if (missingFields.length > 0) {
@@ -191,50 +167,23 @@ const ProductUpload = () => {
     setLoading(false);
 
     if (res && res._id) {
-      setFormFields({
-        name: '',
-        description: '',
-        images: [],
-        brand: '',
-        price: 0,
-        oldPrice: 0,
-        category: '',
-        countInStock: 0,
-        rating: 0,
-        isFeatured: false,
-      });
+      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, });
       setImagesData([]);
       navigate('/products', {
-        state: {
-          toast: { type: 'success', message: 'Product uploaded successfully!' },
-        },
+        state: { toast: { type: 'success', message: 'Product uploaded successfully!' }, },
       });
     } else {
-      setToast({
-        type: 'error',
-        message: res?.message || 'Failed to upload product.',
+        setToast({ type: 'error', message: res?.message || 'Failed to upload product.',
       });
     }
   };
 
   return (
     <div className="right-content w-100 product-upload">
-      <div
-        style={{
-          position: 'fixed',
-          left: '20px',
-          bottom: '20px',
-          zIndex: 9999,
-          display: 'flex',
-          flexDirection: 'column-reverse',
-          gap: '5px',
-        }}
-      >
+      <div style={{ position: 'fixed', left: '20px', bottom: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column-reverse', gap: '5px', }} >
         {toasts.map((toastObj) => (
           <Toast
-            key={toastObj.id}
-            type={toastObj.type}
-            message={toastObj.message}
+            key={toastObj.id} type={toastObj.type} message={toastObj.message}
             onClose={() =>
               setToasts((prev) => prev.filter((t) => t.id !== toastObj.id))
             }
@@ -245,30 +194,13 @@ const ProductUpload = () => {
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Product Upload</h5>
         <Breadcrumbs aria-label="breadcrumb">
-          <MuiLink
-            component={Link}
-            to="/"
-            underline="hover"
-            color="inherit"
-            className="breadcrumb-link"
-          >
-            <IoMdHome />
-            Dashboard
+          <MuiLink component={Link} to="/" underline="hover" color="inherit" className="breadcrumb-link" >
+            <IoMdHome /> Dashboard
           </MuiLink>
-          <MuiLink
-            component={Link}
-            to="/products"
-            underline="hover"
-            color="inherit"
-            className="breadcrumb-link"
-          >
+          <MuiLink component={Link} to="/products" underline="hover" color="inherit" className="breadcrumb-link" >
             Products
           </MuiLink>
-          <Typography
-            className="breadcrumb-current"
-            component="span"
-            sx={{ padding: '6px 10px', borderRadius: '16px' }}
-          >
+          <Typography className="breadcrumb-current" component="span" sx={{ padding: '6px 10px', borderRadius: '16px' }} >
             Product Upload
           </Typography>
         </Breadcrumbs>
@@ -290,12 +222,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={category}
-                    onChange={setCategory}
-                    options={categories}
-                    placeholder="None"
-                  />
+                  <CustomDropdown value={category} onChange={setCategory} options={categories} placeholder="None" />
                 </FormControl>
               </div>
             </div>
@@ -303,9 +230,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>SUB CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={subcategory}
-                    onChange={setSubcategory}
+                  <CustomDropdown value={subcategory} onChange={setSubcategory}
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: 'Jeans' },
@@ -335,9 +260,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>IS FEATURED</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={isFeatured}
-                    onChange={setIsFeatured}
+                  <CustomDropdown value={isFeatured} onChange={setIsFeatured}
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: 'True' },
@@ -373,9 +296,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>RAM</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={ram}
-                    onChange={setRam}
+                  <CustomDropdown value={ram} onChange={setRam}
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: '4GB' },
@@ -395,9 +316,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>WEIGHT</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={weight}
-                    onChange={setWeight}
+                  <CustomDropdown value={weight} onChange={setWeight}
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: '15KG' },
@@ -412,9 +331,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>SIZE</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={size}
-                    onChange={setSize}
+                  <CustomDropdown value={size} onChange={setSize}
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: 'S' },
@@ -446,26 +363,12 @@ const ProductUpload = () => {
             <h6>Image Input Type</h6>
             <div>
               <label>
-                <input
-                  type="radio"
-                  value="url"
-                  checked={inputType === 'url'}
-                  onChange={() => {
-                    setInputType('url');
-                  }}
-                />{' '}
+                <input type="radio" value="url" checked={inputType === 'url'} onChange={() => { setInputType('url'); }} />{' '}
                 Image URL
               </label>
               &nbsp;&nbsp;
               <label>
-                <input
-                  type="radio"
-                  value="file"
-                  checked={inputType === 'file'}
-                  onChange={() => {
-                    setInputType('file');
-                  }}
-                />{' '}
+                <input type="radio" value="file" checked={inputType === 'file'} onChange={() => { setInputType('file'); }} />{' '}
                 Upload Image
               </label>
             </div>
@@ -475,20 +378,9 @@ const ProductUpload = () => {
             <div className="form-group mt-3">
               <h6 className="text-uppercase">Product Image</h6>
               <div className="position-relative inputBtn">
-                <input
-                  type="text"
-                  value={imageUrlInput}
-                  onChange={(e) => setImageUrlInput(e.target.value)}
-                  placeholder="Enter image URL"
-                  style={{ paddingRight: '80px' }}
-                />
-                <Button
-                  className="btn-blue"
-                  type="button"
-                  onClick={handleImageUrlInput}
-                >
-                  Add
-                </Button>
+                <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" 
+                  style={{ paddingRight: '80px' }} />
+                <Button className="btn-blue" type="button" onClick={handleImageUrlInput} > Add </Button>
               </div>
 
               <div className="imgGrid d-flex mt-3">
@@ -519,12 +411,7 @@ const ProductUpload = () => {
                   </div>
                 ))}
                 <div className="uploadBox">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                  />
+                  <input type="file" accept="image/*" multiple onChange={handleFileChange} />
                   <div className="info">
                     <FaRegImage />
                     <h5>image upload</h5>
@@ -534,11 +421,7 @@ const ProductUpload = () => {
             </div>
           )}
 
-          <Button
-            type="submit"
-            className="btn-blue btn-lg btn-big w-100 mt-4"
-            disabled={loading}
-          >
+          <Button type="submit" className="btn-blue btn-lg btn-big w-100 mt-4" disabled={loading} >
             <FaCloudUploadAlt /> &nbsp;{' '}
             {loading ? (
               <span className="dot-loader"></span>

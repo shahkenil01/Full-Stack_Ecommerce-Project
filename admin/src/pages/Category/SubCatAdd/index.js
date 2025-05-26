@@ -9,15 +9,10 @@ import CustomDropdown from '../../../components/CustomDropdown';
 import { fetchDataFromApi } from '../../../utils/api';
 
 const CategoryAdd = () => {
-  const navigate = useNavigate();
   const [toast, setToast] = useState(null);
-  const [loading, setLoading] = useState(false);
-
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState('');
-
   const [formFields, setFormFields] = useState({
-    name: '',
     subCategory: '',
     category: ''
   });
@@ -43,23 +38,6 @@ const CategoryAdd = () => {
     setFormFields((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formFields.name.trim() || !formFields.subCategory.trim()) {
-      return setToast({ type: "error", message: "Please fill all the details" });
-    }
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/subCategory", {
-        state: {
-          toast: { type: "success", message: "Category created successfully!" }
-        }
-      });
-    }, 1500);
-  };
-
   return (
     <div className="right-content w-100 product-upload">
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
@@ -79,7 +57,7 @@ const CategoryAdd = () => {
         </Breadcrumbs>
       </div>
 
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form">
         <div className="row">
           <div className="col-md-12">
             <div className="card p-4 mt-0">
@@ -95,10 +73,9 @@ const CategoryAdd = () => {
                 <input type="text" name="subCategory" onChange={changeInput} />
               </div>
 
-              <Button type="submit" className="btn-blue btn-lg btn-big w-100 mt-4" disabled={loading}>
+              <Button className="btn-blue btn-lg btn-big w-100">
                 <FaCloudUploadAlt />
-                &nbsp;
-                {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}
+                &nbsp; "PUBLISH AND VIEW"
               </Button>
             </div>
           </div>

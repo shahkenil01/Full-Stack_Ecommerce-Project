@@ -78,16 +78,24 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const subCat = await SubCategory.findByIdAndUpdate(req.params.id,
-    {
-      category: req.body.category,
-      subCat: req.body.subCat
-    },{new: true});
-  if (!subCat) {
-    return res.status(500).json({ message: 'Sub Category cannot be updated!', success: false });
-  }
+  try {
+    const subCat = await SubCategory.findByIdAndUpdate(
+      req.params.id,
+      {
+        category: req.body.category,
+        subCat: req.body.subCat
+      },
+      { new: true }
+    );
 
-  res.send(subCat);
+    if (!subCat) {
+      return res.status(404).json({ message: 'Sub Category not found!', success: false });
+    }
+
+    res.status(200).json({ success: true, data: subCat });
+  } catch (error) {
+    res.status(500).json({ message: 'Something went wrong.', error: error.message });
+  }
 });
 
 module.exports = router;

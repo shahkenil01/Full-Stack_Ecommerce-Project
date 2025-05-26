@@ -13,10 +13,12 @@ app.use(bodyParser.json());
 
 //Routes
 const categoryRoutes = require('./routes/categories');
+const subCatSchema = require('./routes/subCat');
 const productRoutes = require('./routes/products');
 const uploadRoutes = require('./routes/upload');
 
 app.use(`/api/category`, categoryRoutes);
+app.use(`/api/subCat`, subCatSchema);
 app.use(`/api/products`, productRoutes);
 app.use('/api/cloudinary', uploadRoutes);
 

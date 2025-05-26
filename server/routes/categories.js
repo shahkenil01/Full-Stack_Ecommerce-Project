@@ -11,6 +11,52 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+router.get('/', async (req, res) => {
+
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 4;
+    const totalPosts = await Category.countDocuments();
+    const totalPages = Math.ceil(totalPosts / perPage);
+
+    if (page > totalPages) {
+      return res.status(404).json({ message: "Page not found"})
+    }
+
+    const categoryList = await Category.find()
+      .skip((page - 1 ) * perPage)
+      .limit(perPage)
+      .exec();
+
+    if (!categoryList) {
+      res.status(500).json({ success: false })
+    }
+  
+    return res.status(200).json({
+      "categoryList":categoryList,
+      "totalPages":totalPages,
+      "page":page
+    })
+
+  }catch(error){
+    res.status(500).json({ success: false })
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({ message: 'The category with the given ID was not found.' });
+    }
+
+    return res.status(200).send(category);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error: error.message });
+  }
+});
+
 router.post('/create', async (req, res) => {
   try {
     const limit = pLimit(2);
@@ -66,52 +112,6 @@ router.post('/create', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
-
-  try{
-    const page = parseInt(req.query.page) || 1;
-    const perPage = 4;
-    const totalPosts = await Category.countDocuments();
-    const totalPages = Math.ceil(totalPosts / perPage);
-
-    if (page > totalPages) {
-      return res.status(404).json({ message: "Page not found"})
-    }
-
-    const categoryList = await Category.find()
-      .skip((page - 1 ) * perPage)
-      .limit(perPage)
-      .exec();
-
-    if (!categoryList) {
-      res.status(500).json({ success: false })
-    }
-  
-    return res.status(200).json({
-      "categoryList":categoryList,
-      "totalPages":totalPages,
-      "page":page
-    })
-
-  }catch(error){
-    res.status(500).json({ success: false })
-  }
-});
-
-router.get('/:id', async (req, res) => {
-  try {
-    const category = await Category.findById(req.params.id);
-
-    if (!category) {
-      return res.status(404).json({ message: 'The category with the given ID was not found.' });
-    }
-
-    return res.status(200).send(category);
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error: error.message });
-  }
-});
-
 router.delete('/:id', async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -145,9 +145,6 @@ router.delete('/:id', async (req, res) => {
     });
   }
 });
-
-
-
 
 router.put('/:id', async (req, res) => {
   try {
@@ -227,6 +224,5 @@ router.put('/:id', async (req, res) => {
     return res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 });
-
 
 module.exports = router;

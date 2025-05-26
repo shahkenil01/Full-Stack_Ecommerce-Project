@@ -8,7 +8,7 @@ import { FiFileText } from "react-icons/fi";
 import { MdBrandingWatermark } from "react-icons/md";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import Slider from "react-slick";
-import UserAvatarImgComponent from "../../components/userAvatarImg";
+import UserAvatarImgComponent from "../../../components/userAvatarImg";
 
 const ProductDetails = () => {
 

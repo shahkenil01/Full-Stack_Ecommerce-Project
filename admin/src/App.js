@@ -9,7 +9,7 @@ import Sidebar from './components/Sidebar';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
-import ProductDetails from './pages/ProductDetails';
+import ProductDetails from './pages/Products/ProductDetails';
 import Products from './pages/Products';
 import ProductUpload from './pages/Products/ProductUpload';
 import Category from './pages/Category';

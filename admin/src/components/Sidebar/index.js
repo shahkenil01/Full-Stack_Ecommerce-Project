@@ -45,12 +45,12 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Button className={`w-100 ${isActive('/products') || activeTab === 1 ? 'active' : ''}`}
+          <Link to="/products"><Button className={`w-100 ${isActive('/products') || activeTab === 1 ? 'active' : ''}`}
             onClick={() => handleTabClick(1)} >
             <span className='icon'><FaProductHunt /></span>
             Products
             <span className={`arrow ${isOpen[1] ? 'rotate' : ''}`}><FaAngleRight /></span>
-          </Button>
+          </Button></Link>
           <div className={`submenuWrapper ${isOpen[1] ? 'colapse' : 'colapsed'}`}>
             <ul className='submenu'>
               <li><Link to="/products" className={location.pathname === '/products' ? 'active-submenu' : ''}>Product List</Link></li>
@@ -62,12 +62,12 @@ const Sidebar = () => {
           </div>
         </li>
         <li>
-          <Button className={`w-100 ${isActive('/category') || activeTab === 2 ? 'active' : ''}`}
+          <Link to="/category"><Button className={`w-100 ${isActive('/category') || activeTab === 2 ? 'active' : ''}`}
             onClick={() => handleTabClick(2)} >
             <span className='icon'><TbCategoryFilled /></span>
             Category
             <span className={`arrow ${isOpen[2] ? 'rotate' : ''}`}><FaAngleRight /></span>
-          </Button>
+          </Button></Link>
           <div className={`submenuWrapper ${isOpen[2] ? 'colapse' : 'colapsed'}`}>
             <ul className='submenu'>
               <li><Link to="/category" className={location.pathname === '/category' ? 'active-submenu' : ''}>Category List</Link></li>

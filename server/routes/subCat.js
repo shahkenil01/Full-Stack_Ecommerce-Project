@@ -14,6 +14,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/by-category/:categoryId', async (req, res) => {
+  try {
+    const subCats = await SubCategory.find({ category: req.params.categoryId });
+    res.status(200).json(subCats);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch subcategories', error: error.message });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const subCat = await SubCategory.findById(req.params.id).populate("category");

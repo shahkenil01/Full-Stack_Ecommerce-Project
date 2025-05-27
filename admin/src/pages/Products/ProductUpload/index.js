@@ -61,8 +61,28 @@ const ProductUpload = () => {
     setFormFields((prev) => ({ ...prev, category }));
   }, [category]);
 
-  // OTHERS
+  // SUB Category
   const [subcategory, setSubcategory] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
+  useEffect(() => {
+    if (!category || typeof category !== 'string') {
+      setSubcategories([]);
+      setSubcategory('');
+      return;
+    }
+
+    (async () => {
+      const res = await fetchDataFromApi(`/api/SubCat/by-category/${category}`);
+      if (res && res.length > 0) {
+        setSubcategories(res.map((sub) => ({ value: sub._id, label: sub.subCat })));
+      } else {
+        setSubcategories([]);
+      }
+      setSubcategory('');
+    })();
+  }, [category]);
+
+  // OTHERS
   const [isFeatured, setIsFeatured] = useState('');
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, isFeatured: isFeatured === '10' }));
@@ -206,7 +226,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={category} onChange={setCategory} options={categories} placeholder="None" />
+                  <CustomDropdown value={category} onChange={setCategory} options={categories} placeholder="Select"/>
                 </FormControl>
               </div>
             </div>
@@ -214,14 +234,10 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>SUB CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={subcategory} onChange={setSubcategory}
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: 'Jeans' },
-                      { value: '20', label: 'Shirts' },
-                    ]}
-                    placeholder="None"
-                  />
+                  <CustomDropdown value={subcategory} onChange={setSubcategory} options={subcategories} 
+                    placeholder={!category ? "Select Category" :
+                    subcategories.length > 0 ? "Select Subcategory" : "No SubCategory Found"} 
+                    isDisabled={!category || subcategories.length === 0}/>
                 </FormControl>
               </div>
             </div>

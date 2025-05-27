@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { RiArrowDropDownFill } from "react-icons/ri";
 import Grow from '@mui/material/Grow';
 
-const CustomDropdown = ({ value, onChange, options = [], placeholder = "Select" }) => {
+const CustomDropdown = ({ value, onChange, options = [], placeholder = "Select", isDisabled = false }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -19,9 +19,11 @@ const CustomDropdown = ({ value, onChange, options = [], placeholder = "Select" 
 
   return (
     <div className={`custom-dropdown-wrapper ${open ? 'open' : ''}`} ref={dropdownRef}>
-      <div className="dropdown-select" onClick={() => setOpen(!open)}>
+      <div className={`dropdown-select ${isDisabled ? 'disabled' : ''}`} onClick={() => !isDisabled && setOpen(!open)}>
         <span>{value ? options.find(o => o.value === value)?.label : <em>{placeholder}</em>}</span>
-        <RiArrowDropDownFill className={`dropdown-icon ${open ? 'rotate' : ''}`} />
+        {!isDisabled && (
+          <RiArrowDropDownFill className={`dropdown-icon ${open ? 'rotate' : ''}`} />
+        )}
       </div>
       <Grow in={open}>
         <div className="dropdown-menu">

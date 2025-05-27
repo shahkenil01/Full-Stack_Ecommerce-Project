@@ -586,7 +586,8 @@ main .sidebarWrapper .sidebar ul .submenuWrapper{
   width: 100%;
   height: 40px;
   margin-top: 5px;
-  font-family: 'Roboto', sans-serif;}
+  font-family: 'Roboto', sans-serif;
+  user-select: none;}
 .dropdown-select {
   display: flex;
   align-items: center;
@@ -625,6 +626,8 @@ main .sidebarWrapper .sidebar ul .submenuWrapper{
   max-height: 200px;
   overflow-y: auto;
   margin-top: 0px;}
+.dropdown-select.disabled {
+  cursor: not-allowed;}
 .dropdown-item {
   padding: 5px 12px;
   cursor: pointer;

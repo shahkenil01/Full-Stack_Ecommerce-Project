@@ -1,35 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Breadcrumbs,
-  Typography,
-  Link as MuiLink,
-  Button,
-  Rating,
-} from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { IoMdHome } from 'react-icons/io';
+import { Breadcrumbs, Typography, Link as MuiLink, Button, Rating, } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import CustomDropdown from '../../../components/CustomDropdown';
-import { FaCloudUploadAlt, FaRegImage } from 'react-icons/fa';
-import { fetchDataFromApi } from '../../../utils/api';
-import Toast from '../../../components/Toast';
+import { IoMdHome } from 'react-icons/io';
 import { IoCloseSharp } from 'react-icons/io5';
-import { putData } from '../../../utils/api';
+import { FaCloudUploadAlt, FaRegImage } from 'react-icons/fa';
+import CustomDropdown from '../../../components/CustomDropdown';
+import { fetchDataFromApi, putData } from '../../../utils/api';
+import { useSnackbar } from 'notistack';
 
 const ProductEdit = () => {
   const { id } = useParams();
-  const [toast, setToast] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
   const [formFields, setFormFields] = useState({
-    name: '',
-    description: '',
-    brand: '',
-    price: 0,
-    oldPrice: 0,
-    category: '',
-    countInStock: 0,
-    rating: 0,
-    isFeatured: false,
-    images: [],
+    name: '', description: '', brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, images: [],
   });
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [inputType, setInputType] = useState('url');
@@ -49,7 +33,7 @@ const ProductEdit = () => {
       if (res) {
         setFormFields(res);
       } else {
-        setToast({ type: 'error', message: 'Product not found!' });
+        enqueueSnackbar('Product not found!', { variant: 'error' });
       }
     })();
   }, [id]);
@@ -123,25 +107,18 @@ const ProductEdit = () => {
     const missing = requiredFields.filter((f) => !formFields[f]);
 
     if (missing.length > 0) {
-      setToast({ type: 'error', message: `Please fill ${missing.join(', ')}` });
+      enqueueSnackbar(`Please fill ${missing.join(', ')}`, { variant: 'error' });
+      setLoadingSubmit(false);
       return;
     }
 
     const res = await putData(`/api/products/${id}`, formFields);
     if (res?.message?.toLowerCase().includes('updated')) {
       setLoadingSubmit(false);
-      setTimeout(() => {
-        navigate('/products', {
-          state: {
-            toast: {
-              type: 'success',
-              message: 'Product updated successfully!',
-            },
-          },
-        });
-      }, 300);
+      enqueueSnackbar('Product updated successfully!', { variant: 'success' });
+      navigate('/products');
     } else {
-      setToast({ type: 'error', message: res?.message || 'Update failed' });
+      enqueueSnackbar(res?.message || 'Update failed', { variant: 'error' });
       setLoadingSubmit(false);
     }
   };
@@ -176,10 +153,10 @@ const ProductEdit = () => {
         }));
         setImageUrlInput('');
       } else {
-        setToast({ type: 'error', message: 'Image upload failed!' });
+        enqueueSnackbar('Image upload failed!', { variant: 'error' });
       }
     } catch (err) {
-      setToast({ type: 'error', message: 'Image upload failed!' });
+      enqueueSnackbar('Image upload failed!', { variant: 'error' });
     } finally {
       setAddingUrl(false);
     }
@@ -204,50 +181,17 @@ const ProductEdit = () => {
 
   return (
     <div className="right-content w-100 product-upload">
-      {toast && (
-        <div
-          style={{
-            position: 'fixed',
-            left: '20px',
-            bottom: '20px',
-            zIndex: 9999,
-          }}
-        >
-          <Toast
-            type={toast.type}
-            message={toast.message}
-            onClose={() => setToast(null)}
-          />
-        </div>
-      )}
       {/* BREADCRUMB */}
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Product Edit</h5>
         <Breadcrumbs aria-label="breadcrumb">
-          <MuiLink
-            component={Link}
-            to="/"
-            underline="hover"
-            color="inherit"
-            className="breadcrumb-link"
-          >
-            <IoMdHome />
-            Dashboard
+          <MuiLink component={Link} to="/" underline="hover" color="inherit" className="breadcrumb-link" >
+            <IoMdHome /> Dashboard
           </MuiLink>
-          <MuiLink
-            component={Link}
-            to="/products"
-            underline="hover"
-            color="inherit"
-            className="breadcrumb-link"
-          >
+          <MuiLink component={Link} to="/products" underline="hover" color="inherit" className="breadcrumb-link" >
             Products
           </MuiLink>
-          <Typography
-            className="breadcrumb-current"
-            component="span"
-            sx={{ padding: '6px 10px', borderRadius: '16px' }}
-          >
+          <Typography className="breadcrumb-current" component="span" sx={{ padding: '6px 10px', borderRadius: '16px' }} >
             Product Edit
           </Typography>
         </Breadcrumbs>
@@ -257,21 +201,11 @@ const ProductEdit = () => {
         <div className="card p-4 mt-0">
           <div className="form-group">
             <h6>PRODUCT NAME</h6>
-            <input
-              type="text"
-              name="name"
-              value={formFields.name}
-              onChange={inputChange}
-            />
+            <input type="text" name="name" value={formFields.name} onChange={inputChange} />
           </div>
           <div className="form-group">
             <h6>DESCRIPTION</h6>
-            <textarea
-              name="description"
-              rows="5"
-              value={formFields.description}
-              onChange={inputChange}
-            />
+            <textarea name="description" rows="5" value={formFields.description} onChange={inputChange} />
           </div>
 
           <div className="row">
@@ -279,13 +213,10 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={formFields.category}
+                  <CustomDropdown value={formFields.category} options={categories} placeholder="None"
                     onChange={(val) =>
                       setFormFields((prev) => ({ ...prev, category: val }))
                     }
-                    options={categories}
-                    placeholder="None"
                   />
                 </FormControl>
               </div>
@@ -294,9 +225,7 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>SUB CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={subcategory}
-                    onChange={setSubcategory}
+                  <CustomDropdown value={subcategory} onChange={setSubcategory}
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: 'Jeans' },
@@ -310,12 +239,7 @@ const ProductEdit = () => {
             <div className="col">
               <div className="form-group">
                 <h6>PRICE</h6>
-                <input
-                  type="text"
-                  name="price"
-                  value={formFields.price}
-                  onChange={inputChange}
-                />
+                <input type="text" name="price" value={formFields.price} onChange={inputChange}/>
               </div>
             </div>
           </div>
@@ -324,20 +248,14 @@ const ProductEdit = () => {
             <div className="col">
               <div className="form-group">
                 <h6>OLD PRICE</h6>
-                <input
-                  type="text"
-                  name="oldPrice"
-                  value={formFields.oldPrice}
-                  onChange={inputChange}
-                />
+                <input type="text" name="oldPrice" value={formFields.oldPrice} onChange={inputChange}/>
               </div>
             </div>
             <div className="col">
               <div className="form-group">
                 <h6>IS FEATURED</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={formFields.isFeatured ? '10' : '20'}
+                  <CustomDropdown value={formFields.isFeatured ? '10' : '20'}
                     onChange={(val) =>
                       setFormFields((prev) => ({
                         ...prev,
@@ -356,12 +274,7 @@ const ProductEdit = () => {
             <div className="col">
               <div className="form-group">
                 <h6>PRODUCT STOCK</h6>
-                <input
-                  type="text"
-                  name="countInStock"
-                  value={formFields.countInStock}
-                  onChange={inputChange}
-                />
+                <input type="text" name="countInStock" value={formFields.countInStock} onChange={inputChange}/>
               </div>
             </div>
           </div>
@@ -370,12 +283,7 @@ const ProductEdit = () => {
             <div className="col">
               <div className="form-group">
                 <h6>BRAND</h6>
-                <input
-                  type="text"
-                  name="brand"
-                  value={formFields.brand}
-                  onChange={inputChange}
-                />
+                <input type="text" name="brand" value={formFields.brand} onChange={inputChange}/>
               </div>
             </div>
             <div className="col">
@@ -388,9 +296,7 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>RAM</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={ram}
-                    onChange={setRam}
+                  <CustomDropdown value={ram} onChange={setRam} placeholder="None"
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: '4GB' },
@@ -398,7 +304,6 @@ const ProductEdit = () => {
                       { value: '30', label: '10GB' },
                       { value: '40', label: '12GB' },
                     ]}
-                    placeholder="None"
                   />
                 </FormControl>
               </div>
@@ -410,15 +315,12 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>WEIGHT</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={weight}
-                    onChange={setWeight}
+                  <CustomDropdown value={weight} onChange={setWeight} placeholder="None"
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: '15KG' },
                       { value: '20', label: '5KG' },
                     ]}
-                    placeholder="None"
                   />
                 </FormControl>
               </div>
@@ -427,9 +329,7 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>SIZE</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown
-                    value={size}
-                    onChange={setSize}
+                  <CustomDropdown value={size} onChange={setSize} placeholder="None"
                     options={[
                       { value: '', label: 'None' },
                       { value: '10', label: 'S' },
@@ -439,7 +339,6 @@ const ProductEdit = () => {
                       { value: '50', label: 'XXL' },
                       { value: '60', label: 'XXXL' },
                     ]}
-                    placeholder="None"
                   />
                 </FormControl>
               </div>
@@ -447,9 +346,7 @@ const ProductEdit = () => {
             <div className="col">
               <div className="form-group">
                 <h6>RATING</h6>
-                <Rating
-                  name="rating"
-                  value={formFields.rating}
+                <Rating name="rating" value={formFields.rating}
                   onChange={(e, newVal) =>
                     setFormFields((prev) => ({ ...prev, rating: newVal }))
                   }
@@ -463,22 +360,12 @@ const ProductEdit = () => {
           <div className="form-group mt-4">
             <div className="form-group-radio mt-2 mb-2">
               <label>
-                <input
-                  type="radio"
-                  value="url"
-                  checked={inputType === 'url'}
-                  onChange={() => setInputType('url')}
-                />{' '}
+                <input type="radio" value="url" checked={inputType === 'url'} onChange={() => setInputType('url')}/>{' '}
                 Image URL{' '}
               </label>
               &nbsp;&nbsp;
               <label>
-                <input
-                  type="radio"
-                  value="file"
-                  checked={inputType === 'file'}
-                  onChange={() => setInputType('file')}
-                />{' '}
+                <input type="radio" value="file" checked={inputType === 'file'} onChange={() => setInputType('file')}/>{' '}
                 Upload Image{' '}
               </label>
             </div>
@@ -486,28 +373,10 @@ const ProductEdit = () => {
             {/* === URL INPUT === */}
             {inputType === 'url' && (
               <div className="form-group bottom">
-                <div
-                  className="position-relative inputBtn mb-3"
-                  style={{ minHeight: 48 }}
-                >
-                  <input
-                    type="text"
-                    value={imageUrlInput}
-                    onChange={(e) => setImageUrlInput(e.target.value)}
-                    placeholder="Enter image URL"
-                    style={{ paddingRight: '80px' }}
-                  />
-                  <Button
-                    className="btn-blue"
-                    type="button"
-                    disabled={addingUrl}
-                    onClick={handleImageUrlInput}
-                  >
-                    {addingUrl ? (
-                      <span className="dot-loader-sm"></span>
-                    ) : (
-                      'Add'
-                    )}
+                <div className="position-relative inputBtn mb-3" style={{ minHeight: 48 }}>
+                  <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" style={{ paddingRight: '80px' }}/>
+                  <Button className="btn-blue" type="button" disabled={addingUrl} onClick={handleImageUrlInput}>
+                    {addingUrl ? ( <span className="dot-loader-sm"></span> ) : ( 'Add' )}
                   </Button>
                 </div>
                 <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
@@ -517,11 +386,7 @@ const ProductEdit = () => {
                         <IoCloseSharp />
                       </span>
                       <div className="box">
-                        <img
-                          className="w-100 preview"
-                          src={src}
-                          alt={`preview-${i}`}
-                        />
+                        <img className="w-100 preview" src={src} alt={`preview-${i}`}/>
                       </div>
                     </div>
                   ))}
@@ -538,22 +403,13 @@ const ProductEdit = () => {
                       <IoCloseSharp />
                     </span>
                     <div className="box">
-                      <img
-                        className="w-100 preview"
-                        src={src}
-                        alt={`preview-${i}`}
-                      />
+                      <img className="w-100 preview" src={src} alt={`preview-${i}`}/>
                     </div>
                   </div>
                 ))}
                 {/* === FILE UPLOAD BOX === */}
                 <div className="uploadBox">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                  />
+                  <input type="file" accept="image/*" multiple onChange={handleFileChange}/>
                   <div className="info">
                     <FaRegImage />
                     <h5>image upload</h5>
@@ -563,17 +419,9 @@ const ProductEdit = () => {
             )}
           </div>
 
-          <Button
-            type="submit"
-            className="btn-blue btn-lg btn-big w-100"
-            disabled={loadingFiles || addingUrl || loadingSubmit}
-          >
+          <Button type="submit" className="btn-blue btn-lg btn-big w-100" disabled={loadingFiles || addingUrl || loadingSubmit}>
             <FaCloudUploadAlt /> &nbsp;{' '}
-            {loadingFiles || addingUrl || loadingSubmit ? (
-              <span className="dot-loader"></span>
-            ) : (
-              'PUBLISH AND VIEW'
-            )}
+            {loadingFiles || addingUrl || loadingSubmit ? (<span className="dot-loader"></span> ) : ( 'PUBLISH AND VIEW' )}
           </Button>
         </div>
       </form>

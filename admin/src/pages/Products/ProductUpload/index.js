@@ -7,12 +7,11 @@ import CustomDropdown from '../../../components/CustomDropdown';
 import { FaCloudUploadAlt, FaRegImage } from 'react-icons/fa';
 import { IoCloseSharp } from 'react-icons/io5';
 import { fetchDataFromApi, postData } from '../../../utils/api';
-import Toast from '../../../components/Toast';
 import { uploadToCloudinary } from '../../../utils/uploadToCloudinary';
+import { useSnackbar } from 'notistack';
 
 const ProductUpload = () => {
-  const [toasts, setToasts] = useState([]);
-  const [toast, setToast] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
 
   const [category, setCategory] = useState('');
@@ -115,14 +114,10 @@ const ProductUpload = () => {
   };
 
   const showToasts = (messages) => {
-    let delay = 0;
-    messages.forEach((msg, index) => {
-      const toastObj =
-        typeof msg === 'string' ? { type: 'error', message: msg } : msg;
-      setTimeout(() => {
-        setToast((prev) => [...prev, { id: Date.now() + index, ...toastObj }]);
-      }, delay);
-      delay += 300;
+    messages.forEach((msg) => {
+      const message = typeof msg === 'string' ? msg : msg.message;
+      const variant = typeof msg === 'string' ? 'error' : msg.type || 'default';
+      enqueueSnackbar(message, { variant });
     });
   };
 
@@ -133,6 +128,7 @@ const ProductUpload = () => {
     const requiredFields = [ 'name', 'description', 'brand', 'price', 'category', 'countInStock', ];
     const missingFields = requiredFields.filter((f) => !formFields[f]);
     if (imagesData.length === 0) missingFields.push('Image');
+
     if (missingFields.length > 0) {
       setLoading(false);
       showToasts(missingFields.map((f) => `Please fill ${f}`));
@@ -169,27 +165,15 @@ const ProductUpload = () => {
     if (res && res._id) {
       setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, });
       setImagesData([]);
-      navigate('/products', {
-        state: { toast: { type: 'success', message: 'Product uploaded successfully!' }, },
-      });
+      enqueueSnackbar('Product uploaded successfully!', { variant: 'success' });
+      navigate('/products');
     } else {
-        setToast({ type: 'error', message: res?.message || 'Failed to upload product.',
-      });
+      enqueueSnackbar(res?.message || 'Failed to upload product.', { variant: 'error' });
     }
   };
 
   return (
     <div className="right-content w-100 product-upload">
-      <div style={{ position: 'fixed', left: '20px', bottom: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column-reverse', gap: '5px', }} >
-        {toasts.map((toastObj) => (
-          <Toast
-            key={toastObj.id} type={toastObj.type} message={toastObj.message}
-            onClose={() =>
-              setToasts((prev) => prev.filter((t) => t.id !== toastObj.id))
-            }
-          />
-        ))}
-      </div>
       {/* BREADCRUMB */}
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Product Upload</h5>
@@ -423,11 +407,7 @@ const ProductUpload = () => {
 
           <Button type="submit" className="btn-blue btn-lg btn-big w-100 mt-4" disabled={loading} >
             <FaCloudUploadAlt /> &nbsp;{' '}
-            {loading ? (
-              <span className="dot-loader"></span>
-            ) : (
-              'PUBLISH AND VIEW'
-            )}
+            {loading ? ( <span className="dot-loader"></span> ) : ( 'PUBLISH AND VIEW' )}
           </Button>
         </div>
       </form>

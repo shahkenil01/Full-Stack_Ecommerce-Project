@@ -4,12 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { IoMdHome } from "react-icons/io";
 import { FaCloudUploadAlt } from "react-icons/fa";
 
-import Toast from "../../../components/Toast";
+import { useSnackbar } from 'notistack';
 import CustomDropdown from '../../../components/CustomDropdown';
 import { fetchDataFromApi, postData } from '../../../utils/api';
 
 const CategoryAdd = () => {
-  const [toast, setToast] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ const CategoryAdd = () => {
     e.preventDefault();
 
     if (!formFields.subCategory || !formFields.category) {
-      setToast({ type: 'error', message: 'Please fill in all fields.' });
+      enqueueSnackbar('Please fill in all fields.', { variant: 'error' });
       return;
     }
 
@@ -62,19 +62,15 @@ const CategoryAdd = () => {
     setLoading(false);
 
     if (result?.success) {
-      navigate("/subCategory", {
-        state: {
-          toast: { type: "success", message: "Sub Category created successfully!" }
-        }
-      });
+      enqueueSnackbar( 'Sub Category created successfully!', { variant: 'success' });
+      navigate("/subCategory");
     } else {
-      setToast({ type: 'error', message: result.message || 'Failed to add Sub Category.' });
+      enqueueSnackbar(result.message || 'Failed to add Sub Category.', { variant: 'error' });
     }
   };
 
   return (
     <div className="right-content w-100 product-upload">
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
 
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Add Sub Category</h5>

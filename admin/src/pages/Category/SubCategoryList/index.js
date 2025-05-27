@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { IoMdHome } from "react-icons/io";
 import { Button, Breadcrumbs, Typography, Link as MuiLink } from '@mui/material';
 import { IoIosClose } from "react-icons/io";
@@ -11,7 +11,15 @@ const Category = () => {
   const [subCategories, setSubCategories] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if (location.state?.toast) {
+      enqueueSnackbar(location.state.toast.message, { variant: location.state.toast.type });
+      navigate(location.pathname, { replace: true });
+    }
+
     (async () => {
       const res = await fetchDataFromApi('/api/subCat');
       if (res) {

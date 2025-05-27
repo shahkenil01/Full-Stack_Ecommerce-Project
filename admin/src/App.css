@@ -698,6 +698,8 @@ body.dark .dropdown-item:focus {
   font-size: 13px !important;
   font-weight: 700 !important;
   padding: 9px 16px !important;}
+th.atimg{
+  width: 160px !important;}
 
 .table tbody td {
   color: #2f2d3e;

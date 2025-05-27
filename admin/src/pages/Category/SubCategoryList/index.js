@@ -79,34 +79,46 @@ const Category = () => {
             <table className="table table-bordered v-align page">
               <thead className="thead-dark ">
                 <tr>
-                  <th style={{ width: "100px" }}>CATEGORY IMAGE</th>
+                  <th className='atimg' style={{ width: "100px" }}>CATEGORY IMAGE</th>
                   <th style={{ width: "170px" }}>CATEGORY</th>
                   <th>SUB CATEGORY</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.values(grouped).map((cat, idx) => (
-                  <tr key={idx}>
-                    <td>
-                      <div className="d-flex align-items-center productBox" style={{ width: "150px" }}>
-                        <div className="imgWrapper" style={{ width: "50px", height: "50px" }}>
-                          <div className="img card shadow m-0">
-                            <img src={cat.image} alt={cat.name} />
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{cat.name}</td>
-                    <td>
-                      {cat.subCats.map((s) => (
-                        <span className='badge badge-primary mx-1' key={s.id}>
-                          {s.name}
-                          <IoIosClose className="cursor" style={{ fontSize: '20px', marginTop: '-2px' }} onClick={() => handleDelete(s.id)} />
-                        </span>
-                      ))}
+                {Object.values(grouped).length === 0 ? (
+                  <tr>
+                    <td colSpan="3" style={{ textAlign: "center", padding: "10px" }}>
+                      No Sub Category Found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  Object.values(grouped).map((cat, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <div className="d-flex align-items-center productBox" style={{ width: "150px" }}>
+                          <div className="imgWrapper" style={{ width: "50px", height: "50px" }}>
+                            <div className="img card shadow m-0">
+                              <img src={cat.image} alt={cat.name} />
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{cat.name}</td>
+                      <td>
+                        {cat.subCats.map((s) => (
+                          <span className="badge badge-primary mx-1" key={s.id}>
+                            {s.name}
+                            <IoIosClose
+                              className="cursor"
+                              style={{ fontSize: '20px', marginTop: '-2px' }}
+                              onClick={() => handleDelete(s.id)}
+                            />
+                          </span>
+                        ))}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

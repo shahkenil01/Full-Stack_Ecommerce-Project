@@ -20,19 +20,6 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      let page = 1, all = [], hasMore = true;
-      while (hasMore) {
-        const res = await fetchDataFromApi(`/api/category?page=${page}`);
-        hasMore = res?.categoryList?.length > 0 && page < res.totalPages;
-        all.push(...(res?.categoryList || []));
-        page++;
-      }
-      setCategories(all);
-    })();
-  }, []);
-
-  useEffect(() => {
     fetchDataFromApi("/api/products").then((res) => {
       setProductList(Array.isArray(res) ? res : (res?.productList || []));
     });
@@ -61,6 +48,19 @@ const Products = () => {
       const allSubs = Array.isArray(res) ? res : [];
       setSubcategories(allSubs);
     });
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let page = 1, all = [], hasMore = true;
+      while (hasMore) {
+        const res = await fetchDataFromApi(`/api/category?page=${page}`);
+        hasMore = res?.categoryList?.length > 0 && page < res.totalPages;
+        all.push(...(res?.categoryList || []));
+        page++;
+      }
+      setCategories(all);
+    })();
   }, []);
 
   return (

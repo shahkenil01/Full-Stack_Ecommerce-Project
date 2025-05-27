@@ -1175,11 +1175,6 @@ textarea {
   opacity: .5;
   text-align: center;}
 
-.toast-success {
-  background-color: #28a745 !important;}
-.toast-error {
-  background-color: #dc3545 !important;}
-
 /*Mui Toast Close Button*/
 .go703367398 {
   padding-left: 5px !important;}

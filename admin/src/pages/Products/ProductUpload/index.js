@@ -82,6 +82,10 @@ const ProductUpload = () => {
     })();
   }, [category]);
 
+  useEffect(() => {
+    setFormFields((prev) => ({ ...prev, subcategory }));
+  }, [subcategory]);
+
   // OTHERS
   const [isFeatured, setIsFeatured] = useState('');
   useEffect(() => {
@@ -155,7 +159,7 @@ const ProductUpload = () => {
       return;
     }
 
-    const finalData = { ...formFields, images: [] };
+    const finalData = { ...formFields, images: [], subcategory };
     const cloudinaryUrls = [];
     const uploadedSet = new Set();
 
@@ -183,7 +187,7 @@ const ProductUpload = () => {
     setLoading(false);
 
     if (res && res._id) {
-      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, });
+      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', subcategory:'', countInStock: 0, rating: 0, isFeatured: false, });
       setImagesData([]);
       enqueueSnackbar('Product uploaded successfully!', { variant: 'success' });
       navigate('/products');

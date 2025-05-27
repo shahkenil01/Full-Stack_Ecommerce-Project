@@ -34,6 +34,11 @@ const productSchema = mongoose.Schema({
     ref: 'Category',
     required: [true, "Product category is required"]
   },
+  subcategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SubCategory',
+    required: false
+  },
   countInStock: {
     type: Number,
     required: [true, "Stock count is required"],

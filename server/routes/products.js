@@ -15,7 +15,7 @@ cloudinary.config({
 
 router.get('/', async (req, res) => {
   try {
-    const productList = await Product.find().populate("category");
+    const productList = await Product.find().populate("category").populate("subcategory");
     res.status(200).json(productList);
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 
 router.post('/create', async (req, res) => {
   try {
-    const { name, description, images, brand, price, oldPrice, category, countInStock, rating, isFeatured, numReviews } = req.body;
+    const { name, description, images, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, numReviews } = req.body;
 
     if (!name || !description || !brand || !price || !category || !countInStock || !images || images.length === 0) {
       return res.status(400).json({ success: false, message: 'Please fill all required fields.' });
@@ -32,7 +32,7 @@ router.post('/create', async (req, res) => {
 
     const imgUrls = images;
 
-    const product = new Product({ name, description, images: imgUrls, brand, price, oldPrice, category, countInStock, rating, isFeatured, numReviews });
+    const product = new Product({ name, description, images: imgUrls, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, numReviews });
     const savedProduct = await product.save();
 
     res.status(201).json(savedProduct);
@@ -76,7 +76,7 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const limit = pLimit(2);
-  const { name, description, brand, price, category: categoryId, countInStock, rating, isFeatured, images } = req.body;
+  const { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images } = req.body;
 
   if (!name) return res.status(400).json({ error: "Product name is required" });
   if (!description) return res.status(400).json({ error: "Description is required" });
@@ -119,7 +119,7 @@ router.put('/:id', async (req, res) => {
     );
 
     // ─── 4) Prepare the rest of the data and update ─────────────────────────
-    const updatedData = { name, description, brand, price, category: categoryId, countInStock, rating, isFeatured, images: finalImages };
+    const updatedData = { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images: finalImages };
 
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updatedData, { new: true });
     res.status(200).json({ message: "Product updated successfully", data: updatedProduct });

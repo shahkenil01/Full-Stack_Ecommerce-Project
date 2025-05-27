@@ -44,7 +44,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchDataFromApi("/api/SubCat").then((res) => {
-      const allSubs = Array.isArray(res) ? res : (res?.subCatList || []);
+      const allSubs = Array.isArray(res) ? res : [];
       setSubcategories(allSubs);
     });
   }, []);
@@ -135,7 +135,7 @@ const Products = () => {
                       </div>
                     </td>
                     <td>{item.category?.name || "No Category"}</td>
-                    <td>{ subcategories.find((s) => s._id === item.subcategory)?.subCat || 'No Subcategory' }</td>
+                    <td>{item.subcategory?.subCat || 'No Subcategory'}</td>
                     <td><span className="badge badge-secondary">{item.brand}</span></td>
                     <td>
                       <div style={{ width: "70px" }}>

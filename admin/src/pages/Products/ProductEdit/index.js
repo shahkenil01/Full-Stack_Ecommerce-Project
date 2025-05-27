@@ -26,6 +26,12 @@ const ProductEdit = () => {
   const [addingUrl, setAddingUrl] = useState(false);
 
   useEffect(() => {
+    if (formFields.subcategory) {
+      setSubcategory(formFields.subcategory);
+    }
+  }, [formFields.subcategory]);
+
+  useEffect(() => {
     (async () => {
       const res = await fetchDataFromApi(`/api/products/${id}`);
       if (res) {
@@ -85,13 +91,21 @@ const ProductEdit = () => {
     (async () => {
       const res = await fetchDataFromApi(`/api/SubCat/by-category/${formFields.category}`);
       if (res && res.length > 0) {
-        setSubcategories(res.map((sub) => ({ value: sub._id, label: sub.subCat })));
+        const options = res.map((sub) => ({ value: sub._id, label: sub.subCat }));
+        setSubcategories(options);
+      
+        if (formFields.subcategory) {
+          const found = options.find((o) => o.value === formFields.subcategory || o.value === formFields.subcategory._id);
+          if (found) {
+            setSubcategory(found.value);
+          }
+        }
       } else {
         setSubcategories([]);
+        setSubcategory('');
       }
-      setSubcategory('');
     })();
-  }, [formFields.category]);
+  }, [formFields.category, formFields.subcategory]);
 
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, subcategory }));

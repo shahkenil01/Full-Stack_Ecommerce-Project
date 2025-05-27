@@ -17,8 +17,6 @@ const ProductEdit = () => {
   });
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [inputType, setInputType] = useState('url');
-  const [categories, setCategories] = useState([]);
-  const [category, setCategory] = useState([]);
   const navigate = useNavigate();
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -38,14 +36,6 @@ const ProductEdit = () => {
     })();
   }, [id]);
 
-  useEffect(() => {
-    (async () => {
-      const res = await fetchDataFromApi(`/api/category?page=1`);
-      const all = res?.categoryList || [];
-      setCategories(all.map((cat) => ({ value: cat._id, label: cat.name })));
-    })();
-  }, []);
-
   const inputChange = (e) => {
     const { name, value } = e.target;
     setFormFields((prev) => ({
@@ -57,12 +47,57 @@ const ProductEdit = () => {
   };
 
   // CATEGORY
+  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      let page = 1, all = [], hasMore = true;
+      while (hasMore) {
+        const res = await fetchDataFromApi(`/api/category?page=${page}`);
+        if (res?.categoryList?.length) {
+          all.push(...res.categoryList);
+          page++;
+          hasMore = page <= res.totalPages;
+        } else {
+          hasMore = false;
+        }
+      }
+      setCategories(all.map((cat) => ({ value: cat._id, label: cat.name })));
+    })();
+  }, []);
+
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, category }));
   }, [category]);
 
-  // OTHERS
+  // SUB CATEGORY
   const [subcategory, setSubcategory] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
+
+  useEffect(() => {
+    if (!formFields.category || typeof formFields.category !== 'string') {
+      setSubcategories([]);
+      setSubcategory('');
+      return;
+    }
+
+    (async () => {
+      const res = await fetchDataFromApi(`/api/SubCat/by-category/${formFields.category}`);
+      if (res && res.length > 0) {
+        setSubcategories(res.map((sub) => ({ value: sub._id, label: sub.subCat })));
+      } else {
+        setSubcategories([]);
+      }
+      setSubcategory('');
+    })();
+  }, [formFields.category]);
+
+  useEffect(() => {
+    setFormFields((prev) => ({ ...prev, subcategory }));
+  }, [subcategory]);
+
+  // OTHERS
   const [isFeatured, setIsFeatured] = useState('');
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, isFeatured: isFeatured === '10' }));
@@ -225,13 +260,10 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>SUB CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={subcategory} onChange={setSubcategory}
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: 'Jeans' },
-                      { value: '20', label: 'Shirts' },
-                    ]}
-                    placeholder="None"
+                  <CustomDropdown value={subcategory} onChange={setSubcategory} options={subcategories}
+                    placeholder={ !formFields.category ? "Select Category":
+                      subcategories.length > 0 ? "Select Subcategory" : "No SubCategory Found" }
+                    isDisabled={!formFields.category || subcategories.length === 0}
                   />
                 </FormControl>
               </div>

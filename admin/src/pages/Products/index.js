@@ -11,6 +11,7 @@ import { useSnackbar } from 'notistack';
 
 const Products = () => {
   const [categoryBy, setCategoryBy] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
   const [productList, setProductList] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -40,6 +41,13 @@ const Products = () => {
       enqueueSnackbar(res?.message || "Failed to delete product.", { variant: "error" });
     }
   };
+
+  useEffect(() => {
+    fetchDataFromApi("/api/SubCat").then((res) => {
+      const allSubs = Array.isArray(res) ? res : (res?.subCatList || []);
+      setSubcategories(allSubs);
+    });
+  }, []);
 
   return (
     <div className="right-content w-100">
@@ -127,7 +135,7 @@ const Products = () => {
                       </div>
                     </td>
                     <td>{item.category?.name || "No Category"}</td>
-                    <td>Men Bags</td>
+                    <td>{ subcategories.find((s) => s._id === item.subcategory)?.subCat || 'No Subcategory' }</td>
                     <td><span className="badge badge-secondary">{item.brand}</span></td>
                     <td>
                       <div style={{ width: "70px" }}>

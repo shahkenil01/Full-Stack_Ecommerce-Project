@@ -7,11 +7,12 @@ import { IoCloseSharp } from 'react-icons/io5';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 import { postData } from '../../../utils/api';
-import Toast from "../../../components/Toast";
+import { useSnackbar } from 'notistack';
 
 const CategoryAdd = () => {
   const navigate = useNavigate();
-  const [toast, setToast] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
+
   const [loading, setLoading] = useState(false);
   const [inputType, setInputType] = useState('url');
   const [formFields, setFormFields] = useState({
@@ -43,15 +44,15 @@ const CategoryAdd = () => {
     const { name, color, images } = formFields;
 
     if (!name.trim() || !color.trim()) {
-      return setToast({ type: "error", message: "Please fill all the details" });
+      return enqueueSnackbar("Please fill all the details", { variant: "error" });
     }
 
     if (inputType === 'url' && (!images[0] || !images[0].trim())) {
-      return setToast({ type: "error", message: "Please provide image URL" });
+      return enqueueSnackbar("Please provide image URL", { variant: "error" });
     }
 
     if (inputType === 'file' && !uploadedFile) {
-      return setToast({ type: "error", message: "Please upload an image" });
+      return enqueueSnackbar("Please upload an image", { variant: "error" });
     }
 
     const finalData = { name: name.trim(), color: color.trim(), images: [] };
@@ -73,24 +74,20 @@ const CategoryAdd = () => {
     setLoading(false);
 
     if (res?.success) {
-      navigate("/category", {
-        state: {
-          toast: { type: "success", message: "Category created successfully!" }
-        }
-      });
+      enqueueSnackbar("Category created successfully!", { variant: "success" });
+      navigate("/category");
     } else {
-      setToast({
-        type: "error",
-        message: res?.message === "Category name already exists"
+      enqueueSnackbar(
+        res?.message === "Category name already exists"
           ? "Category name already exists!"
-          : res?.message || "Failed to create category."
-      });
+          : res?.message || "Failed to create category.",
+        { variant: "error" }
+      );
     }
   };
 
   return (
     <div className="right-content w-100 product-upload">
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
 
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Add Category</h5>

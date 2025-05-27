@@ -1,19 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
 import { FaPencilAlt } from "react-icons/fa";
 import { IoMdHome } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
-
 import { Button, Breadcrumbs, Typography, Link as MuiLink, Pagination } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { fetchDataFromApi, deleteData } from '../../utils/api';
-import Toast from "../../components/Toast";
+import { useSnackbar } from 'notistack';
 
 const Category = () => {
 
   const [catData, setCatData] = useState([]);
-  const [toast, setToast] = useState(null);
   const location = useLocation();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -29,10 +27,10 @@ const Category = () => {
 
   useEffect(() => {
     if (location.state?.toast) {
-      setToast(location.state.toast);
+      enqueueSnackbar(location.state.toast.message, { variant: location.state.toast.type });
       window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.state, enqueueSnackbar]);
 
   const handleDelete = async (id) => {
     const res = await deleteData(`/api/category/${id}`);
@@ -46,9 +44,9 @@ const Category = () => {
       const updated = await fetchDataFromApi(`/api/category?page=${newPage}`);
       setCatData(updated);
       
-      setToast({ type: "success", message: "Category deleted successfully!" });
+      enqueueSnackbar("Category deleted successfully!", { variant: "success" });
     } else {
-      setToast({ type: "error", message: res?.message || "Failed to delete category." });
+      enqueueSnackbar(res?.message || "Failed to delete category.", { variant: "error" });
     }
   };  
 
@@ -127,9 +125,6 @@ const Category = () => {
         </div>
       </div>
     </div>
-
-    <div style={{ position: "fixed", left: "20px", bottom: "20px", zIndex: 9999, display: "flex", flexDirection: "column-reverse", gap: "5px", }}>
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}</div>
 </>
   );
 };

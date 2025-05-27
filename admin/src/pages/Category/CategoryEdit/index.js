@@ -6,14 +6,14 @@ import { FaCloudUploadAlt, FaRegImage } from "react-icons/fa";
 import { IoCloseSharp } from 'react-icons/io5';
 
 import { fetchDataFromApi, putData } from '../../../utils/api';
-import Toast from "../../../components/Toast";
+import { useSnackbar } from 'notistack';
 
 const CategoryEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
   const [inputType, setInputType] = useState('url');
 
   const [formFields, setFormFields] = useState({
@@ -68,18 +68,18 @@ const CategoryEdit = () => {
     e.preventDefault();
 
     if (!formFields.name.trim() || !formFields.color.trim()) {
-      setToast({ type: "error", message: "Please fill all the details" });
+      enqueueSnackbar("Please provide image URL", { variant: "error" });
       return;
     }
 
     if (inputType === 'url' && (!formFields.images || !formFields.images[0]?.trim())) {
-      setToast({ type: "error", message: "Please provide image URL" });
+      enqueueSnackbar("Please upload a new image or Details", { variant: "error" });
       return;
     }
 
     if (inputType === 'file') {
       if (uploadedFiles.length === 0) {
-        setToast({ type: "error", message: "Please upload a new image or Details" });
+        enqueueSnackbar("Please upload a new image or Details", { variant: "error" });
         return;
       }
 
@@ -100,13 +100,10 @@ const CategoryEdit = () => {
     const res = await putData(`/api/category/${id}`, formFields);
 
     if (res?.message === "Category updated") {
-      navigate("/category", {
-        state: {
-          toast: { type: "success", message: "Category updated successfully!" }
-        }
-      });
+      enqueueSnackbar("Category updated successfully!", { variant: "success" });
+      navigate("/category");
     } else {
-      setToast({ type: "error", message: res?.message || "Failed to update category." });
+      enqueueSnackbar(res?.message || "Failed to update category.", { variant: "error" });
     }
 
     setLoading(false);
@@ -114,9 +111,6 @@ const CategoryEdit = () => {
 
   return (
     <div className="right-content w-100 product-upload">
-      <div style={{ position: "fixed", left: "20px", bottom: "20px", zIndex: 9999, display: "flex", flexDirection: "column-reverse", gap: "5px", }}>
-        {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
-      </div>
 
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Edit Category</h5>

@@ -17,6 +17,7 @@ const ProductEdit = () => {
   });
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [inputType, setInputType] = useState('url');
+  const [initialData, setInitialData] = useState(null);
   const navigate = useNavigate();
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -36,6 +37,7 @@ const ProductEdit = () => {
       const res = await fetchDataFromApi(`/api/products/${id}`);
       if (res) {
         setFormFields(res);
+        setInitialData(res);
       } else {
         enqueueSnackbar('Product not found!', { variant: 'error' });
       }
@@ -157,6 +159,19 @@ const ProductEdit = () => {
 
     if (missing.length > 0) {
       enqueueSnackbar(`Please fill ${missing.join(', ')}`, { variant: 'error' });
+      setLoadingSubmit(false);
+      return;
+    }
+
+    const isSame = initialData && Object.entries(initialData).every(([key, value]) => {
+      if (Array.isArray(value)) {
+        return JSON.stringify(value) === JSON.stringify(formFields[key]);
+      }
+      return value === formFields[key];
+    });
+
+    if (isSame) {
+      enqueueSnackbar("No changes made.", { variant: "error" });
       setLoadingSubmit(false);
       return;
     }

@@ -15,7 +15,7 @@ import ProductUpload from './pages/Products/ProductUpload';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';
-import SubCategory from './pages/Category/ListSubCat';
+import SubCategory from './pages/Category/SubCategoryList';
 import SubCategoryAdd from './pages/Category/SubCatAdd';
 import TopLoadingBar from './components/TopLoadingBar';
 import ProductsRam from './pages/Products/ProductsRam';

@@ -6,12 +6,17 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 
 import Toast from "../../../components/Toast";
 import CustomDropdown from '../../../components/CustomDropdown';
-import { fetchDataFromApi } from '../../../utils/api';
+import { fetchDataFromApi, postData } from '../../../utils/api';
 
 const CategoryAdd = () => {
   const [toast, setToast] = useState(null);
+
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState('');
+
   const [formFields, setFormFields] = useState({
     subCategory: '',
     category: ''
@@ -19,6 +24,7 @@ const CategoryAdd = () => {
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, category }));
   }, [category]);
+
 
   useEffect(() => {
     (async () => {
@@ -36,6 +42,34 @@ const CategoryAdd = () => {
   const changeInput = (e) => {
     const { name, value } = e.target;
     setFormFields((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formFields.subCategory || !formFields.category) {
+      setToast({ type: 'error', message: 'Please fill in all fields.' });
+      return;
+    }
+
+    const payload = {
+      subCat: formFields.subCategory,
+      category: formFields.category,
+    };
+
+    setLoading(true);
+    const result = await postData('/api/subCat/create', payload);
+    setLoading(false);
+
+    if (result?.success) {
+      navigate("/subCategory", {
+        state: {
+          toast: { type: "success", message: "Sub Category created successfully!" }
+        }
+      });
+    } else {
+      setToast({ type: 'error', message: result.message || 'Failed to add Sub Category.' });
+    }
   };
 
   return (
@@ -70,12 +104,11 @@ const CategoryAdd = () => {
 
               <div className="form-group">
                 <h6>Sub Category</h6>
-                <input type="text" name="subCategory" onChange={changeInput} />
+                <input type="text" name="subCategory" value={formFields.subCategory} onChange={changeInput} />
               </div>
 
-              <Button className="btn-blue btn-lg btn-big w-100">
-                <FaCloudUploadAlt />
-                &nbsp; "PUBLISH AND VIEW"
+              <Button className="btn-blue btn-lg btn-big w-100" onClick={handleSubmit} disabled={loading}>
+                <FaCloudUploadAlt /> &nbsp; {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}
               </Button>
             </div>
           </div>

@@ -1178,6 +1178,15 @@ textarea {
 .toast-error {
   background-color: #dc3545 !important;}
 
+/*Mui Toast Close Button*/
+.go703367398 {
+  padding-left: 5px !important;}
+.css-h7cjts-MuiButtonBase-root-MuiIconButton-root{
+  height: 25px !important;
+  width: 25px !important;}
+.css-1umw9bq-MuiSvgIcon-root{
+  font-size: 18px !important;}
+
 .dot-loader {
   display: inline-block;
   width: 16px;

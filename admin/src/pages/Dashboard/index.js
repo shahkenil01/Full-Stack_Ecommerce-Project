@@ -14,7 +14,10 @@ import SearchBox from "../../components/SearchBox";
 
 const Dashboard = () => {
   const [categoryBy, setCategoryBy] = useState('');
+  const [categories, setCategories] = useState([]);
   const [productList, setProductList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [prevFilteredCount, setPrevFilteredCount] = useState(0);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -24,8 +27,6 @@ const Dashboard = () => {
       setProductList(res || []);
     });
   }, []);
-
-  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -39,6 +40,21 @@ const Dashboard = () => {
       setCategories(all);
     })();
   }, []);
+
+  const filteredProducts = productList
+    .filter((item) => {
+      const matchCategory = categoryBy ? item.category?._id === categoryBy : true;
+      const matchSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCategory && matchSearch;
+    });
+    
+  useEffect(() => {
+    if (page > 0 && filteredProducts.length <= page * rowsPerPage) {
+      setPage(0); // Reset page if current page doesn't have items
+    }
+    setPrevFilteredCount(filteredProducts.length);
+  }, [filteredProducts.length]);
+
 
   return (
     <div className="right-content home w-100">
@@ -74,7 +90,7 @@ const Dashboard = () => {
 
           <div className="col-md-9 d-flex justify-content-end">
             <div className="searchWrap d-flex">
-              <SearchBox />
+              <SearchBox value={searchQuery} onChange={setSearchQuery}/>
             </div>
           </div>
         </div>
@@ -93,10 +109,17 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {productList?.length > 0 ? productList
-                .filter(item => categoryBy ? item.category?._id === categoryBy : true)
+              {productList.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-2.5"> No products found in database. </td>
+                </tr>
+              ) : filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-2.5"> No products found for this filter. </td>
+                </tr>
+              ) : ( filteredProducts
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) 
-                .map((item, index) => (
+                .map((item) => (
                 <tr key={item._id}>
                   <td>
                     <div className="d-flex align-items-center productBox">
@@ -131,15 +154,16 @@ const Dashboard = () => {
                     </div>
                   </td>
                 </tr>
-              )) : (
-                <tr><td colSpan="10">No products found</td></tr>
-              )}
+              ))
+            )}
             </tbody>
           </table>
           <TablePagination 
             component="div"
-            count={productList.length} 
-            page={page} onPageChange={(event, newPage) => setPage(newPage)} rowsPerPage={rowsPerPage} 
+            count={filteredProducts.length} 
+            page={page} 
+            onPageChange={(event, newPage) => setPage(newPage)} 
+            rowsPerPage={rowsPerPage} 
             onRowsPerPageChange={(event) => { setRowsPerPage(parseInt(event.target.value, 10));   setPage(0); }} 
             rowsPerPageOptions={[5, 10, 25]} />
         </div>

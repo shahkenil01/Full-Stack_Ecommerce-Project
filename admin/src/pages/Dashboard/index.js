@@ -47,14 +47,16 @@ const Dashboard = () => {
       const matchSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchSearch;
     });
-    
+
   useEffect(() => {
     if (page > 0 && filteredProducts.length <= page * rowsPerPage) {
-      setPage(0); // Reset page if current page doesn't have items
+      setPage(0);
     }
     setPrevFilteredCount(filteredProducts.length);
   }, [filteredProducts.length]);
-
+  useEffect(() => {
+    setPage(0);
+  }, [categoryBy, searchQuery]);
 
   return (
     <div className="right-content home w-100">

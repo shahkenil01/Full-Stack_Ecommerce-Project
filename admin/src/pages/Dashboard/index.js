@@ -25,6 +25,21 @@ const Dashboard = () => {
     });
   }, []);
 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      let page = 1, all = [], hasMore = true;
+      while (hasMore) {
+        const res = await fetchDataFromApi(`/api/category?page=${page}`);
+        hasMore = res?.categoryList?.length > 0 && page < res.totalPages;
+        all.push(...(res?.categoryList || []));
+        page++;
+      }
+      setCategories(all);
+    })();
+  }, []);
+
   return (
     <div className="right-content home w-100">
       <div className="row dashboardBoxWrapperRow dashboard_Box dashboardBoxWrapperRowV2">
@@ -48,12 +63,10 @@ const Dashboard = () => {
               <CustomDropdown
                 value={categoryBy}
                 onChange={setCategoryBy}
-                options={[
-                  { value: '', label: 'None' },
-                  { value: 10, label: 'Ten' },
-                  { value: 20, label: 'Twenty' },
-                  { value: 30, label: 'Thirty' }
-                ]}
+                options={[{ value: '', label: 'All' }, ...categories.map(cat => ({
+                  value: cat._id,
+                  label: cat.name
+                }))]}
                 placeholder="None"
               />
             </FormControl>
@@ -81,7 +94,9 @@ const Dashboard = () => {
             </thead>
             <tbody>
               {productList?.length > 0 ? productList
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) .map((item, index) => (
+                .filter(item => categoryBy ? item.category?._id === categoryBy : true)
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) 
+                .map((item, index) => (
                 <tr key={item._id}>
                   <td>
                     <div className="d-flex align-items-center productBox">
@@ -97,7 +112,7 @@ const Dashboard = () => {
                     </div>
                   </td>
                   <td>{item.category?.name || "No Category"}</td>
-                  <td>Men Bags</td>
+                  <td>{item.subcategory?.subCat || "No Subcategory"}</td>
                   <td><span className="badge badge-secondary">{item.brand}</span></td>
                   <td>
                     <div style={{ width: "70px" }}>

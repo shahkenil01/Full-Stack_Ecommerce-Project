@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { MdDashboard } from "react-icons/md";
+import { IoImageOutline } from "react-icons/io5";
 import { FaAngleRight, FaProductHunt } from "react-icons/fa";
 import { TbCategoryFilled } from "react-icons/tb";
+import { FaClipboardCheck } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 
 const Sidebar = () => {
@@ -47,6 +49,20 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
+          <Button className={`w-100 ${activeTab === 1 && 'active'}`}
+            onClick={() => handleTabClick(1)} >
+            <span className='icon'><IoImageOutline /></span>
+            Home Banner Slides
+            <span className={`arrow ${isOpen[1] ? 'rotate' : ''}`}><FaAngleRight /></span>
+          </Button>
+          <div className={`submenuWrapper ${isOpen[1] ? 'colapse' : 'colapsed'}`}>
+            <ul className='submenu'>
+              <li><Link to="/homeBannerSlide/add" className={location.pathname === '/homeBannerSlide/add' ? 'active-submenu' : ''}>Add Home Banner Slide</Link></li>
+              <li><Link to="/homeBannerSlide/list" className={location.pathname === '/homeBannerSlide/list' ? 'active-submenu' : ''}>Home Banner Slide</Link></li>
+            </ul>
+          </div>
+        </li>
+        <li>
           <Button className={`w-100 ${activeTab === 2 ? 'active' : ''}`}
             onClick={() => handleTabClick(2)} >
             <span className='icon'><TbCategoryFilled /></span>
@@ -76,6 +92,57 @@ const Sidebar = () => {
               <li><Link to="/productRAMS/add" className={location.pathname === '/productRAMS/add' ? 'active-submenu' : ''}>Add Product RAMS</Link></li>
               <li><Link to="/productWEIGHT/add" className={location.pathname === '/productWEIGHT/add' ? 'active-submenu' : ''}>Add Product WEIGHT</Link></li>
               <li><Link to="/productSIZE/add" className={location.pathname === '/productSIZE/add' ? 'active-submenu' : ''}>Add Product SIZE</Link></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <Link to="/orders">
+            <Button className={`w-100 ${activeTab === 4 && 'active'}`}
+              onClick={() => handleTabClick(4)} >
+              <span className='icon'><FaClipboardCheck /></span>
+              Orders
+            </Button>
+          </Link>
+        </li>
+        <li>
+          <Button className={`w-100 ${activeTab === 5 && 'active'}`}
+            onClick={() => handleTabClick(5)} >
+            <span className='icon'><IoImageOutline /></span>
+            Home Banners
+            <span className={`arrow ${isOpen[5] ? 'rotate' : ''}`}><FaAngleRight /></span>
+          </Button>
+          <div className={`submenuWrapper ${isOpen[5] ? 'colapse' : 'colapsed'}`}>
+            <ul className='submenu'>
+              <li><Link to="/banners" className={location.pathname === '/banners' ? 'active-submenu' : ''}>Banner List</Link></li>
+              <li><Link to="/banners/add" className={location.pathname === '/banners/add' ? 'active-submenu' : ''}>Banner Upload</Link></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <Button className={`w-100 ${activeTab === 6 && 'active'}`}
+            onClick={() => handleTabClick(6)} >
+            <span className='icon'><IoImageOutline /></span>
+            Home Side Banners
+            <span className={`arrow ${isOpen[6] ? 'rotate' : ''}`}><FaAngleRight /></span>
+          </Button>
+          <div className={`submenuWrapper ${isOpen[6] ? 'colapse' : 'colapsed'}`}>
+            <ul className='submenu'>
+              <li><Link to="/homeSideBanners" className={location.pathname === '/homeSideBanners' ? 'active-submenu' : ''}>Banner List</Link></li>
+              <li><Link to="/homeSideBanners/add" className={location.pathname === '/homeSideBanners/add' ? 'active-submenu' : ''}>Banner Upload</Link></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <Button className={`w-100 ${activeTab === 7 && 'active'}`}
+            onClick={() => handleTabClick(7)} >
+            <span className='icon'><IoImageOutline /></span>
+            Home Bottom Banners
+            <span className={`arrow ${isOpen[7] ? 'rotate' : ''}`}><FaAngleRight /></span>
+          </Button>
+          <div className={`submenuWrapper ${isOpen[7] ? 'colapse' : 'colapsed'}`}>
+            <ul className='submenu'>
+              <li><Link to="/homeBottomBanners" className={location.pathname === '/homeBottomBanners' ? 'active-submenu' : ''}>Banner List</Link></li>
+              <li><Link to="/homeBottomBanners/add" className={location.pathname === '/homeBottomBanners/add' ? 'active-submenu' : ''}>Banner Upload</Link></li>
             </ul>
           </div>
         </li>

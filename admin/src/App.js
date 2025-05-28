@@ -10,7 +10,8 @@ import Sidebar from './components/Sidebar';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
-import HomeBannerSlide from './pages/HomeBannerSlide/AddHomeBannerSlide';
+import HomeBannerSlide from './pages/HomeBannerSlide';
+import HomeBannerSlideAdd from './pages/HomeBannerSlide/AddHomeBannerSlide';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';
@@ -62,6 +63,7 @@ function AppWrapper() {
     { path: '/dashboard' },
     { path: '/login' },
     { path: '/signup' },
+    { path: '/homeBannerSlide/list'},
     { path: '/homeBannerSlide/add'},
     { path: '/category' },
     { path: '/category/add' },
@@ -81,6 +83,7 @@ function AppWrapper() {
   const skipLoaderRoutes = [
     '/login',
     '/signup',
+    '/homeBannerSlide/list',
     '/homeBannerSlide/add',
     '/category/add',
     '/product/upload',
@@ -115,7 +118,8 @@ function AppWrapper() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/homeBannerSlide/add" element={<HomeBannerSlide />} />
+            <Route path="/homeBannerSlide/list" element={<HomeBannerSlide />} />
+            <Route path="/homeBannerSlide/add" element={<HomeBannerSlideAdd />} />
             <Route path="/category" element={<Category />} />
             <Route path="/category/add" element={<CategoryAdd />} />
             <Route path="/category/edit/:id" element={<CategoryEdit />} />

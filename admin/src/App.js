@@ -3,25 +3,26 @@ import { createContext, useEffect, useState } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css';
 import ScrollToTop from './components/ScrollToTop';
+import TopLoadingBar from './components/TopLoadingBar';
 import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
-import ProductDetails from './pages/Products/ProductDetails';
-import Products from './pages/Products';
-import ProductUpload from './pages/Products/ProductUpload';
+import HomeBannerSlide from './pages/HomeBannerSlide';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';
 import SubCategory from './pages/Category/SubCategoryList';
 import SubCategoryAdd from './pages/Category/SubCatAdd';
-import TopLoadingBar from './components/TopLoadingBar';
+import Products from './pages/Products';
+import ProductDetails from './pages/Products/ProductDetails';
+import ProductUpload from './pages/Products/ProductUpload';
+import ProductEdit from './pages/Products/ProductEdit';
 import ProductsRam from './pages/Products/ProductsRam';
 import ProductsWeight from './pages/Products/ProductsWeight';
 import ProductsSize from './pages/Products/ProductsSize';
-import ProductEdit from './pages/Products/ProductEdit';
 
 const MyContext = createContext();
 
@@ -61,24 +62,26 @@ function AppWrapper() {
     { path: '/dashboard' },
     { path: '/login' },
     { path: '/signup' },
+    { path: '/homeBannerSlide/add'},
+    { path: '/category' },
+    { path: '/category/add' },
+    { path: '/category/edit/:id' },
+    { path: '/subCategory' },
+    { path: '/subCategory/add' },
     { path: '/products' },
     { path: '/product/details' },
     { path: '/product/upload' },
     { path: '/productRAMS/add' },
+    { path: '/product/edit/:id' },
     { path: '/productWEIGHT/add' },
     { path: '/productSIZE/add' },
-    { path: '/product/edit/:id' },
-    { path: '/category' },
-    { path: '/category/add' },
-    { path: '/subCategory' },
-    { path: '/subCategory/add' },
-    { path: '/category/edit/:id' },
   ];
 
   const matchedRoutes = matchRoutes(routes, location);
   const skipLoaderRoutes = [
     '/login',
     '/signup',
+    '/homeBannerSlide/add',
     '/category/add',
     '/product/upload',
     '/productRAMS/add',
@@ -112,6 +115,12 @@ function AppWrapper() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/homeBannerSlide/add" element={<HomeBannerSlide />} />
+            <Route path="/category" element={<Category />} />
+            <Route path="/category/add" element={<CategoryAdd />} />
+            <Route path="/category/edit/:id" element={<CategoryEdit />} />
+            <Route path="/subCategory" element={<SubCategory />} />
+            <Route path="/subCategory/add" element={<SubCategoryAdd />} />
             <Route path="/products" element={<Products />} />
             <Route path="/product/details" element={<ProductDetails />} />
             <Route path="/product/upload" element={<ProductUpload />} />
@@ -119,11 +128,6 @@ function AppWrapper() {
             <Route path="/productRAMS/add" element={<ProductsRam />} />
             <Route path="/productWEIGHT/add" element={<ProductsWeight />} />
             <Route path="/productSIZE/add" element={<ProductsSize />} />
-            <Route path="/category" element={<Category />} />
-            <Route path="/category/add" element={<CategoryAdd />} />
-            <Route path="/subCategory" element={<SubCategory />} />
-            <Route path="/subCategory/add" element={<SubCategoryAdd />} />
-            <Route path="/category/edit/:id" element={<CategoryEdit />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

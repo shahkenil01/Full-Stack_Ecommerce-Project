@@ -1150,7 +1150,8 @@ textarea {
   background: #f1f1f1;}
 .imgUploadBox .uploadBox img {
   height: 100%;
-  object-fit: cover;}
+  object-fit: cover;
+  border-radius: 10px;}
 .imgUploadBox .uploadBox .box .lazy-load-image-background {
   height: 100% !important;
   width: 100% !important;}
@@ -1263,6 +1264,8 @@ textarea {
 
 .be {
   margin-bottom: -18px !important;}
+.top{
+  margin-top: -20px;}
 .dashCat {
   margin-top: -10px !important;
   margin-bottom: -1px;}

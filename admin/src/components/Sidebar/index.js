@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { MdDashboard } from "react-icons/md";
-import { IoImageOutline } from "react-icons/io5";
+import { FaImage } from "react-icons/fa6";
 import { FaAngleRight, FaProductHunt } from "react-icons/fa";
 import { TbCategoryFilled } from "react-icons/tb";
 import { FaClipboardCheck } from "react-icons/fa";
@@ -20,6 +20,7 @@ const Sidebar = () => {
   };
 
   const pathToTabIndex = {
+    '/homeBannerSlide': 1,
     '/category': 2,
     '/subCategory': 2,
     '/products': 3,
@@ -27,9 +28,8 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
-    const found = Object.entries(pathToTabIndex).find(([prefix]) =>
-      location.pathname.startsWith(prefix)
-    );
+    const found = Object.entries(pathToTabIndex)
+      .find(([prefix]) => location.pathname.startsWith(prefix));
     const tabIndex = found ? found[1] : 0;
     setActiveTab(tabIndex);
   }, [location.pathname]);
@@ -47,9 +47,9 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Button className={`w-100 ${activeTab === 1 && 'active'}`}
+          <Button className={`w-100 ${activeTab === 1 ? 'active' : ''}`}
             onClick={() => handleTabClick(1)} >
-            <span className='icon'><IoImageOutline /></span>
+            <span className='icon'><FaImage /></span>
             Home Banner Slides
             <span className={`arrow ${isOpen[1] ? 'rotate' : ''}`}><FaAngleRight /></span>
           </Button>
@@ -103,9 +103,9 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Button className={`w-100 ${activeTab === 5 && 'active'}`}
+          <Button className={`w-100 ${activeTab === 5 ? 'active' : ''}`}
             onClick={() => handleTabClick(5)} >
-            <span className='icon'><IoImageOutline /></span>
+            <span className='icon'><FaImage /></span>
             Home Banners
             <span className={`arrow ${isOpen[5] ? 'rotate' : ''}`}><FaAngleRight /></span>
           </Button>
@@ -117,9 +117,9 @@ const Sidebar = () => {
           </div>
         </li>
         <li>
-          <Button className={`w-100 ${activeTab === 6 && 'active'}`}
+          <Button className={`w-100 ${activeTab === 6 ? 'active' : ''}`}
             onClick={() => handleTabClick(6)} >
-            <span className='icon'><IoImageOutline /></span>
+            <span className='icon'><FaImage /></span>
             Home Side Banners
             <span className={`arrow ${isOpen[6] ? 'rotate' : ''}`}><FaAngleRight /></span>
           </Button>
@@ -131,9 +131,9 @@ const Sidebar = () => {
           </div>
         </li>
         <li>
-          <Button className={`w-100 ${activeTab === 7 && 'active'}`}
+          <Button className={`w-100 ${activeTab === 7 ? 'active' : ''}`}
             onClick={() => handleTabClick(7)} >
-            <span className='icon'><IoImageOutline /></span>
+            <span className='icon'><FaImage /></span>
             Bottom Banners
             <span className={`arrow ${isOpen[7] ? 'rotate' : ''}`}><FaAngleRight /></span>
           </Button>

@@ -76,7 +76,7 @@ const Dashboard = () => {
 
         <div className="row cardFilters mt-3">
           <div className="col-md-3">
-            <h4>CATEGORY BY</h4>
+            <h4 className="dashCat">CATEGORY BY</h4>
             <FormControl size="small" className="w-100">
               <CustomDropdown
                 value={categoryBy}

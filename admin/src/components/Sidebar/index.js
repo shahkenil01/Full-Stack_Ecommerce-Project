@@ -12,24 +12,26 @@ const Sidebar = () => {
   const location = useLocation();
 
   const handleTabClick = (index) => {
-    setActiveTab(index);
-    setIsOpen(prev => prev.map((state, i) => i === index ? !state : false));
+    setIsOpen((prev) =>
+      prev.map((state, i) => i === index ? !state : false)
+    );
   };
 
   const isActive = (path) => location.pathname.startsWith(path);
 
   const pathToTabIndex = {
-    '/products': 1,
-    '/product': 1,
     '/category': 2,
     '/subCategory': 2,
+    '/products': 3,
+    '/product': 3,
   };
 
   useEffect(() => {
     const found = Object.entries(pathToTabIndex).find(([prefix]) =>
       location.pathname.startsWith(prefix)
     );
-    setActiveTab(found ? found[1] : 0);
+    const tabIndex = found ? found[1] : 0;
+    setActiveTab(tabIndex);
   }, [location.pathname]);
 
   return (
@@ -45,24 +47,7 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Button className={`w-100 ${isActive('/products') || activeTab === 1 ? 'active' : ''}`}
-            onClick={() => handleTabClick(1)} >
-            <span className='icon'><FaProductHunt /></span>
-            Products
-            <span className={`arrow ${isOpen[1] ? 'rotate' : ''}`}><FaAngleRight /></span>
-          </Button>
-          <div className={`submenuWrapper ${isOpen[1] ? 'colapse' : 'colapsed'}`}>
-            <ul className='submenu'>
-              <li><Link to="/products" className={location.pathname === '/products' ? 'active-submenu' : ''}>Product List</Link></li>
-              <li><Link to="/product/upload" className={location.pathname === '/product/upload' ? 'active-submenu' : ''}>Product Upload</Link></li>
-              <li><Link to="/productRAMS/add" className={location.pathname === '/productRAMS/add' ? 'active-submenu' : ''}>Add Product RAMS</Link></li>
-              <li><Link to="/productWEIGHT/add" className={location.pathname === '/productWEIGHT/add' ? 'active-submenu' : ''}>Add Product WEIGHT</Link></li>
-              <li><Link to="/productSIZE/add" className={location.pathname === '/productSIZE/add' ? 'active-submenu' : ''}>Add Product SIZE</Link></li>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <Button className={`w-100 ${isActive('/category') || activeTab === 2 ? 'active' : ''}`}
+          <Button className={`w-100 ${activeTab === 2 ? 'active' : ''}`}
             onClick={() => handleTabClick(2)} >
             <span className='icon'><TbCategoryFilled /></span>
             Category
@@ -74,6 +59,23 @@ const Sidebar = () => {
               <li><Link to="/category/add" className={location.pathname === '/category/add' ? 'active-submenu' : ''}>Add a Category</Link></li>
               <li><Link to="/subCategory" className={location.pathname === '/subCategory' ? 'active-submenu' : ''}>Sub Category List</Link></li>
               <li><Link to="/subCategory/add" className={location.pathname === '/subCategory/add' ? 'active-submenu' : ''}>Add a Sub Category</Link></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <Button className={`w-100 ${activeTab === 3 ? 'active' : ''}`}
+            onClick={() => handleTabClick(3)} >
+            <span className='icon'><FaProductHunt /></span>
+            Products
+            <span className={`arrow ${isOpen[3] ? 'rotate' : ''}`}><FaAngleRight /></span>
+          </Button>
+          <div className={`submenuWrapper ${isOpen[3] ? 'colapse' : 'colapsed'}`}>
+            <ul className='submenu'>
+              <li><Link to="/products" className={location.pathname === '/products' ? 'active-submenu' : ''}>Product List</Link></li>
+              <li><Link to="/product/upload" className={location.pathname === '/product/upload' ? 'active-submenu' : ''}>Product Upload</Link></li>
+              <li><Link to="/productRAMS/add" className={location.pathname === '/productRAMS/add' ? 'active-submenu' : ''}>Add Product RAMS</Link></li>
+              <li><Link to="/productWEIGHT/add" className={location.pathname === '/productWEIGHT/add' ? 'active-submenu' : ''}>Add Product WEIGHT</Link></li>
+              <li><Link to="/productSIZE/add" className={location.pathname === '/productSIZE/add' ? 'active-submenu' : ''}>Add Product SIZE</Link></li>
             </ul>
           </div>
         </li>

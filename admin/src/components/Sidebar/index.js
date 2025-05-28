@@ -19,8 +19,6 @@ const Sidebar = () => {
     );
   };
 
-  const isActive = (path) => location.pathname.startsWith(path);
-
   const pathToTabIndex = {
     '/category': 2,
     '/subCategory': 2,
@@ -136,7 +134,7 @@ const Sidebar = () => {
           <Button className={`w-100 ${activeTab === 7 && 'active'}`}
             onClick={() => handleTabClick(7)} >
             <span className='icon'><IoImageOutline /></span>
-            Home Bottom Banners
+            Bottom Banners
             <span className={`arrow ${isOpen[7] ? 'rotate' : ''}`}><FaAngleRight /></span>
           </Button>
           <div className={`submenuWrapper ${isOpen[7] ? 'colapse' : 'colapsed'}`}>

@@ -381,7 +381,7 @@ body.dark .imgUploadBox .uploadBox * { color: #ffffffb3 !important; }
   justify-content: center;
   width: 25px;
   height: 25px;
-  transition: all 0.3s ease-in-out;}
+  transition: all 0.1s ease-in-out;}
 .main .sidebarWrapper .sidebar ul li button .arrow{
   display: inline-flex;
   transform: rotate(0deg);}
@@ -398,7 +398,6 @@ body.dark .imgUploadBox .uploadBox * { color: #ffffffb3 !important; }
 .main .sidebarWrapper .sidebar .submenu{
   padding: 0px 45px;
   position: relative;
-  transition: all 0.3s ease-in-out;
   height: 0px;}
 .main .sidebarWrapper .sidebar .submenu::before{
   content: '';
@@ -435,11 +434,13 @@ main .sidebarWrapper .sidebar ul .submenuWrapper{
   transition: all 0.3s ease-in-out;
   height: 0px;
   overflow: hidden;}
-.main .sidebarWrapper .sidebar ul .submenuWrapper.colapsed .submenu{
-  transition: all 0.3s ease-in-out;
+.main .sidebarWrapper .sidebar ul .submenuWrapper.colapsed {
+  pointer-events: none;
   opacity: 0;}
 
 .main .sidebarWrapper .sidebar ul .submenuWrapper.colapse{
+  pointer-events: auto;
+  opacity: 1;
   height: auto;
   overflow: inherit;
   padding: 5px 0;}

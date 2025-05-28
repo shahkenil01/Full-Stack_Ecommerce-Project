@@ -10,7 +10,7 @@ import Sidebar from './components/Sidebar';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
-import HomeBannerSlide from './pages/HomeBannerSlide';
+import HomeBannerSlide from './pages/HomeBannerSlide/AddHomeBannerSlide';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';

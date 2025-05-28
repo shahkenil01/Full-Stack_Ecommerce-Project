@@ -5,7 +5,7 @@ import { IoMdHome } from "react-icons/io";
 import { FaCloudUploadAlt, FaRegImage } from "react-icons/fa";
 import { IoCloseSharp } from 'react-icons/io5';
 
-const HomeBannerSlide = () => {
+const AddHomeBannerSlide = () => {
   const [inputType, setInputType] = useState('url');
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [imagesData, setImagesData] = useState([]);
@@ -153,4 +153,4 @@ const HomeBannerSlide = () => {
   );
 };
 
-export default HomeBannerSlide;
+export default AddHomeBannerSlide;

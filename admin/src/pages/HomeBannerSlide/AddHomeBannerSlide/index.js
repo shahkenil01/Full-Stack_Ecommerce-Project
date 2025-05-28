@@ -63,26 +63,16 @@ const AddHomeBannerSlide = () => {
         <div className="card p-4 mt-0">
 
           {/* === IMAGE SECTION === */}
-          <div className="form-group-radio mt-3">
+          <div className="form-group-radio">
             <h6>Image Input Type</h6>
-            <div>
+            <div className='mt-3'>
               <label>
-                <input
-                  type="radio"
-                  value="url"
-                  checked={inputType === 'url'}
-                  onChange={() => setInputType('url')}
-                />{' '}
+                <input type="radio" value="url" checked={inputType === 'url'} onChange={() => setInputType('url')} />{' '}
                 Image URL
               </label>
               &nbsp;&nbsp;
               <label>
-                <input
-                  type="radio"
-                  value="file"
-                  checked={inputType === 'file'}
-                  onChange={() => setInputType('file')}
-                />{' '}
+                <input type="radio" value="file" checked={inputType === 'file'} onChange={() => setInputType('file')} />{' '}
                 Upload Image
               </label>
             </div>
@@ -92,16 +82,9 @@ const AddHomeBannerSlide = () => {
             <div className="form-group mt-3 mb-2">
               <h6 className="text-uppercase">Product Image</h6>
               <div className="position-relative inputBtn">
-                <input
-                  type="text"
-                  value={imageUrlInput}
-                  onChange={(e) => setImageUrlInput(e.target.value)}
-                  placeholder="Enter image URL"
-                  style={{ paddingRight: '80px' }}
-                />
-                <Button className="btn-blue" type="button" onClick={handleImageUrlInput}>
-                  Add
-                </Button>
+                <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)}
+                  placeholder="Enter image URL" style={{ paddingRight: '80px' }} />
+                <Button className="btn-blue" type="button" onClick={handleImageUrlInput}> Add </Button>
               </div>
 
               <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3 mt-3">

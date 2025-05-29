@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { MyContext } from '../../App';
 import { Link } from 'react-router-dom';
 
-const ProductItem = ({ item }) => {
+const ProductItem = ({ item, itemView }) => {
   const { setIsOpenProductModal } = useContext(MyContext);
 
   const image = item?.images?.[0] || "https://via.placeholder.com/300";
@@ -18,7 +18,7 @@ const ProductItem = ({ item }) => {
   const id = item?._id;
 
   return (
-    <div className={`productItem`}>
+    <div className={`productItem ${itemView}`}>
       <Link to={`/product/${id}`} className="fullLink"></Link>
 
       <div className="imgWrapper">

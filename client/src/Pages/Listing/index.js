@@ -6,9 +6,10 @@ import { TfiLayoutGrid4Alt } from "react-icons/tfi";
 import { FaAngleDown } from "react-icons/fa6";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from "react";
-import ProductItem from "../../Components/ProductItem";
 import Pagination from '@mui/material/Pagination';
+import ProductItem from "../../Components/ProductItem";
+import { useEffect, useState } from "react";
+import { fetchDataFromApi } from "../../utils/api";
 
 const Listing = () => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -20,6 +21,16 @@ const Listing = () => {
     const handleClose = () => {
       setAnchorEl(null);
     };
+
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+      fetchDataFromApi('/api/products').then(res => {
+        if (Array.isArray(res)) {
+          setProducts(res);
+        }
+      });
+    }, []);
     return (
         <>
             <section className="product_Listing_Page">
@@ -58,14 +69,9 @@ const Listing = () => {
                                 </div>
 
                                 <div className="productListing">
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
-                                    <ProductItem itemView={productView}/>
+                                    {products.map((item) => (
+                                        <ProductItem key={item._id} item={item} itemView={productView} />
+                                    ))}
                                 </div>
 
                                 <div className="d-flex align-items-center justify-content-center mt-4">

@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css');
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 
 body{
   font-family: "Lato", sans-serif; 
@@ -408,12 +409,20 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   left: 45px;}
 .homeBanner-next-btn {
   right: 65px;}
-.homeBanner-prev-btn::after , .related-products-prev-btn::after{
-  content: "❮";
-  font-size: 25px;}
-.homeBanner-next-btn::after , .related-products-next-btn::after{
-  content: "❯";
-  font-size: 25px;}
+.homeBanner-prev-btn::after, .related-products-prev-btn::after {
+  content: "\f104";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 22px;
+  color: black;}
+.homeBanner-next-btn::after, .related-products-next-btn::after {
+  content: "\f105";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 22px;
+  color: black;}
+.homeBanner-prev-btn.popular-products-prev.swiper-button-disabled, .homeBanner-next-btn.popular-products-next.swiper-button-disabled {
+  opacity: 0;}
 /**Arrow Style End**/
 /**Home Banner Section End**/
 /**Home Banner Section Left Side Start**/

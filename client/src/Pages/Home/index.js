@@ -14,17 +14,18 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 const CustomNextArrow = ({ onClick, isDisabled }) => (
-    <div className={`homeBanner-next-btn popular-products-next ${isDisabled ? "disabled" : ""}`} onClick={!isDisabled ? onClick : null} />
+    <div
+        className={`homeBanner-next-btn popular-products-next ${isDisabled ? "disabled" : ""}`}
+        onClick={!isDisabled ? onClick : null}
+    />
 );
 
 const CustomPrevArrow = ({ onClick, isDisabled }) => (
-    <div className={`homeBanner-prev-btn popular-products-prev ${isDisabled ? "disabled" : ""}`} onClick={!isDisabled ? onClick : null} />
+    <div
+        className={`homeBanner-prev-btn popular-products-prev ${isDisabled ? "disabled" : ""}`}
+        onClick={!isDisabled ? onClick : null}
+    />
 );
-
-const handleSwiperUpdate = (swiper) => {
-    document.querySelector(".popular-products-prev").classList.toggle("disabled", swiper.isBeginning);
-    document.querySelector(".popular-products-next").classList.toggle("disabled", swiper.isEnd);
-};
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -32,6 +33,15 @@ const Home = () => {
 
     const [value, setValue] = React.useState(0);
     const handleChange = (event, newValue) => setValue(newValue);
+
+    const [swiperInstance, setSwiperInstance] = useState(null);
+    const [isBeginning, setIsBeginning] = useState(true);
+    const [isEnd, setIsEnd] = useState(false);
+    const handleSwiperUpdate = (swiper) => {
+        if (!swiper) return;
+        setIsBeginning(swiper.isBeginning);
+        setIsEnd(swiper.isEnd);
+    };
 
     useEffect(() => {
         fetchDataFromApi('/api/products').then(res => {
@@ -96,7 +106,8 @@ const Home = () => {
                                     modules={[Navigation]}
                                     className="mySwiper"
                                     onSlideChange={(swiper) => handleSwiperUpdate(swiper)}
-                                    onSwiper={(swiper) => handleSwiperUpdate(swiper)}
+                                    onSwiper={(swiper) => { setSwiperInstance(swiper); requestAnimationFrame(() => { swiper.update();
+                                        handleSwiperUpdate(swiper); }); }}
                                 >
                                     {products.map((item) => (
                                         <SwiperSlide key={item._id}>

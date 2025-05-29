@@ -54,11 +54,7 @@ const HomeBannerSlide = () => {
                     <div className="d-flex align-items-center productBox" style={{ width: "100%" }}>
                       <div className="imgWrapper" style={{ width: "200%", flex: '0 0  200px' }}>
                         <div className="img card shadow m-0">
-                          <img
-                            src={item.image}
-                            alt="Slide"
-                            style={{ width: "100%", maxHeight: "120px", objectFit: "cover", borderRadius: "6px" }}
-                          />
+                          <img src={item.image} alt="Slide" style={{ width: "100%", maxHeight: "120px", borderRadius: "6px" }}/>
                         </div>
                       </div>
                     </div>

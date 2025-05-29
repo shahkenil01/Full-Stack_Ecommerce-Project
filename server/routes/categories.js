@@ -43,6 +43,20 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/all', async (req, res) => {
+  try {
+    const categoryList = await Category.find();
+
+    if (!categoryList) {
+      return res.status(500).json({ success: false });
+    }
+
+    return res.status(200).json(categoryList);
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);

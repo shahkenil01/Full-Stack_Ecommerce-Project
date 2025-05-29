@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import HomeBanner from "../../Components/HomeBanner";
 import ProductItem from "../../Components/ProductItem";
 import HomeCat from "../../Components/HomeCat";
@@ -8,12 +9,13 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { fetchDataFromApi } from '../../utils/api';
 
 const CustomNextArrow = ({ onClick, isDisabled }) => (
     <div className={`homeBanner-next-btn popular-products-next ${isDisabled ? "disabled" : ""}`} onClick={!isDisabled ? onClick : null} />
 );
 
-const CustomPrevArrow = ({onClick, isDisabled }) => (
+const CustomPrevArrow = ({ onClick, isDisabled }) => (
     <div className={`homeBanner-prev-btn popular-products-prev ${isDisabled ? "disabled" : ""}`} onClick={!isDisabled ? onClick : null} />
 );
 
@@ -23,6 +25,15 @@ const handleSwiperUpdate = (swiper) => {
 };
 
 const Home = () => {
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        fetchDataFromApi('/api/products').then(res => {
+            if (Array.isArray(res)) {
+                setProducts(res);
+            }
+        });
+    }, []);
 
     return (
         <>
@@ -64,12 +75,11 @@ const Home = () => {
                                     onSlideChange={(swiper) => handleSwiperUpdate(swiper)}
                                     onSwiper={(swiper) => handleSwiperUpdate(swiper)}
                                 >
-                                    <SwiperSlide><ProductItem /></SwiperSlide>
-                                    <SwiperSlide><ProductItem /></SwiperSlide>
-                                    <SwiperSlide><ProductItem /></SwiperSlide>
-                                    <SwiperSlide><ProductItem /></SwiperSlide>
-                                    <SwiperSlide><ProductItem /></SwiperSlide>
-                                    <SwiperSlide><ProductItem /></SwiperSlide>
+                                    {products.map((item) => (
+                                        <SwiperSlide key={item._id}>
+                                            <ProductItem item={item} />
+                                        </SwiperSlide>
+                                    ))}
                                 </Swiper>
 
                                 <CustomPrevArrow />
@@ -84,22 +94,10 @@ const Home = () => {
                                 <Button className="viewAllBtn ml-auto">View All<IoIosArrowRoundForward /></Button>
                             </div>
 
-                            <div className="product_row productRow2 w-100 mt-3 d-flex">
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
-                                <ProductItem />
+                            <div className="product_row productRow2 w-100 mt-3 d-flex flex-wrap">
+                                {products.map((item) => (
+                                    <ProductItem item={item} key={item._id} />
+                                ))}
                             </div>
 
                             <div className="d-flex mt-4 mb-2 bannerSec">
@@ -116,12 +114,10 @@ const Home = () => {
                                 </div>
                             </div>
 
-
                         </div>
                     </div>
                 </div>
             </section>
-
         </>
     );
 };

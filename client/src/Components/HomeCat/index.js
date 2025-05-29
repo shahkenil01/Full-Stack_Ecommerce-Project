@@ -7,10 +7,16 @@ import { fetchDataFromApi } from '../../utils/api';
 
 const HomeCat = () => {
   const [categories, setCategories] = useState([]);
+  const customOrder = ["Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery"];
+
+  const sortedCategories = [...categories].sort((a, b) => {
+    return customOrder.indexOf(a.name) - customOrder.indexOf(b.name);
+  });
 
   useEffect(() => {
     fetchDataFromApi('/api/category/all').then((res) => {
       if (res) {
+        console.log("Fetched categories:", res);
         setCategories(res);
       }
     });
@@ -23,12 +29,12 @@ const HomeCat = () => {
           <h3 className="mb-3 hd">Featured Categories</h3>
           <Swiper slidesPerView={8} spaceBetween={8} navigation={false} slidesPerGroup={1}
             modules={[Navigation]} className="mySwiper4">
-            {categories.map((cat) => (
+            {sortedCategories.map((cat) => (
               <SwiperSlide key={cat._id}>
-                <div className="item text-center cursor" style={{ backgroundColor: cat.color || '#f5f5f5' }}>
-                  <img src={cat.images[0]} alt={cat.name} />
-                </div>
-                <h6>{cat.name}</h6>
+              <div className="item text-center cursor" style={{ backgroundColor: cat.color || '#f5f5f5' }}>
+                <img src={cat.images[0]} alt={cat.name} />
+              </div>
+              <h6>{cat.name}</h6>
               </SwiperSlide>
             ))}
           </Swiper>

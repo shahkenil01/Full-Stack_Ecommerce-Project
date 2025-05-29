@@ -16,7 +16,6 @@ const HomeCat = () => {
   useEffect(() => {
     fetchDataFromApi('/api/category/all').then((res) => {
       if (res) {
-        console.log("Fetched categories:", res);
         setCategories(res);
       }
     });

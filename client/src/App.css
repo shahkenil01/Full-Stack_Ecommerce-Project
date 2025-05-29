@@ -230,7 +230,7 @@ button{
   position: relative;}
 .catWrapper .sidebarNav{
   width: 180px;
-  height: 280px !important;
+  height: 310px !important;
   opacity: 0;
   background-color: #fff !important;
   position: absolute;
@@ -245,7 +245,7 @@ button{
   height: auto;
   opacity: 1;
   visibility: visible;
-  top: 52px;
+  top: 46px;
   z-index: 100;}
 .sidebarNav ul li{
   margin-top: -1px;

@@ -1,13 +1,37 @@
+import React, { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
 import { IoIosMenu } from "react-icons/io";
 import { FaAngleDown } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import images from '../../../assets/images';
+import { fetchDataFromApi } from '../../../utils/api';
 
-const  Navigation=()=>{
-
+const Navigation = () => {
     const [isopenSidebarVal, setisopenSidebarVal] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
+
+const getSubCats = (categoryId) =>
+  subCategories.filter(sub => sub.category && sub.category._id === categoryId);
+
+    const customOrder = [ "Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery" ];
+
+    useEffect(() => {
+        const loadData = async () => {
+          const cats = await fetchDataFromApi('/api/category/all');
+          const subs = await fetchDataFromApi('/api/subCat/');
+
+          if (Array.isArray(cats) && Array.isArray(subs)) {
+            const sortedAll = [...cats].sort((a, b) =>
+              (customOrder.indexOf(a.name.trim()) ?? 999) - (customOrder.indexOf(b.name.trim()) ?? 999)
+            );
+
+            setCategories(sortedAll);
+            setSubCategories(subs);
+          }
+        };
+        loadData();
+    }, []);
 
     return(
         <nav>
@@ -23,75 +47,60 @@ const  Navigation=()=>{
 
                             <div className={`sidebarNav ${isopenSidebarVal===true ? 'open' : ''}`}>
                                 <ul>
-                                    <li><Link to="/"><Button><img src={images.Fashion} width="20" className="mr-2" alt="Fashion" />Fashion</Button></Link>
-                                        <div className="submenu">
-                                            <Link to="/"><Button className="custom">men</Button></Link>
-                                            <Link to="/"><Button className="custom">women</Button></Link>
-                                        </div>
-                                    </li>
-                                    <li><Link to="/"><Button><img src={images.Electronics} width="20" className="mr-2" />Electronics</Button></Link>
-                                        <div className="submenu">
-                                            <Link to="/"><Button className="custom">Laptops</Button></Link>
-                                            <Link to="/"><Button className="custom">smart watches accessories</Button></Link>
-                                            <Link to="/"><Button className="custom">cameras</Button></Link>
-                                        </div>
-                                    </li>
-                                    <li><Link to="/"><Button><img src={images.Bags} width="20" className="mr-2" />Bags</Button></Link>
-                                        <div className="submenu">
-                                            <Link to="/"><Button className="custom">men bags</Button></Link>
-                                            <Link to="/"><Button className="custom">women bags</Button></Link>
-                                        </div>
-                                    </li>
-                                    <li><Link to="/"><Button><img src={images.Footwear} width="20" className="mr-2" />Footwear</Button></Link>
-                                        <div className="submenu">
-                                            <Link to="/"><Button className="custom">men footwear</Button></Link>
-                                            <Link to="/"><Button className="custom">women footwear</Button></Link>
-                                        </div>
-                                    </li>
-                                    <li><Link to="/"><Button><img src={images.Groceries} width="20" className="mr-2" />Groceries</Button></Link></li>
-                                    <li><Link to="/"><Button><img src={images.Beauty} width="20" className="mr-2" />Beauty</Button></Link></li>
-                                    <li><Link to="/"><Button><img src={images.Wellness} width="20" className="mr-2" />Wellness</Button></Link></li>
+                                  {categories.map((cat) => {
+                                    const subs = getSubCats(cat._id);
+                                    return (
+                                      <li key={cat._id}>
+                                        <Link to={`/cat/${cat._id}`}>
+                                          <Button>
+                                            <img src={images[cat.name]} width="20" className="mr-2" alt={cat.name} />
+                                            {cat.name}
+                                          </Button>
+                                        </Link>
+
+                                        {subs.length > 0 && (
+                                          <div className="submenu">
+                                            {subs.map((sub) => (
+                                              <Link to={`/subcat/${sub._id}`} key={sub._id}>
+                                                <Button className="custom">{sub.subCat}</Button>
+                                              </Link>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </li>
+                                    );
+                                  })}
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <div className='col-sm-10 navPart2 d-flex align-items-center '>
                         <ul className='list list-inline ml-auto'>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Fashion} width="20" className="mr-2" alt="Fashion" />fashion</Button></Link>
-                                <div className='submenu shadow widh'>
-                                    <Link to="/"><Button>men</Button></Link>
-                                    <Link to="/"><Button>women</Button></Link>
-                                </div>
-                            </li>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Electronics} width="20" className="mr-2" />electronics</Button></Link>
-                                <div className='submenu shadow'>
-                                    <Link to="/"><Button>Laptops</Button></Link>
-                                    <Link to="/"><Button>smart watches accessories</Button></Link>
-                                    <Link to="/"><Button>cameras</Button></Link>
-                                </div>
-                            </li>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Bags} width="20" className="mr-2" />bags</Button></Link>
-                                <div className='submenu shadow widh'>
-                                    <Link to="/"><Button>men bags</Button></Link>
-                                    <Link to="/"><Button>women bags</Button></Link>
-                                </div>
-                            </li>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Footwear} width="20" className="mr-2" />footwear</Button></Link>
-                                <div className='submenu shadow'>
-                                    <Link to="/"><Button>men footwear</Button></Link>
-                                    <Link to="/"><Button>women footwear</Button></Link>
-                                </div>
-                            </li>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Groceries} width="20" className="mr-2" />groceries</Button></Link></li>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Beauty} width="20" className="mr-2" />beauty</Button></Link></li>
-                            <li className='list-inline-item'><Link to="/cat/1">
-                                <Button><img src={images.Wellness} width="20" className="mr-2" />wellness</Button></Link></li>
+                          {categories
+                            .filter(cat => cat.name.trim().toLowerCase() !== 'jewellery')
+                            .map((cat) => {
+                              const subs = getSubCats(cat._id);
+                              return (
+                                <li className='list-inline-item' key={cat._id}>
+                                  <Link to={`/cat/${cat._id}`}>
+                                    <Button>
+                                      <img src={images[cat.name]} width="20" className="mr-2" alt={cat.name} />
+                                      {cat.name.toLowerCase()}
+                                    </Button>
+                                  </Link>
+                            
+                                  {subs.length > 0 && (
+                                    <div className="submenu shadow">
+                                      {subs.map(sub => (
+                                        <Link to={`/subcat/${sub._id}`} key={sub._id}>
+                                          <Button>{sub.subCat}</Button>
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  )}
+                                </li>
+                              );
+                            })}
                         </ul>
                     </div>
                 </div>

@@ -15,7 +15,7 @@ const  Navigation=()=>{
                 <div className='row'>
                     <div className='col-sm-2 navPart1'>
                         <div className='catWrapper'>
-                            <Button className='allCNameatTab align-items-center' onClick={()=>setisopenSidebarVal(!isopenSidebarVal)}>
+                            <Button className='allCatTab align-items-center' onClick={()=>setisopenSidebarVal(!isopenSidebarVal)}>
                                 <span className='icon1 mr-2'><IoIosMenu/></span>
                                 <span className="text">ALL CATEGORIES</span>
                                 <span className='icon2 ml-2'><FaAngleDown/></span>

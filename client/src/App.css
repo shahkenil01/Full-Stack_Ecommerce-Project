@@ -428,7 +428,8 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   overflow: hidden;}
 .col-md-3 {
   flex: 0 0 22%;
-  max-width: 22%;}
+  max-width: 22%;
+  margin-left: -20px;}
 .sticky{/*Banner Postion Fix*/
   position: sticky;
   top: 10px;
@@ -436,7 +437,8 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
 .info-1 {
   margin-right: 100px;}
 .info-1 .info{
-  margin-left: 10px;}
+  margin-left: 10px;
+  margin-right: 5%;}
 .homeCat .hd{
   margin-left: 20px;}
 .hd{
@@ -445,6 +447,20 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   text-transform: uppercase;}
 /**Home Banner Section Left Side End**/
 /**Home Banner Section Right Side Start**/
+.item {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 13px;
+  font-weight: 700 !important;
+  justify-content: center;
+  padding: 5px 10px !important;
+  text-transform: capitalize;
+  transition: all .2s;}
+.css-1wxkzlj-MuiTabs-flexContainer{
+  margin-right: -200px;}
+.css-a73olz{
+  margin-right: -130px;}
 .viewAllBtn{
   padding: 5px 20px !important;
   background: #fff !important;
@@ -461,10 +477,10 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
 /**Arrow Style Start**/
 /* Apply HomeBanner Arrow Styles to Popular Products */
 .popular-products-prev {
-  top: 9%;
+  top: 14%;
   left: 2.5%;}
 .popular-products-next {
-  top: 9%;
+  top: 14%;
   right: 2.5%;}
 
 .popular-products-prev.disabled, .popular-products-next.disabled, .related-products-prev-btn.disabled, .related-products-next-btn.disabled {
@@ -602,7 +618,7 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
 .productRow2{
   flex-wrap: wrap;
   gap: 10px;
-  width: 100% !important;
+  width: 102.5% !important;
   margin-left: 10px;}
 .productRow2 .productItem{
   width: 23.6%;
@@ -612,6 +628,9 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
 .swiper{
   overflow: visible !important;
   width: 98%;}
+.col-md-9.productRow {
+  flex: 0 0 79.5% !important;
+  max-width: 79.5% !important;}
 .productRow {
   overflow: hidden; /* Prevent overflow */}
 .mySwiper {

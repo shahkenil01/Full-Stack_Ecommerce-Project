@@ -16,11 +16,13 @@ const categoryRoutes = require('./routes/categories');
 const subCatSchema = require('./routes/subCat');
 const productRoutes = require('./routes/products');
 const uploadRoutes = require('./routes/upload');
+const productSizeRoutes = require('./routes/productSize');
 
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
 app.use(`/api/products`, productRoutes);
 app.use('/api/cloudinary', uploadRoutes);
+app.use('/api/sizes', productSizeRoutes);
 
 // Database
 mongoose.connect(process.env.CONNECTION_STRING)

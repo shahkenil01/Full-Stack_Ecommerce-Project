@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 
 router.post('/create', async (req, res) => {
   try {
-    const { name, description, images, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, numReviews } = req.body;
+    const { name, description, images, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, discount, productRAMS, productSIZE, productWEIGHT, numReviews } = req.body;
 
     if (!name || !description || !brand || !price || !category || !countInStock || !images || images.length === 0) {
       return res.status(400).json({ success: false, message: 'Please fill all required fields.' });
@@ -32,7 +32,7 @@ router.post('/create', async (req, res) => {
 
     const imgUrls = images;
 
-    const product = new Product({ name, description, images: imgUrls, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, numReviews });
+    const product = new Product({ name, description, images: imgUrls, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, discount, productRAMS, productSIZE, productWEIGHT, numReviews });
     const savedProduct = await product.save();
 
     res.status(201).json(savedProduct);

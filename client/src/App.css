@@ -508,6 +508,7 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   border: 1px solid #0000001a !important;
   border-radius: 7px !important;
   color: #000;
+  transition: all .2s;
   display: block !important;
   user-select: none;}
  
@@ -607,7 +608,8 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   transition: all 0.3s ease-in-out;
   position: relative;
   z-index: 2;
-  pointer-events: auto;}
+  pointer-events: auto;
+  height: 100%;}
 .productItem .imgWrapper:hover .actions{
   opacity: 1;
   right: 3px;
@@ -1061,7 +1063,7 @@ footer .copyright p{
   gap: 20px;
   flex-wrap: wrap;}
 .productListing .productItem.four{
-  width: 23.3%;}
+  width: 23.38%;}
 .productListing .productItem.three{
   width: 31.8%;}
 .productListing .productItem.one{
@@ -1070,9 +1072,13 @@ footer .copyright p{
   align-items: center !important;}
 
 .productListing .productItem.one .imgWrapper{
-  width: 25%;
+  width: 21%;
   position: relative;
   overflow: hidden;}
+.productListing .productItem.three .imgWrapper {
+  height: 60%;}
+.productListing .productItem.four .imgWrapper img {
+  height: auto;}
 .productListing .productItem.one .imgWrapper .actions {
   position: absolute;
   top: 3%;

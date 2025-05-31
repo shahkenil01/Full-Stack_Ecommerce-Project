@@ -24,6 +24,13 @@ const ProductItem = ({ item, itemView }) => {
       <div className="imgWrapper">
         <Link to={`/product/${id}`}>
           <img src={image} className="w-100" alt={name} />
+          {item?.images?.[1] && (
+            <img
+              src={item.images[1]}
+              className="w-100 hover-img"
+              alt="hover"
+            />
+          )}
         </Link>
         {oldPrice && oldPrice > price && (
           <span className="badge badge-primary">

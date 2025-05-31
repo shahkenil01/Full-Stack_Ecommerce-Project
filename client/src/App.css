@@ -599,7 +599,7 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   border-radius: 7px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
   position: relative;
   width: 100%;}
@@ -623,6 +623,21 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
   position: relative;
   z-index: 10;}
+/*2nd image hover animation*/
+.imgWrapper img.hover-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  z-index: 3;
+  pointer-events: none;
+  object-fit: cover;}
+.productItem .imgWrapper:hover img.hover-img {
+  opacity: 1;
+  transform: scale(1.1);}
 
 /**Home Product End**/
 /**New Product Start**/
@@ -1073,10 +1088,13 @@ footer .copyright p{
 
 .productListing .productItem.one .imgWrapper{
   width: 23%;
+  height: 100%;
   position: relative;
   overflow: hidden;}
 .productListing .productItem.three .imgWrapper {
   height: 60%;}
+.productListing .productItem.four .imgWrapper {
+  height: 200px;}
 .productListing .productItem.four .imgWrapper img {
   height: auto;}
 .productListing .productItem.one .imgWrapper .actions {

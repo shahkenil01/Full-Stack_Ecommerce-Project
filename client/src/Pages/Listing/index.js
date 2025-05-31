@@ -74,10 +74,6 @@ const Listing = () => {
                                     ))}
                                 </div>
 
-                                <div className="d-flex align-items-center justify-content-center mt-4">
-                                    <Pagination count={10} color="primary" size="large"/>
-                                </div>
-
                             </div>
                         </div>
                 </div>

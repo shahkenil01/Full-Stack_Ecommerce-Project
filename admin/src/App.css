@@ -770,7 +770,7 @@ table td .new, table td .old {
 
 .MuiTablePagination-actions, .MuiTablePagination-select{
   margin-top: -14px;}
-body.dark .css-mmygx2-MuiSelect-select-MuiInputBase-input{
+body.dark .css-mmygx2-MuiSelect-select-MuiInputBase-input, body.dark .css-1yxt9mb.css-1yxt9mb.css-1yxt9mb{
   color: white !important;}
 
 .loginSection{

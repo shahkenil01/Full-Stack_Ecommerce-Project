@@ -1,11 +1,16 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv/config');
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://frolicking-stardust-75beb1.netlify.app',
+  credentials: false,
+}));
+
 app.options('*', cors());
 
 //middleware

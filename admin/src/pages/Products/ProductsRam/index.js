@@ -1,11 +1,67 @@
+import { useState, useEffect } from 'react';
 import { Breadcrumbs, Typography, Link as MuiLink, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { IoMdHome } from "react-icons/io";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import { FaPencilAlt } from "react-icons/fa";
+import { FaCloudUploadAlt, FaPencilAlt } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { useSnackbar } from 'notistack';
+import { postData, fetchDataFromApi, deleteData, putData } from '../../../utils/api';
 
 const ProductsRam = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [ram, setRam] = useState('');
+  const [rams, setRams] = useState([]);
+  const [editId, setEditId] = useState(null);
+
+  const fetchRams = async () => {
+    const res = await fetchDataFromApi('/api/rams');
+    if (res) setRams(res);
+  };
+
+  useEffect(() => {
+    fetchRams();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!ram.trim()) {
+      enqueueSnackbar("Please fill the field", { variant: "error" });
+      return;
+    }
+
+    if (editId) {
+      const res = await putData(`/api/rams/${editId}`, { name: ram });
+      if (res?.success === false) {
+        enqueueSnackbar(res.message || "Update failed", { variant: "error" });
+      } else {
+        enqueueSnackbar("RAM updated successfully!", { variant: "success" });
+        setEditId(null);
+        setRam('');
+        fetchRams();
+      }
+    } else {
+      const res = await postData('/api/rams', { name: ram });
+      if (res?.success === false) {
+        enqueueSnackbar(res.message || "Failed to add RAM", { variant: "error" });
+      } else {
+        enqueueSnackbar("RAM added successfully!", { variant: "success" });
+        setRam('');
+        fetchRams();
+      }
+    }
+  };
+
+  const handleEditClick = (item) => {
+    setEditId(item._id);
+    setRam(item.name);
+  };
+
+  const handleDelete = async (id) => {
+    await deleteData(`/api/rams/${id}`);
+    enqueueSnackbar("RAM deleted!", { variant: "success" });
+    fetchRams();
+  };
 
   return (
     <div className="right-content w-100 product-upload">
@@ -25,23 +81,33 @@ const ProductsRam = () => {
         </Breadcrumbs>
       </div>
 
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <div className="row">
           <div className="col-md-12">
             <div className="card p-4 mt-0">
               <div className="form-group">
                 <h6>PRODUCT RAM</h6>
-                <input type="text" name="name"/>
+                <input type="text" name="name" value={ram}
+                  onChange={(e) => setRam(e.target.value)}
+                />
               </div>
 
-              <Button className="btn-blue btn-lg btn-big w-100">
-                <FaCloudUploadAlt /> &nbsp; PUBLISH AND VIEW
+              <Button type="submit" className="btn-blue btn-lg btn-big w-100">
+                <FaCloudUploadAlt /> &nbsp; {editId ? 'UPDATE RAM' : 'PUBLISH AND VIEW'}
               </Button>
+
+              {editId && (
+                <Button variant="outlined" color="secondary" className="w-100 mt-2"
+                  onClick={() => { setEditId(null); setRam('');}}>
+                  Cancel Edit
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </form>
-      <div className="card p-4 mt-0" style={{ width: '55%'}}>
+
+      <div className="card p-4 mt-0" style={{ width: '55%' }}>
         <div className='table-responsive mt-3'>
           <table className="table table-bordered table-striped v-align">
             <thead className="thead-dark">
@@ -51,15 +117,21 @@ const ProductsRam = () => {
               </tr>
             </thead>
             <tbody>
-                <tr>
-                  <td>2GB</td>
+              {rams.map((item) => (
+                <tr key={item._id}>
+                  <td>{item.name}</td>
                   <td>
-                    <div className="actions d-flex align-items-center">
-                      <Button className='success' color="success"><FaPencilAlt /></Button>
-                      <Button className='error' color="error"><MdDelete /></Button>
+                    <div className="actions d-flex align-items-center gap-2">
+                      <Button className='success' color="success" onClick={() => handleEditClick(item)}>
+                        <FaPencilAlt />
+                      </Button>
+                      <Button className='error' color="error" onClick={() => handleDelete(item._id)}>
+                        <MdDelete />
+                      </Button>
                     </div>
                   </td>
                 </tr>
+              ))}
             </tbody>
           </table>
         </div>

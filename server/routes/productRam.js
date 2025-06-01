@@ -1,37 +1,41 @@
 const express = require('express');
 const router = express.Router();
-const ProductSize = require('../models/ProductSize');
+const ProductRam = require('../models/productRam');
 
+// GET all
 router.get('/', async (req, res) => {
-  const sizes = await ProductSize.find().sort({ dateCreated: 1 });
-  res.json(sizes);
+  const rams = await ProductRam.find().sort({ dateCreated: 1 });
+  res.json(rams);
 });
 
+// POST new
 router.post('/', async (req, res) => {
   try {
-    const size = new ProductSize({ name: req.body.name });
-    await size.save();
-    res.json(size);
+    const ram = new ProductRam({ name: req.body.name });
+    await ram.save();
+    res.json(ram);
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 });
 
+// PUT update
 router.put('/:id', async (req, res) => {
   try {
-    const updatedSize = await ProductSize.findByIdAndUpdate(
+    const updatedRam = await ProductRam.findByIdAndUpdate(
       req.params.id,
       { name: req.body.name },
       { new: true }
     );
-    res.json(updatedSize);
+    res.json(updatedRam);
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 });
 
+// DELETE
 router.delete('/:id', async (req, res) => {
-  await ProductSize.findByIdAndDelete(req.params.id);
+  await ProductRam.findByIdAndDelete(req.params.id);
   res.json({ message: 'Deleted successfully' });
 });
 

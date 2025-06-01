@@ -20,6 +20,10 @@ const ProductsRam = () => {
       if (res) setSizes(res);
     };
 
+  useEffect(() => {
+    fetchSizes();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!size.trim()) {
@@ -60,10 +64,6 @@ const ProductsRam = () => {
     fetchSizes();
   };
 
-  useEffect(() => {
-    fetchSizes();
-  }, []);
-
   return (
     <div className="right-content w-100 product-upload">
 
@@ -96,6 +96,13 @@ const ProductsRam = () => {
               <Button type="submit" className="btn-blue btn-lg btn-big w-100">
                 <FaCloudUploadAlt /> &nbsp; {editId ? 'UPDATE SIZE' : 'PUBLISH AND VIEW'}
               </Button>
+
+              {editId && (
+                <Button variant="outlined" color="secondary" className="w-100 mt-2"
+                  onClick={() => { setEditId(null); setSize('');}}>
+                  Cancel Edit
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -116,14 +123,6 @@ const ProductsRam = () => {
                   <td>{sz.name}</td>
                   <td>
                     <div className="actions d-flex align-items-center">
-                      {editId && (
-                        <Button variant="outlined" color="secondary" className="w-100 mt-2"
-                          onClick={() => {
-                            setEditId(null); setSize('');
-                          }}>
-                          Cancel
-                        </Button>
-                      )}
                       <Button className='success' color="success" onClick={() => handleEditClick(sz)}>
                         <FaPencilAlt />
                       </Button>

@@ -16,7 +16,13 @@ const ProductsRam = () => {
 
   const fetchRams = async () => {
     const res = await fetchDataFromApi('/api/rams');
-    if (res) setRams(res);
+    if (Array.isArray(res?.data)) {
+      setRams(res.data);
+    } else if (Array.isArray(res)) {
+      setRams(res);
+    } else {
+      setRams([]);
+    }
   };
 
   useEffect(() => {

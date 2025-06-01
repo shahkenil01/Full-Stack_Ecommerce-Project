@@ -17,7 +17,13 @@ const ProductsRam = () => {
 
   const fetchSizes = async () => {
     const res = await fetchDataFromApi('/api/sizes');
-      if (res) setSizes(res);
+      if (Array.isArray(res?.data)) {
+        setSizes(res.data);
+      } else if (Array.isArray(res)) {
+        setSizes(res);
+      } else {
+        setSizes([]);
+      }
     };
 
   useEffect(() => {

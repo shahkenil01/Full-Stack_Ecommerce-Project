@@ -159,13 +159,13 @@ const ProductEdit = () => {
         fetchDataFromApi('/api/weights'),
       ]);
 
-      if (ramRes?.data) {
+      if (Array.isArray(ramRes?.data)) {
         setRamList(ramRes.data.map(item => ({ value: item.name, label: item.name })));
       }
       if (sizeRes?.data) {
         setSizeList(sizeRes.data.map(item => ({ value: item.name, label: item.name })));
       }
-      if (weightRes?.data) {
+      if (Array.isArray(sizeRes?.data)) {
         setWeightList(weightRes.data.map(item => ({ value: item.name, label: item.name })));
       }
     })();

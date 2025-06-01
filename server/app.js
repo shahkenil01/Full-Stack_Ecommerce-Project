@@ -7,8 +7,8 @@ require('dotenv/config');
 
 app.use(cors({
   origin: [
-    'https://frolicking-stardust-75beb1.netlify.app', // client
-    'https://683c8f6980f90c775ca88bf0--unrivaled-gnome-d22ae1.netlify.app' // admin
+    'https://e-commerce-best.netlify.app/', // client
+    'https://e-commerce-admin-master.netlify.app/' // admin
   ],
   credentials: false,
 }));

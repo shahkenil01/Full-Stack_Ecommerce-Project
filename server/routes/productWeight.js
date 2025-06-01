@@ -1,37 +1,41 @@
 const express = require('express');
 const router = express.Router();
-const ProductSize = require('../models/productSize');
+const ProductWeight = require('../models/productWeight');
 
+// GET all
 router.get('/', async (req, res) => {
-  const sizes = await ProductSize.find().sort({ dateCreated: 1 });
-  res.json(sizes);
+  const weights = await ProductWeight.find().sort({ dateCreated: 1 }); // ascending
+  res.json({ success: true, data: weights });
 });
 
+// POST new
 router.post('/', async (req, res) => {
   try {
-    const size = new ProductSize({ name: req.body.name });
-    await size.save();
-    res.json(size);
+    const weight = new ProductWeight({ name: req.body.name });
+    await weight.save();
+    res.json({ success: true, data: weight });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 });
 
+// PUT update
 router.put('/:id', async (req, res) => {
   try {
-    const updatedSize = await ProductSize.findByIdAndUpdate(
+    const updatedWeight = await ProductWeight.findByIdAndUpdate(
       req.params.id,
       { name: req.body.name },
       { new: true }
     );
-    res.json(updatedSize);
+    res.json({ success: true, data: updatedWeight });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 });
 
+// DELETE
 router.delete('/:id', async (req, res) => {
-  await ProductSize.findByIdAndDelete(req.params.id);
+  await ProductWeight.findByIdAndDelete(req.params.id);
   res.json({ message: 'Deleted successfully' });
 });
 

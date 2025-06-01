@@ -15,15 +15,17 @@ app.use(bodyParser.json());
 const categoryRoutes = require('./routes/categories');
 const subCatSchema = require('./routes/subCat');
 const productRoutes = require('./routes/products');
-const productSizeRoutes = require('./routes/productSize');
 const productRamRoutes = require('./routes/productRam');
+const productWeightRoutes = require('./routes/productWeight');
+const productSizeRoutes = require('./routes/productSize');
 const uploadRoutes = require('./routes/upload');
 
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
 app.use(`/api/products`, productRoutes);
-app.use('/api/sizes', productSizeRoutes);
 app.use('/api/rams', productRamRoutes);
+app.use('/api/weights', productWeightRoutes);
+app.use('/api/sizes', productSizeRoutes);
 app.use('/api/cloudinary', uploadRoutes);
 
 // Database

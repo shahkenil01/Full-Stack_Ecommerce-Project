@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ProductSize = require('../models/productSize');
+const ProductSize = require('../models/ProductSize');
 
 router.get('/', async (req, res) => {
   const sizes = await ProductSize.find().sort({ dateCreated: 1 });

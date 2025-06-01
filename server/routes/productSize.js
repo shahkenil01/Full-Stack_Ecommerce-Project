@@ -4,7 +4,7 @@ const ProductSize = require('../models/productSize');
 
 router.get('/', async (req, res) => {
   const sizes = await ProductSize.find().sort({ dateCreated: 1 });
-  res.json(sizes);
+  res.json({ success: true, data: sizes });
 });
 
 router.post('/', async (req, res) => {

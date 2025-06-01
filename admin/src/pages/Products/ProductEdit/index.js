@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Breadcrumbs, Typography, Link as MuiLink, Button, Rating, } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
@@ -12,26 +12,32 @@ import { useSnackbar } from 'notistack';
 const ProductEdit = () => {
   const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+
   const [formFields, setFormFields] = useState({
     name: '', description: '', brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false, images: [],
   });
+
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [inputType, setInputType] = useState('url');
   const [initialData, setInitialData] = useState(null);
-  const navigate = useNavigate();
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const [ram, setRam] = useState('');
-  const [weight, setWeight] = useState('');
-  const [size, setSize] = useState('');
   const [addingUrl, setAddingUrl] = useState(false);
 
-  useEffect(() => {
-    if (formFields.subcategory) {
-      setSubcategory(formFields.subcategory);
-    }
-  }, [formFields.subcategory]);
+  // CATEGORY handling
+  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
 
+  // SUBCATEGORY handling
+  const [subcategory, setSubcategory] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
+
+  // Rating and feature flag
+  const [value, setValue] = useState(0);
+  const [isFeatured, setIsFeatured] = useState('');
+
+  // ========================= FETCH PRODUCT DETAILS =========================
   useEffect(() => {
     (async () => {
       const res = await fetchDataFromApi(`/api/products/${id}`);
@@ -44,20 +50,7 @@ const ProductEdit = () => {
     })();
   }, [id]);
 
-  const inputChange = (e) => {
-    const { name, value } = e.target;
-    setFormFields((prev) => ({
-      ...prev,
-      [name]: ['price', 'oldPrice', 'countInStock'].includes(name)
-        ? Number(value)
-        : value,
-    }));
-  };
-
-  // CATEGORY
-  const [category, setCategory] = useState('');
-  const [categories, setCategories] = useState([]);
-
+  // ========================= FETCH CATEGORIES =========================
   useEffect(() => {
     (async () => {
       let page = 1, all = [], hasMore = true;
@@ -75,14 +68,12 @@ const ProductEdit = () => {
     })();
   }, []);
 
+  // Sync selected category to formFields
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, category }));
   }, [category]);
 
-  // SUB CATEGORY
-  const [subcategory, setSubcategory] = useState('');
-  const [subcategories, setSubcategories] = useState([]);
-
+  // ========================= FETCH SUBCATEGORIES =========================
   useEffect(() => {
     if (!formFields.category || typeof formFields.category !== 'string') {
       setSubcategories([]);
@@ -95,7 +86,7 @@ const ProductEdit = () => {
       if (res && res.length > 0) {
         const options = res.map((sub) => ({ value: sub._id, label: sub.subCat }));
         setSubcategories(options);
-      
+        
         if (formFields.subcategory) {
           const found = options.find((o) => o.value === formFields.subcategory || o.value === formFields.subcategory._id);
           if (found) {
@@ -109,21 +100,93 @@ const ProductEdit = () => {
     })();
   }, [formFields.category, formFields.subcategory]);
 
+  // Sync selected subcategory to formFields
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, subcategory }));
   }, [subcategory]);
 
-  // OTHERS
-  const [isFeatured, setIsFeatured] = useState('');
+  // Sync feature flag to formFields
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, isFeatured: isFeatured === '10' }));
   }, [isFeatured]);
 
-  const [value, setValue] = useState(0);
+  // Sync rating to formFields
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, rating: value }));
   }, [value]);
 
+  // Sync subcategory initially (if loaded late)
+  useEffect(() => {
+    if (formFields.subcategory) {
+      setSubcategory(formFields.subcategory);
+    }
+  }, [formFields.subcategory]);
+
+  // ========================= HANDLE FORM INPUTS =========================
+  const inputChange = (e) => {
+    const { name, value } = e.target;
+    setFormFields((prev) => ({
+      ...prev,
+      [name]: ['price', 'oldPrice', 'countInStock'].includes(name)
+        ? Number(value)
+        : value,
+    }));
+  };
+
+  // ========================= FATCH RAM, WEIGHT, SIZE =========================
+  const [ramList, setRamList] = useState([]);
+  const [sizeList, setSizeList] = useState([]);
+  const [weightList, setWeightList] = useState([]);
+
+  const [ram, setRam] = useState([]);     // MULTI SELECT
+  const [size, setSize] = useState([]);
+  const [weight, setWeight] = useState([]);
+
+  useEffect(() => {
+    setFormFields((prev) => ({
+      ...prev,
+      productRAMS: ram,
+      productSIZE: size,
+      productWEIGHT: weight
+    }));
+  }, [ram, size, weight]);
+
+  useEffect(() => {
+    (async () => {
+      const [ramRes, sizeRes, weightRes] = await Promise.all([
+        fetchDataFromApi('/api/rams'),
+        fetchDataFromApi('/api/sizes'),
+        fetchDataFromApi('/api/weights'),
+      ]);
+
+      if (ramRes?.data) {
+        setRamList(ramRes.data.map(item => ({ value: item.name, label: item.name })));
+      }
+      if (sizeRes?.data) {
+        setSizeList(sizeRes.data.map(item => ({ value: item.name, label: item.name })));
+      }
+      if (weightRes?.data) {
+        setWeightList(weightRes.data.map(item => ({ value: item.name, label: item.name })));
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetchDataFromApi(`/api/products/${id}`);
+      if (res) {
+        setFormFields(res);
+        setInitialData(res);
+        setRam(res.productRAMS || []);
+        setSize(res.productSIZE || []);
+        setWeight(res.productWEIGHT || []);
+      } else {
+        enqueueSnackbar('Product not found!', { variant: 'error' });
+      }
+    })();
+  }, [id]);
+
+  // ========================= IMAGE UPLOAD FUNCTIONS =========================
   const uploadImageViaServer = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -143,55 +206,21 @@ const ProductEdit = () => {
     }
   };
 
-  const updateProduct = async (e) => {
-    e.preventDefault();
-    setLoadingSubmit(true);
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    setLoadingFiles(true);
+    const uploadedUrls = [];
 
-    const requiredFields = [
-      'name',
-      'description',
-      'brand',
-      'price',
-      'category',
-      'countInStock',
-    ];
-    const missing = requiredFields.filter((f) => !formFields[f]);
-
-    if (missing.length > 0) {
-      enqueueSnackbar(`Please fill ${missing.join(', ')}`, { variant: 'error' });
-      setLoadingSubmit(false);
-      return;
+    for (let file of files) {
+      const url = await uploadImageViaServer(file);
+      if (url) uploadedUrls.push(url);
     }
 
-    const isSame = initialData && Object.entries(initialData).every(([key, value]) => {
-      if (Array.isArray(value)) {
-        return JSON.stringify(value) === JSON.stringify(formFields[key]);
-      }
-      return value === formFields[key];
-    });
-
-    if (isSame) {
-      enqueueSnackbar("No changes made.", { variant: "error" });
-      setLoadingSubmit(false);
-      return;
-    }
-
-    const res = await putData(`/api/products/${id}`, formFields);
-    if (res?.message?.toLowerCase().includes('updated')) {
-      setLoadingSubmit(false);
-      enqueueSnackbar('Product updated successfully!', { variant: 'success' });
-      navigate('/products');
-    } else {
-      enqueueSnackbar(res?.message || 'Update failed', { variant: 'error' });
-      setLoadingSubmit(false);
-    }
-  };
-
-  const removeImage = (index) => {
     setFormFields((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      images: [...prev.images, ...uploadedUrls],
     }));
+    setLoadingFiles(false);
   };
 
   const handleImageUrlInput = async () => {
@@ -226,21 +255,58 @@ const ProductEdit = () => {
     }
   };
 
-  const handleFileChange = async (e) => {
-    const files = Array.from(e.target.files);
-    setLoadingFiles(true);
-    const uploadedUrls = [];
-
-    for (let file of files) {
-      const url = await uploadImageViaServer(file);
-      if (url) uploadedUrls.push(url);
-    }
-
+  const removeImage = (index) => {
     setFormFields((prev) => ({
       ...prev,
-      images: [...prev.images, ...uploadedUrls],
+      images: prev.images.filter((_, i) => i !== index),
     }));
-    setLoadingFiles(false);
+  };
+
+  // ========================= PRODUCT UPDATE SUBMISSION =========================
+  const updateProduct = async (e) => {
+    e.preventDefault();
+    setLoadingSubmit(true);
+
+    // Required field check
+    const requiredFields = [
+      'name',
+      'description',
+      'brand',
+      'price',
+      'category',
+      'countInStock',
+    ];
+    const missing = requiredFields.filter((f) => !formFields[f]);
+
+    if (missing.length > 0) {
+      enqueueSnackbar(`Please fill ${missing.join(', ')}`, { variant: 'error' });
+      setLoadingSubmit(false);
+      return;
+    }
+
+    // No change detection
+    const isSame = initialData && Object.entries(initialData).every(([key, value]) => {
+      if (Array.isArray(value)) {
+        return JSON.stringify(value) === JSON.stringify(formFields[key]);
+      }
+      return value === formFields[key];
+    });
+
+    if (isSame) {
+      enqueueSnackbar("No changes made.", { variant: "error" });
+      setLoadingSubmit(false);
+      return;
+    }
+
+    // Submit update to backend
+    const res = await putData(`/api/products/${id}`, formFields);
+    if (res?.message?.toLowerCase().includes('updated')) {
+      enqueueSnackbar('Product updated successfully!', { variant: 'success' });
+      navigate('/products');
+    } else {
+      enqueueSnackbar(res?.message || 'Update failed', { variant: 'error' });
+    }
+    setLoadingSubmit(false);
   };
 
   return (
@@ -357,15 +423,7 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>RAM</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={ram} onChange={setRam} placeholder="None"
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: '4GB' },
-                      { value: '20', label: '8GB' },
-                      { value: '30', label: '10GB' },
-                      { value: '40', label: '12GB' },
-                    ]}
-                  />
+                  <CustomDropdown value={ram} onChange={setRam} options={ramList} isMulti={true} placeholder="Select RAM" />
                 </FormControl>
               </div>
             </div>
@@ -376,13 +434,7 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>WEIGHT</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={weight} onChange={setWeight} placeholder="None"
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: '15KG' },
-                      { value: '20', label: '5KG' },
-                    ]}
-                  />
+                  <CustomDropdown value={weight} onChange={setWeight} options={weightList} isMulti={true} placeholder="Select Weight"/>
                 </FormControl>
               </div>
             </div>
@@ -390,17 +442,7 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>SIZE</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={size} onChange={setSize} placeholder="None"
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: 'S' },
-                      { value: '20', label: 'M' },
-                      { value: '30', label: 'L' },
-                      { value: '40', label: 'XL' },
-                      { value: '50', label: 'XXL' },
-                      { value: '60', label: 'XXXL' },
-                    ]}
-                  />
+                  <CustomDropdown value={size} onChange={setSize} options={sizeList} isMulti={true} placeholder="Select Size"/>
                 </FormControl>
               </div>
             </div>

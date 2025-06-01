@@ -4,7 +4,7 @@ const ProductWeight = require('../models/productWeight');
 
 // GET all
 router.get('/', async (req, res) => {
-  const weights = await ProductWeight.find().sort({ dateCreated: 1 }); // ascending
+  const weights = await ProductWeight.find().sort({ dateCreated: 1 });
   res.json({ success: true, data: weights });
 });
 

@@ -5,7 +5,7 @@ const ProductRam = require('../models/productRam');
 // GET all
 router.get('/', async (req, res) => {
   const rams = await ProductRam.find().sort({ dateCreated: 1 });
-  res.json(rams);
+  res.json({ success: true, data: rams });
 });
 
 // POST new

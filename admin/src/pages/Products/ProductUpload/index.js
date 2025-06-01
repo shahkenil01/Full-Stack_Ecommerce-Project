@@ -14,37 +14,35 @@ const ProductUpload = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
 
-  const [category, setCategory] = useState('');
+  // === FORM STATES ===
   const [formFields, setFormFields] = useState({
     name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', countInStock: 0, rating: 0, isFeatured: false,
   });
+
   const [rating, setRating] = useState(0);
+  const [category, setCategory] = useState('');
+  const [subcategory, setSubcategory] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+
+  const [ram, setRam] = useState('');
+  const [weight, setWeight] = useState('');
+  const [size, setSize] = useState('');
+  const [value, setValue] = useState(0);
+  const [isFeatured, setIsFeatured] = useState('');
+
+  const [ramList, setRamList] = useState([]);
+  const [sizeList, setSizeList] = useState([]);
+  const [weightList, setWeightList] = useState([]);
+
+  // === IMAGE HANDLING STATES ===
+  const [inputType, setInputType] = useState('url');
+  const [imagesData, setImagesData] = useState([]);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      const res = await fetchDataFromApi(`/api/category?page=1`);
-      const all = res?.categoryList || [];
-      setCategories(all.map((cat) => ({ value: cat._id, label: cat.name })));
-    })();
-  }, []);
-
-  useEffect(() => {
-    setFormFields((prev) => ({ ...prev, category, rating }));
-  }, [category, rating]);
-
-  const inputChange = (e) => {
-    const { name, value } = e.target;
-    setFormFields((prev) => ({
-      ...prev,
-      [name]: ['price', 'oldPrice', 'countInStock'].includes(name)
-        ? Number(value)
-        : value,
-    }));
-  };
-
-  // CATEGORY
-  const [categories, setCategories] = useState([]);
+  // === FETCH CATEGORIES FOR DROPDOWN ===
   useEffect(() => {
     (async () => {
       let page = 1, all = [], hasMore = true;
@@ -57,20 +55,14 @@ const ProductUpload = () => {
       setCategories(all.map((cat) => ({ value: cat._id, label: cat.name })));
     })();
   }, []);
-  useEffect(() => {
-    setFormFields((prev) => ({ ...prev, category }));
-  }, [category]);
 
-  // SUB Category
-  const [subcategory, setSubcategory] = useState('');
-  const [subcategories, setSubcategories] = useState([]);
+  // === FETCH SUBCATEGORIES BASED ON SELECTED CATEGORY ===
   useEffect(() => {
     if (!category || typeof category !== 'string') {
       setSubcategories([]);
       setSubcategory('');
       return;
     }
-
     (async () => {
       const res = await fetchDataFromApi(`/api/SubCat/by-category/${category}`);
       if (res && res.length > 0) {
@@ -82,32 +74,66 @@ const ProductUpload = () => {
     })();
   }, [category]);
 
+  // === FETCH RAM, SIZE, WEIGHT OPTIONS ===
+  useEffect(() => {
+    (async () => {
+      const ramRes = await fetchDataFromApi('/api/rams');
+      const sizeRes = await fetchDataFromApi('/api/sizes');
+      const weightRes = await fetchDataFromApi('/api/weights');
+
+      if (ramRes?.data) setRamList(ramRes.data.map(item => ({ value: item.name, label: item.name })));
+      if (sizeRes?.data) setSizeList(sizeRes.data.map(item => ({ value: item.name, label: item.name })));
+      if (weightRes?.data) setWeightList(weightRes.data.map(item => ({ value: item.name, label: item.name })));
+    })();
+  }, []);
+
+  useEffect(() => {
+    setFormFields((prev) => ({
+      ...prev,
+      productRAMS: ram,
+      productSIZE: size,
+      productWEIGHT: weight,
+    }));
+  }, [ram, size, weight]);
+
+  // === SET FORM FIELD ON INDIVIDUAL CHANGE ===
+  const inputChange = (e) => {
+    const { name, value } = e.target;
+    setFormFields((prev) => ({
+      ...prev,
+      [name]: ['price', 'oldPrice', 'countInStock'].includes(name) ? Number(value) : value,
+    }));
+  };
+
+  // === UPDATE FORM FIELDS WHEN CATEGORY, SUBCATEGORY, RATING ETC CHANGE ===
+  useEffect(() => {
+    setFormFields((prev) => ({ ...prev, category, rating }));
+  }, [category, rating]);
+
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, subcategory }));
   }, [subcategory]);
 
-  // OTHERS
-  const [isFeatured, setIsFeatured] = useState('');
+  useEffect(() => {
+    setFormFields((prev) => ({
+      ...prev,
+      productRAMS: ram,
+      productSIZE: size,
+      productWEIGHT: weight,
+    }));
+  }, [ram, size, weight]);
+
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, isFeatured: isFeatured === '10' }));
   }, [isFeatured]);
 
-  const [ram, setRam] = useState('');
-  const [weight, setWeight] = useState('');
-  const [size, setSize] = useState('');
-  const [value, setValue] = useState(0);
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, rating: value }));
   }, [value]);
 
-  // IMAGE HANDLING
-  const [inputType, setInputType] = useState('url');
-  const [imagesData, setImagesData] = useState([]);
-  const [imageUrlInput, setImageUrlInput] = useState('');
-
+  // === HANDLE IMAGE FILE UPLOAD ===
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-
     const images = files.map((file) => ({
       src: URL.createObjectURL(file),
       type: 'file',
@@ -126,6 +152,7 @@ const ProductUpload = () => {
     });
   };
 
+  // === HANDLE IMAGE URL INPUT ===
   const handleImageUrlInput = () => {
     const url = imageUrlInput.trim();
     if (!url || imagesData.some((img) => img.src === url)) return;
@@ -133,10 +160,12 @@ const ProductUpload = () => {
     setImageUrlInput('');
   };
 
+  // === REMOVE AN IMAGE FROM IMAGE ARRAY ===
   const removeImage = (index) => {
     setImagesData((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // === SHOW ERROR/SUCCESS TOAST MESSAGES ===
   const showToasts = (messages) => {
     messages.forEach((msg) => {
       const message = typeof msg === 'string' ? msg : msg.message;
@@ -145,11 +174,13 @@ const ProductUpload = () => {
     });
   };
 
+  // === HANDLE PRODUCT SUBMIT ===
   const addProduct = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const requiredFields = [ 'name', 'description', 'brand', 'price', 'category', 'countInStock', ];
+    // Validate required fields
+    const requiredFields = ['name', 'description', 'brand', 'price', 'category', 'countInStock'];
     const missingFields = requiredFields.filter((f) => !formFields[f]);
     if (imagesData.length === 0) missingFields.push('Image');
 
@@ -159,6 +190,7 @@ const ProductUpload = () => {
       return;
     }
 
+    // Prepare final data with uploaded image URLs
     const finalData = { ...formFields, images: [], subcategory };
     const cloudinaryUrls = [];
     const uploadedSet = new Set();
@@ -183,11 +215,17 @@ const ProductUpload = () => {
     }
 
     finalData.images = cloudinaryUrls;
+
+    // Post to API
     const res = await postData('/api/products/create', finalData);
     setLoading(false);
 
     if (res && res._id) {
-      setFormFields({ name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0, category: '', subcategory:'', countInStock: 0, rating: 0, isFeatured: false, });
+      // Reset form
+      setFormFields({
+        name: '', description: '', images: [], brand: '', price: 0, oldPrice: 0,
+        category: '', subcategory: '', countInStock: 0, rating: 0, isFeatured: false,
+      });
       setImagesData([]);
       enqueueSnackbar('Product uploaded successfully!', { variant: 'success' });
       navigate('/products');
@@ -300,16 +338,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>RAM</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={ram} onChange={setRam}
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: '4GB' },
-                      { value: '20', label: '8GB' },
-                      { value: '30', label: '10GB' },
-                      { value: '40', label: '12GB' },
-                    ]}
-                    placeholder="None"
-                  />
+                  <CustomDropdown value={ram} onChange={setRam} options={ramList} placeholder="Select RAM" isMulti={true}/>
                 </FormControl>
               </div>
             </div>
@@ -320,14 +349,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>WEIGHT</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={weight} onChange={setWeight}
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: '15KG' },
-                      { value: '20', label: '5KG' },
-                    ]}
-                    placeholder="None"
-                  />
+                  <CustomDropdown value={weight} onChange={setWeight} options={weightList} placeholder="Select Weight" isMulti={true}/>
                 </FormControl>
               </div>
             </div>
@@ -335,18 +357,7 @@ const ProductUpload = () => {
               <div className="form-group">
                 <h6>SIZE</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={size} onChange={setSize}
-                    options={[
-                      { value: '', label: 'None' },
-                      { value: '10', label: 'S' },
-                      { value: '20', label: 'M' },
-                      { value: '30', label: 'L' },
-                      { value: '40', label: 'XL' },
-                      { value: '50', label: 'XXL' },
-                      { value: '60', label: 'XXXL' },
-                    ]}
-                    placeholder="None"
-                  />
+                  <CustomDropdown value={size} onChange={setSize} options={sizeList} placeholder="Select Size" isMulti={true}/>
                 </FormControl>
               </div>
             </div>

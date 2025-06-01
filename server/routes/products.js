@@ -76,7 +76,7 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const limit = pLimit(2);
-  const { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images } = req.body;
+  const { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images, productRAMS, productSIZE, productWEIGHT } = req.body;
 
   if (!name) return res.status(400).json({ error: "Product name is required" });
   if (!description) return res.status(400).json({ error: "Description is required" });
@@ -119,7 +119,7 @@ router.put('/:id', async (req, res) => {
     );
 
     // ─── 4) Prepare the rest of the data and update ─────────────────────────
-    const updatedData = { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images: finalImages };
+    const updatedData = { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images: finalImages, productRAMS, productSIZE, productWEIGHT };
 
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updatedData, { new: true });
     res.status(200).json({ message: "Product updated successfully", data: updatedProduct });

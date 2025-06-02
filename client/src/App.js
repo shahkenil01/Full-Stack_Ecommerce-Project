@@ -65,7 +65,6 @@ function App() {
         </Routes>
 
         {isHeaderFooterShow === true && <Footer />}
-        
 
         {isOpenProductModal && (
           <ProductModel

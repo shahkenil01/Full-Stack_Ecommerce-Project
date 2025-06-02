@@ -13,6 +13,7 @@ import Cart from './Pages/Cart';
 import ScrollToTop from './ScrollToTop';
 import SignIn from './Pages/SignIn';
 import SignUp from './Pages/SignUp';
+import NotFound from './Pages/NotFound';
 import { Analytics } from '@vercel/analytics/react';
 
 const MyContext = createContext();
@@ -56,14 +57,11 @@ function App() {
         <Routes>
           <Route path="/" exact={true} element={<Home />} />
           <Route path="/cat/:id" exact={true} element={<Listing />} />
-          <Route
-            exact={true}
-            path="/product/:id"
-            element={<ProductDetails />}
-          />
+          <Route exact={true} path="/product/:id" element={<ProductDetails />} />
           <Route exact={true} path="/cart" element={<Cart />} />
           <Route exact={true} path="/signIn" element={<SignIn />} />
           <Route exact={true} path="/signUp" element={<SignUp />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         {isHeaderFooterShow === true && <Footer />}

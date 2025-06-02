@@ -1,3 +1,5 @@
+import { useEffect, useContext } from 'react';
+import { MyContext } from '../../App';
 import { Link } from 'react-router-dom';
 
 function NotFound() {

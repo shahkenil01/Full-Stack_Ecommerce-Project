@@ -285,21 +285,6 @@ const ProductUpload = () => {
             </div>
             <div className="col">
               <div className="form-group">
-                <h6>PRICE</h6>
-                <input type="text" name="price" onChange={inputChange} />
-              </div>
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col">
-              <div className="form-group">
-                <h6>OLD PRICE</h6>
-                <input type="text" name="oldPrice" onChange={inputChange} />
-              </div>
-            </div>
-            <div className="col">
-              <div className="form-group">
                 <h6>IS FEATURED</h6>
                 <FormControl size="small" className="w-100">
                   <CustomDropdown value={isFeatured} onChange={setIsFeatured}
@@ -311,6 +296,21 @@ const ProductUpload = () => {
                     placeholder="None"
                   />
                 </FormControl>
+              </div>
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col">
+              <div className="form-group">
+                <h6>PRICE</h6>
+                <input type="text" name="price" onChange={inputChange} />
+              </div>
+            </div>
+            <div className="col">
+              <div className="form-group">
+                <h6>OLD PRICE</h6>
+                <input type="text" name="oldPrice" onChange={inputChange} />
               </div>
             </div>
             <div className="col">
@@ -336,10 +336,8 @@ const ProductUpload = () => {
             </div>
             <div className="col">
               <div className="form-group">
-                <h6>RAM</h6>
-                <FormControl size="small" className="w-100">
-                  <CustomDropdown value={ram} onChange={setRam} options={ramList} placeholder="Select RAM" isMulti={true}/>
-                </FormControl>
+                <h6>RATING</h6>
+                <Rating name="rating" value={value} onChange={(e, newVal) => setValue(newVal)} />
               </div>
             </div>
           </div>
@@ -363,12 +361,10 @@ const ProductUpload = () => {
             </div>
             <div className="col">
               <div className="form-group">
-                <h6>RATING</h6>
-                <Rating
-                  name="rating"
-                  value={value}
-                  onChange={(e, newVal) => setValue(newVal)}
-                />
+                <h6>RAM</h6>
+                <FormControl size="small" className="w-100">
+                  <CustomDropdown value={ram} onChange={setRam} options={ramList} placeholder="Select RAM" isMulti={true}/>
+                </FormControl>
               </div>
             </div>
           </div>
@@ -390,7 +386,7 @@ const ProductUpload = () => {
           </div>
 
           {inputType === 'url' && (
-            <div className="form-group mt-3">
+            <div className="form-group mt-3 be1">
               <h6 className="text-uppercase">Product Image</h6>
               <div className="position-relative inputBtn">
                 <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" 
@@ -412,7 +408,7 @@ const ProductUpload = () => {
           )}
 
           {inputType === 'file' && (
-            <div className="imagesUploadSec mt-3">
+            <div className="imagesUploadSec mt-3 mb-4">
               <h5 className="mb-3">Upload Image(s)</h5>
               <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
                 {imagesData.map((img, idx) => (
@@ -436,7 +432,7 @@ const ProductUpload = () => {
             </div>
           )}
 
-          <Button type="submit" className="btn-blue btn-lg btn-big w-100 mt-4" disabled={loading} >
+          <Button type="submit" className="btn-blue btn-lg btn-big w-100" disabled={loading} >
             <FaCloudUploadAlt /> &nbsp;{' '}
             {loading ? ( <span className="dot-loader"></span> ) : ( 'PUBLISH AND VIEW' )}
           </Button>

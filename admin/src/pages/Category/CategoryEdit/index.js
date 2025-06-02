@@ -193,7 +193,7 @@ const CategoryEdit = () => {
                 </div>
               )}
 
-              <Button type='submit' className='btn-blue btn-lg btn-big w-100 mt-4' disabled={loading}>
+              <Button type='submit' className='btn-blue btn-lg btn-big w-100' disabled={loading}>
                 <FaCloudUploadAlt />
                 &nbsp;
                 {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}

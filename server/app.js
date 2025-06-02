@@ -8,7 +8,8 @@ require('dotenv/config');
 app.use(cors({
   origin: [
     'https://e-commerce-best.netlify.app', // client
-    'https://e-commerce-admin-master.netlify.app' // admin
+    'https://e-commerce-admin-master.netlify.app', // admin
+    'http://localhost:3000' //localhost
   ],
   credentials: false,
 }));

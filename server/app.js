@@ -36,7 +36,10 @@ app.use('/api/sizes', productSizeRoutes);
 app.use('/api/cloudinary', uploadRoutes);
 
 // Database
-mongoose.connect(process.env.CONNECTION_STRING)
+mongoose.connect(process.env.CONNECTION_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => {
     console.log('Database Connection is ready...');
     //Server

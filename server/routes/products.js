@@ -5,7 +5,6 @@ const router = express.Router();
 
 const pLimit = require('p-limit').default;
 const cloudinary = require('cloudinary').v2;
-const { uploadToCloudinary } = require('../utils/cloudinary');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

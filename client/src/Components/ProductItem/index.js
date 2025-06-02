@@ -25,11 +25,7 @@ const ProductItem = ({ item, itemView }) => {
         <Link to={`/product/${id}`}>
           <img src={image} className="w-100" alt={name} />
           {item?.images?.[1] && (
-            <img
-              src={item.images[1]}
-              className="w-100 hover-img"
-              alt="hover"
-            />
+            <img className="w-100 hover-img" src={item.images[1]} alt="hover"/>
           )}
         </Link>
         {oldPrice && oldPrice > price && (
@@ -54,14 +50,7 @@ const ProductItem = ({ item, itemView }) => {
         <span className={`d-block ${inStock ? 'text-success' : 'text-danger'}`}>
           {inStock ? 'In Stock' : 'Out of Stock'}
         </span>
-        <Rating
-          className="mt-1 mb-1"
-          name="read-only"
-          value={rating}
-          readOnly
-          size="small"
-          precision={0.5}
-        />
+        <Rating className="mt-1 mb-1" name="read-only" value={rating} readOnly size="small" precision={0.5} />
         <div className="d-flex">
           {oldPrice && <span className="oldPrice">₹{oldPrice}</span>}
           <span className="netPrice text-danger ml-2">₹{price}</span>

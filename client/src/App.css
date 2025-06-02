@@ -566,7 +566,7 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   visibility: hidden;
   transform: scale(0.8);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.5s;
-  z-index: 2;
+  z-index: 100;
   pointer-events: auto;}
 .productItem:hover .actions {
   opacity: 1;

@@ -6,7 +6,7 @@ const BASE_URL = process.env.NODE_ENV === "development"
 
 export const fetchDataFromApi = async (url) => {
   try {
-    const { data } = await axios.get(BASE_URL + url);
+    const { data } = await axios.get(`${BASE_URL}${url}`);
     return data;
   } catch (error) {
     console.error("GET error:", error);
@@ -16,7 +16,7 @@ export const fetchDataFromApi = async (url) => {
 
 export const postData = async (url, formData) => {
   try {
-    const { data } = await axios.post(BASE_URL + url, formData);
+    const { data } = await axios.post(`${BASE_URL}${url}`, formData);
     return data;
   } catch (error) {
     console.error("POST error:", error);
@@ -29,7 +29,7 @@ export const postData = async (url, formData) => {
 
 export const putData = async (url, formData) => {
   try {
-    const { data } = await axios.put(BASE_URL + url, formData);
+    const { data } = await axios.put(`${BASE_URL}${url}`, formData);
     return data;
   } catch (error) {
     console.error("PUT error:", error);

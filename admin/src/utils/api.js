@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.NODE_ENV === "development"
     ? process.env.REACT_APP_BACKEND_URL
-    : "full-stackecommerce-project-production.up.railway.app";// https://full-stack-ecommerce-project-u0om.onrender.com, https://savory-jumpy-gym.glitch.me
+    : "https://full-stackecommerce-project-production.up.railway.app";// https://full-stack-ecommerce-project-u0om.onrender.com, https://savory-jumpy-gym.glitch.me
 
 export const fetchDataFromApi = async (url) => {
   try {

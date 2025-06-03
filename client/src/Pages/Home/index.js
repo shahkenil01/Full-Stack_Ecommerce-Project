@@ -54,9 +54,17 @@ const Home = () => {
     useEffect(() => {
         const order = ["Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery"];
         fetchDataFromApi('/api/category/all')
-            .then(res => res && setCategories(res.sort((a, b) =>
-                (order.indexOf(a.name.trim()) ?? 999) - (order.indexOf(b.name.trim()) ?? 999)
-            )));
+            .then(res => {
+                if (Array.isArray(res)) {
+                    const sorted = res.sort((a, b) =>
+                        (order.indexOf(a.name.trim()) ?? 999) - (order.indexOf(b.name.trim()) ?? 999)
+                    );
+                    setCategories(sorted);
+                } else {
+                    console.error("Expected array from /api/category/all but got:", res);
+                    setCategories([]); // prevent blank UI
+                }
+            });
     }, []);
 
     return (

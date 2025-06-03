@@ -3,7 +3,6 @@ const { Product } = require('../models/products.js');
 const express = require('express');
 const router = express.Router();
 
-const pLimit = require('p-limit').default;
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -74,6 +73,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
+  const pLimit = await import('p-limit').then(mod => mod.default);
   const limit = pLimit(2);
   const { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images, productRAMS, productSIZE, productWEIGHT } = req.body;
 

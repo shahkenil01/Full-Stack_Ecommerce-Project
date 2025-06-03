@@ -2,7 +2,6 @@ const Category = require('../models/category');
 const express = require('express');
 const router = express.Router();
 
-const pLimit = require('p-limit').default;
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -73,6 +72,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/create', async (req, res) => {
   try {
+    const pLimit = await import('p-limit').then(mod => mod.default);
     const limit = pLimit(2);
 
     if (!Array.isArray(req.body.images) || req.body.images.length === 0) {
@@ -162,6 +162,7 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
+    const pLimit = await import('p-limit').then(mod => mod.default);
     const limit = pLimit(2);
 
     const existing = await Category.findById(req.params.id);

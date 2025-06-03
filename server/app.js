@@ -9,7 +9,8 @@ app.use(cors({
   origin: [
     'https://e-commerce-best.netlify.app', // client
     'https://e-commerce-admin-master.netlify.app', // admin
-    'http://localhost:3000' //localhost
+    'http://localhost:3000', //localhost Admin
+    'http://localhost:3005' //localhost Client
   ],
   credentials: false,
 }));

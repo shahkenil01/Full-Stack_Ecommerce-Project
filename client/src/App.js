@@ -14,7 +14,6 @@ import ScrollToTop from './ScrollToTop';
 import SignIn from './Pages/SignIn';
 import SignUp from './Pages/SignUp';
 import NotFound from './Pages/NotFound';
-import { Analytics } from '@vercel/analytics/react';
 
 const MyContext = createContext();
 
@@ -32,7 +31,6 @@ function App() {
   const getCountry = async (url) => {
     await axios.get(url).then((res) => {
       setCountryList(res.data.data);
-      console.log(res.data.data);
     });
   };
 
@@ -72,7 +70,6 @@ function App() {
             closeProductModal={() => setIsOpenProductModal(false)}
           />
         )}
-        <Analytics />
       </MyContext.Provider>
     </BrowserRouter>
   );

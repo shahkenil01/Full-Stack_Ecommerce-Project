@@ -109,11 +109,11 @@ const Home = () => {
                                     onSwiper={(swiper) => { setSwiperInstance(swiper); requestAnimationFrame(() => { swiper.update();
                                         handleSwiperUpdate(swiper); }); }}
                                 >
-                                    {products.map((item) => (
+                                    {Array.isArray(products) ? products.map((item) => (
                                         <SwiperSlide key={item._id}>
-                                            <ProductItem item={item} />
+                                          <ProductItem item={item} />
                                         </SwiperSlide>
-                                    ))}
+                                    )) : null}
                                 </Swiper>
 
                                 <CustomPrevArrow />

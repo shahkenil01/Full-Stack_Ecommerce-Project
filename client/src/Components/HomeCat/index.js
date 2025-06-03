@@ -9,9 +9,9 @@ const HomeCat = () => {
   const [categories, setCategories] = useState([]);
   const customOrder = ["Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery"];
 
-  const sortedCategories = [...categories].sort((a, b) => {
+  const sortedCategories = Array.isArray(categories) ? [...categories].sort((a, b) => {
     return customOrder.indexOf(a.name) - customOrder.indexOf(b.name);
-  });
+  }) : [];
 
   useEffect(() => {
     fetchDataFromApi('/api/category/all').then((res) => {

@@ -41,12 +41,11 @@ const Dashboard = () => {
     })();
   }, []);
 
-  const filteredProducts = productList
-    .filter((item) => {
+  const filteredProducts = Array.isArray(productList) ? productList.filter((item) => {
       const matchCategory = categoryBy ? item.category?._id === categoryBy : true;
       const matchSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchSearch;
-    });
+    }) : [];
 
   useEffect(() => {
     if (page > 0 && filteredProducts.length <= page * rowsPerPage) {
@@ -81,10 +80,11 @@ const Dashboard = () => {
               <CustomDropdown
                 value={categoryBy}
                 onChange={setCategoryBy}
-                options={[{ value: '', label: 'All' }, ...categories.map(cat => ({
+                options={[{ value: '', label: 'All' }, ...(Array.isArray(categories) ? categories.map(cat => ({
                   value: cat._id,
                   label: cat.name
-                }))]}
+                })) : [])
+                ]}
                 placeholder="None"
               />
             </FormControl>

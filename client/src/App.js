@@ -21,6 +21,7 @@ function App() {
   const [countryList, setCountryList] = useState([]);
   const [selectedCountry, setselectedCountry] = useState('');
   const [isOpenProductModal, setIsOpenProductModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isHeaderFooterShow, setisHeaderFooterShow] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
 
@@ -40,6 +41,8 @@ function App() {
     selectedCountry,
     isOpenProductModal,
     setIsOpenProductModal,
+    selectedProduct,
+    setSelectedProduct,
     isHeaderFooterShow,
     setisHeaderFooterShow,
     isLogin,

@@ -1,13 +1,13 @@
-import Rating from '@mui/material/Rating';
-import { TfiFullscreen } from "react-icons/tfi";
-import Button from "@mui/material/Button";
-import { IoMdHeartEmpty } from "react-icons/io";
 import { useContext } from 'react';
-import { MyContext } from '../../App';
 import { Link } from 'react-router-dom';
+import { TfiFullscreen } from "react-icons/tfi";
+import { IoMdHeartEmpty } from "react-icons/io";
+import Button from "@mui/material/Button";
+import Rating from '@mui/material/Rating';
+import { MyContext } from '../../App';
 
 const ProductItem = ({ item, itemView }) => {
-  const { setIsOpenProductModal } = useContext(MyContext);
+  const { setIsOpenProductModal, setSelectedProduct } = useContext(MyContext);
 
   const image = item?.images?.[0] || "https://via.placeholder.com/300";
   const inStock = item?.countInStock > 0;
@@ -34,7 +34,7 @@ const ProductItem = ({ item, itemView }) => {
           </span>
         )}
         <div className="actions">
-          <Button onClick={() => setIsOpenProductModal(true)}>
+          <Button onClick={() => { setSelectedProduct(item); setIsOpenProductModal(true); }}>
             <TfiFullscreen />
           </Button>
           <Button>

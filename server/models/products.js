@@ -59,10 +59,6 @@ const productSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
-  discount: {
-    type:Number,
-    require: true,
-  },
   productRAMS: [{
     type:String,
   }],

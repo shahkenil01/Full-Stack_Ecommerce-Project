@@ -599,7 +599,7 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   border-radius: 7px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  height: 220px;
+  height: 230px;
   overflow: hidden;
   position: relative;
   width: 100%;}
@@ -609,13 +609,15 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   position: relative;
   z-index: 2;
   pointer-events: auto;
-  height: 100%;}
+  height: 100%;
+  object-fit: cover;}
 .productItem .imgWrapper:hover .actions{
   opacity: 1;
   right: 3px;
   pointer-events: auto;}
 .productItem .imgWrapper:hover img{
-  transform: scale(1.1);}
+  transform: scale(1.1);
+  object-fit: cover;}
 .productItem .product_row .productItem{
   overflow: hidden;
   border-right: 1px solid transparent !important;}

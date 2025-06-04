@@ -3,6 +3,7 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const PORT = process.env.PORT || 4000;
 require('dotenv/config');
 
 app.use(cors({
@@ -45,8 +46,8 @@ mongoose.connect(process.env.CONNECTION_STRING, {
   .then(() => {
     console.log('Database Connection is ready...');
     //Server
-    app.listen(process.env.PORT, () => {
-      console.log(`server is running http://localhost:${process.env.PORT}`);
+    app.listen(PORT, () => {
+      console.log(`server is running http://localhost:${PORT}`);
     });
   })
   .catch((err) => {

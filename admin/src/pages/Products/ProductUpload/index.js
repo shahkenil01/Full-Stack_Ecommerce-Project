@@ -25,9 +25,9 @@ const ProductUpload = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
 
-  const [ram, setRam] = useState('');
-  const [weight, setWeight] = useState('');
-  const [size, setSize] = useState('');
+  const [ram, setRam] = useState([]);
+  const [weight, setWeight] = useState([]);
+  const [size, setSize] = useState([]);
   const [value, setValue] = useState(0);
   const [isFeatured, setIsFeatured] = useState('');
 
@@ -111,7 +111,10 @@ const ProductUpload = () => {
   }, [category, rating]);
 
   useEffect(() => {
-    setFormFields((prev) => ({ ...prev, subcategory }));
+    setFormFields((prev) => ({
+      ...prev,
+      subcategory: subcategory || undefined
+    }));
   }, [subcategory]);
 
   useEffect(() => {
@@ -191,7 +194,12 @@ const ProductUpload = () => {
     }
 
     // Prepare final data with uploaded image URLs
-    const finalData = { ...formFields, images: [], subcategory };
+    const finalData = { ...formFields, images: [] };
+
+    if (subcategory && subcategory !== "") {
+      finalData.subcategory = subcategory;
+    }
+
     const cloudinaryUrls = [];
     const uploadedSet = new Set();
 

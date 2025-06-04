@@ -42,7 +42,7 @@ const ProductZoom = ({ images = [], price, oldPrice }) => {
             <div className='productZoom position-relative'>
                 {hasDiscount && (
                     <div className='badge badge-primary'>
-                        -{discountPercent}%
+                        {discountPercent}%
                     </div>
                 )}
                 <Slider {...settings2} className='zoomSliderBig' ref={zoomSliderBig}>

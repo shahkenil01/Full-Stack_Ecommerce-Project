@@ -30,7 +30,7 @@ const ProductItem = ({ item, itemView }) => {
         </Link>
         {oldPrice && oldPrice > price && (
           <span className="badge badge-primary">
-            -{Math.round(((oldPrice - price) / oldPrice) * 100)}%
+            {Math.round(((oldPrice - price) / oldPrice) * 100)}%
           </span>
         )}
         <div className="actions">

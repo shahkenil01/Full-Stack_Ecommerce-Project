@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [prevFilteredCount, setPrevFilteredCount] = useState(0);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   useEffect(() => {
     fetchDataFromApi("/api/products").then((res) => {
@@ -97,17 +97,18 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="table-responsive mt-3">
+        <div className="table-responsive fixedheight mt-3">
           <table className="table table-bordered v-align">
             <thead className="thead-dark">
               <tr>
+                <th style={{ width: "50px" }}>NO.</th>
                 <th>PRODUCT</th>
                 <th style={{ width: "100px" }}>CATEGORY</th>
                 <th style={{ width: "150px" }}>SUB CATEGORY</th>
-                <th style={{ width: "120px" }}>BRAND</th>
-                <th>PRICE</th>
-                <th>RATING</th>
-                <th>ACTIONS</th>
+                <th style={{ width: "100px" }}>BRAND</th>
+                <th style={{ width: "50px" }}>PRICE</th>
+                <th style={{ width: "100px" }}>RATING</th>
+                <th style={{ width: "120px" }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -121,8 +122,9 @@ const Dashboard = () => {
                 </tr>
               ) : ( filteredProducts
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) 
-                .map((item) => (
+                .map((item, index) => (
                 <tr key={item._id}>
+                  <td>{page * rowsPerPage + index + 1}</td>
                   <td>
                     <div className="d-flex align-items-center productBox">
                       <div className="imgWrapper">
@@ -160,16 +162,13 @@ const Dashboard = () => {
             )}
             </tbody>
           </table>
-          <TablePagination 
-            component="div"
-            count={filteredProducts.length} 
-            page={page} 
-            onPageChange={(event, newPage) => setPage(newPage)} 
-            rowsPerPage={rowsPerPage} 
-            onRowsPerPageChange={(event) => { setRowsPerPage(parseInt(event.target.value, 10));   setPage(0); }} 
-            rowsPerPageOptions={[5, 10, 25]} />
         </div>
-
+        <TablePagination className='mt-3' style={{ marginBottom: '-20px' }} component="div" count={filteredProducts.length} page={page} 
+          onPageChange={(event, newPage) => setPage(newPage)} 
+          rowsPerPage={rowsPerPage} 
+          onRowsPerPageChange={(event) => { setRowsPerPage(parseInt(event.target.value, 10));   setPage(0); }} 
+          rowsPerPageOptions={[50, 100, 150,200]} 
+        />
       </div>
     </div>
   );

@@ -114,11 +114,11 @@ const Dashboard = () => {
             <tbody>
               {productList.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-2.5"> No products found in database. </td>
+                  <td colSpan="8" className="text-center py-2.5"> No products found in database. </td>
                 </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-2.5"> No products found for this filter. </td>
+                  <td colSpan="8" className="text-center py-2.5"> No products found for this filter. </td>
                 </tr>
               ) : ( filteredProducts
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) 

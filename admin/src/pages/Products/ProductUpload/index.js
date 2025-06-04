@@ -402,13 +402,15 @@ const ProductUpload = () => {
                 <Button className="btn-blue" type="button" onClick={handleImageUrlInput} > Add </Button>
               </div>
 
-              <div className="imgGrid d-flex mt-3">
-                {imagesData.map((img, idx) => (
-                  <div className="img position-relative me-2" key={idx}>
-                    <img src={img.src} alt="preview" className="w-100" />
-                    <span className="remove" onClick={() => removeImage(idx)}>
+               <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3 mt-3 mb-3">
+                {imagesData.map((img, i) => (
+                  <div className="uploadBox" key={i}>
+                    <span className="remove" onClick={() => removeImage(i)}>
                       <IoCloseSharp />
                     </span>
+                    <div className="box">
+                      <img className="w-100 preview" src={img.src} alt={`preview-${i}`} />
+                    </div>
                   </div>
                 ))}
               </div>

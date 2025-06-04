@@ -175,7 +175,7 @@ const Products = () => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="7" className="text-center">No products found.</td>
+                    <td colSpan="8" className="text-center">No products found.</td>
                   </tr>
               )}
             </tbody>

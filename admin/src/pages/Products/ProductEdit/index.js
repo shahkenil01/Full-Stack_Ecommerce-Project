@@ -26,7 +26,6 @@ const ProductEdit = () => {
   const [addingUrl, setAddingUrl] = useState(false);
 
   // CATEGORY handling
-  const [category, setCategory] = useState('');
   const [categories, setCategories] = useState([]);
 
   // SUBCATEGORY handling
@@ -70,8 +69,8 @@ const ProductEdit = () => {
 
   // Sync selected category to formFields
   useEffect(() => {
-    setFormFields((prev) => ({ ...prev, category }));
-  }, [category]);
+    setFormFields((prev) => ({ ...prev, subcategory: '' }));
+  }, [formFields.category]);
 
   // ========================= FETCH SUBCATEGORIES =========================
   useEffect(() => {
@@ -91,18 +90,25 @@ const ProductEdit = () => {
           const found = options.find((o) => o.value === formFields.subcategory || o.value === formFields.subcategory._id);
           if (found) {
             setSubcategory(found.value);
+          } else {
+            setSubcategory('');
           }
         }
       } else {
         setSubcategories([]);
         setSubcategory('');
+
+        setFormFields((prev) => ({ ...prev, subcategory: '' }));
       }
     })();
   }, [formFields.category, formFields.subcategory]);
 
   // Sync selected subcategory to formFields
   useEffect(() => {
-    setFormFields((prev) => ({ ...prev, subcategory }));
+    setFormFields((prev) => ({
+      ...prev,
+      subcategory: typeof subcategory === 'object' ? subcategory.value : subcategory,
+    }));
   }, [subcategory]);
 
   // Sync feature flag to formFields
@@ -114,13 +120,6 @@ const ProductEdit = () => {
   useEffect(() => {
     setFormFields((prev) => ({ ...prev, rating: value }));
   }, [value]);
-
-  // Sync subcategory initially (if loaded late)
-  useEffect(() => {
-    if (formFields.subcategory) {
-      setSubcategory(formFields.subcategory);
-    }
-  }, [formFields.subcategory]);
 
   // ========================= HANDLE FORM INPUTS =========================
   const inputChange = (e) => {
@@ -286,10 +285,18 @@ const ProductEdit = () => {
 
     // No change detection
     const isSame = initialData && Object.entries(initialData).every(([key, value]) => {
+      const newVal = formFields[key];
+
       if (Array.isArray(value)) {
-        return JSON.stringify(value) === JSON.stringify(formFields[key]);
+        return JSON.stringify(value) === JSON.stringify(newVal);
       }
-      return value === formFields[key];
+
+      if (key === 'subcategory') {
+        const oldSubId = typeof value === 'object' ? value._id : value;
+        const newSubId = typeof newVal === 'object' ? newVal.value : newVal;
+        return oldSubId === newSubId;
+      }
+      return value === newVal;
     });
 
     if (isSame) {
@@ -298,8 +305,13 @@ const ProductEdit = () => {
       return;
     }
 
+    const payload = { ...formFields };
+      if (!payload.subcategory) {
+      delete payload.subcategory;
+    }
+
     // Submit update to backend
-    const res = await putData(`/api/products/${id}`, formFields);
+    const res = await putData(`/api/products/${id}`, payload);
     if (res?.message?.toLowerCase().includes('updated')) {
       enqueueSnackbar('Product updated successfully!', { variant: 'success' });
       navigate('/products');
@@ -344,9 +356,14 @@ const ProductEdit = () => {
                 <h6>CATEGORY</h6>
                 <FormControl size="small" className="w-100">
                   <CustomDropdown value={formFields.category} options={categories} placeholder="None"
-                    onChange={(val) =>
-                      setFormFields((prev) => ({ ...prev, category: val }))
-                    }
+                    onChange={(val) => {
+                      setFormFields((prev) => ({
+                        ...prev,
+                        category: val,
+                        subcategory: '',
+                      }));
+                      setSubcategory('');
+                    }}
                   />
                 </FormControl>
               </div>
@@ -355,9 +372,17 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>SUB CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={subcategory} onChange={setSubcategory} options={subcategories}
-                    placeholder={ !formFields.category ? "Select Category":
-                      subcategories.length > 0 ? "Select Subcategory" : "No SubCategory Found" }
+                  <CustomDropdown value={formFields.subcategory}
+                    onChange={(val) => {
+                      setFormFields((prev) => ({
+                        ...prev,
+                        subcategory: typeof val === 'object' ? val.value : val,
+                      }));
+                      setSubcategory(typeof val === 'object' ? val.value : val);
+                    }} options={subcategories} 
+                    placeholder={ !formFields.category 
+                      ? "Select Category": subcategories.length > 0 
+                      ? "Select Subcategory" : "No SubCategory Found" }
                     isDisabled={!formFields.category || subcategories.length === 0}
                   />
                 </FormControl>

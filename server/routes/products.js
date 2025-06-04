@@ -118,7 +118,7 @@ router.put('/:id', async (req, res) => {
     );
 
     // ─── 4) Prepare the rest of the data and update ─────────────────────────
-    const updatedData = { name, description, brand, price, category: categoryId, subcategory, countInStock, rating, isFeatured, images: finalImages, productRAMS, productSIZE, productWEIGHT };
+    const updatedData = { name, description, brand, price, category: categoryId,  subcategory: subcategory || null, countInStock, rating, isFeatured, images: finalImages, productRAMS, productSIZE, productWEIGHT };
 
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updatedData, { new: true });
     res.status(200).json({ message: "Product updated successfully", data: updatedProduct });

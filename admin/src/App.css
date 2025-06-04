@@ -690,6 +690,16 @@ body.dark .dropdown-item:focus {
 
 .table-responsive::-webkit-scrollbar-thumb{
   background: #ccc !important;}
+.fixedheight .table{
+  margin-bottom: 0 !important;}
+.table-responsive.fixedheight {
+  max-height: 450px;
+  overflow-y: auto;
+  display: block;}
+.fixedheight thead th {
+  position: sticky;
+  top: -1px;
+  z-index: 1;}
 
 .table .thead-dark th{
   background-color: #1866ee;

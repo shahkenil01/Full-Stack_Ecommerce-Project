@@ -14,7 +14,7 @@ const Products = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [productList, setProductList] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
   const [categories, setCategories] = useState([]);
@@ -115,7 +115,7 @@ const Products = () => {
           </div>
         </div>
 
-        <div className="table-responsive mt-3">
+        <div className="table-responsive fixedheight mt-3">
           <table className="table table-bordered v-align">
             <thead className="thead-dark">
               <tr>
@@ -178,15 +178,15 @@ const Products = () => {
               )}
             </tbody>
           </table>
-          <TablePagination component="div" count={productList.length} page={page}
-            onPageChange={(event, newPage) => setPage(newPage)} rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(event) => {
-              setRowsPerPage(parseInt(event.target.value, 10));
-              setPage(0);
-            }}
-            rowsPerPageOptions={[5, 10, 25]}
-          />
-          </div>
+        </div>
+        <TablePagination className='mt-3' style={{ marginBottom: '-20px' }} component="div" count={productList.length} page={page}
+          onPageChange={(event, newPage) => setPage(newPage)} rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(event) => {
+            setRowsPerPage(parseInt(event.target.value, 10));
+            setPage(0);
+          }}
+          rowsPerPageOptions={[50, 100, 150, 200]}
+        />
       </div>
     </div>
   );

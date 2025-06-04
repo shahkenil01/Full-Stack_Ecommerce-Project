@@ -119,21 +119,23 @@ const Products = () => {
           <table className="table table-bordered v-align">
             <thead className="thead-dark">
               <tr>
+                <th style={{ width: "50px" }}>NO.</th>
                 <th>PRODUCT</th>
                 <th style={{ width: "100px" }}>CATEGORY</th>
                 <th style={{ width: "150px" }}>SUB CATEGORY</th>
-                <th style={{ width: "120px" }}>BRAND</th>
-                <th>PRICE</th>
-                <th>RATING</th>
-                <th>ACTIONS</th>
+                <th style={{ width: "100px" }}>BRAND</th>
+                <th style={{ width: "50px" }}>PRICE</th>
+                <th style={{ width: "100px" }}>RATING</th>
+                <th style={{ width: "120px" }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
               {productList.length > 0 ? productList
                 .filter((item) => categoryBy ? item.category?._id === categoryBy : true)
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
+                .map((item, index) => (
                   <tr key={item._id}>
+                    <td>{page * rowsPerPage + index + 1}</td>
                     <td>
                       <div className="d-flex align-items-center productBox">
                         <div className="imgWrapper">

@@ -43,13 +43,27 @@ const Home = () => {
         setIsEnd(swiper.isEnd);
     };
 
+    const [customProducts, setCustomProducts] = useState([]);
+
     useEffect(() => {
         fetchDataFromApi('/api/products').then(res => {
             if (Array.isArray(res)) {
-                setProducts(res);
+                const numbered = res.map((item, index) => ({
+                ...item,
+                displayNumber: index + 1
+            }));
+
+            const allowedNumbers = [45, 22, 2, 5, 7, 10, 12, 14, 16, 18, 20, 24, 26, 28, 30];
+
+            const filtered = allowedNumbers
+            .map((num) => numbered.find((item) => item.displayNumber === num))
+            .filter(Boolean);
+
+            setProducts(res);
+            setCustomProducts(filtered);
             }
         });
-    }, []);
+        }, []);
 
     useEffect(() => {
         const order = ["Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery"];
@@ -136,8 +150,8 @@ const Home = () => {
                             </div>
 
                             <div className="product_row productRow2 w-100 mt-3 d-flex flex-wrap">
-                                {products.map((item) => (
-                                    <ProductItem item={item} key={item._id} />
+                                {customProducts.map((product) => (
+                                    <ProductItem item={product} key={product._id} />
                                 ))}
                             </div>
 

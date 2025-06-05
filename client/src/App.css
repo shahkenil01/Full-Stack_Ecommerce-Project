@@ -486,10 +486,10 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
 /**Arrow Style Start**/
 /* Apply HomeBanner Arrow Styles to Popular Products */
 .popular-products-prev {
-  top: 14%;
+  top: 10%;
   left: 2.5%;}
 .popular-products-next {
-  top: 14%;
+  top: 10%;
   right: 2.5%;}
 
 .popular-products-prev.disabled, .popular-products-next.disabled, .related-products-prev-btn.disabled, .related-products-next-btn.disabled {

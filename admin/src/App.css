@@ -1125,7 +1125,8 @@ textarea {
   height: 50px;
   margin-top: -5px;}
 .product-upload .custom-dropdown-wrapper .dropdown-menu {
-  margin-top: 5px;}
+  margin-top: 5px;
+  z-index: 101;}
 
 .imgUploadBox {
   flex-wrap: nowrap;

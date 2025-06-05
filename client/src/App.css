@@ -594,6 +594,11 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   border: 1px solid #ed174a;}
 .productItem .actions button:hover svg{
   color: #fff !important;}
+td .imgWrapper .card {
+  border-radius: 5px !important;
+  height: 50px;
+  width: 50px;
+  overflow: hidden !important;}
 .productItem .imgWrapper{/*Product Image Size*/
   background: #fff;
   border-radius: 7px;

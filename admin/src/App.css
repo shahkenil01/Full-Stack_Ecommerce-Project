@@ -746,6 +746,11 @@ table.v-align td{
 .card .border{
   overflow: hidden !important;}
 
+td .imgWrapper .card {
+  border-radius: 5px !important;
+  height: 50px;
+  width: 50px;
+  overflow: hidden !important;}
 table td .imgWrapper{
   width: 22%;
   flex: 0 0 22%;}

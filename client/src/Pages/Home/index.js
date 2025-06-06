@@ -30,40 +30,75 @@ const CustomPrevArrow = ({ onClick, isDisabled }) => (
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
-
-    const [value, setValue] = React.useState(0);
-    const handleChange = (event, newValue) => setValue(newValue);
-
+    const [value, setValue] = useState(0);
+    const [customProducts, setCustomProducts] = useState([]);
+    const [categoryProducts, setCategoryProducts] = useState([]);
     const [swiperInstance, setSwiperInstance] = useState(null);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
+
     const handleSwiperUpdate = (swiper) => {
         if (!swiper) return;
         setIsBeginning(swiper.isBeginning);
         setIsEnd(swiper.isEnd);
     };
 
-    const [customProducts, setCustomProducts] = useState([]);
+    const getCategoryProducts = (categoryName) => {
+        const allowedNumbersByCategory = {
+            "Fashion": [35, 36, 37, 38, 39, 40],
+            "Electronics": [8, 9, 10, 11, 12],
+            "Bags": [16, 17, 27, 47],
+            "Footwear": [2, 6, 7, 19],
+            "Groceries": [1, 3, 59],
+            "Beauty": [25, 26, 54],
+            "Wellness": [4, 5, 28, 29, 30],
+            "Jewellery": [20]
+        };
+
+        const allowedNumbers = allowedNumbersByCategory[categoryName] || [];
+
+        const numbered = products.map((item, index) => ({
+            ...item,
+            displayNumber: index + 1
+        }));
+
+        return allowedNumbers
+           .map((num) =>
+               numbered.find((item) =>
+                    item.displayNumber === num && item.category?.name === categoryName
+                )
+            )
+            .filter(Boolean);
+    };
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+        const selectedCategory = categories[newValue]?.name;
+        if (!selectedCategory) return;
+
+        const filtered = getCategoryProducts(selectedCategory);
+        setCategoryProducts(filtered);
+    };
 
     useEffect(() => {
         fetchDataFromApi('/api/products').then(res => {
             if (Array.isArray(res)) {
                 const numbered = res.map((item, index) => ({
-                ...item,
-                displayNumber: index + 1
-            }));
+                    ...item,
+                    displayNumber: index + 1
+                }));
 
-            const allowedNumbers = [45, 22, 2, 5, 7, 10, 12, 14, 16, 18, 20, 24, 26, 28, 30];
+                const allowedNumbers = [45, 22, 2, 5, 7, 10, 12, 14, 16, 18, 20, 24, 26, 28, 30];
 
-            const filtered = allowedNumbers
-            .map((num) => numbered.find((item) => item.displayNumber === num))
-            .filter(Boolean);
+                const filtered = allowedNumbers
+                    .map((num) => numbered.find((item) => item.displayNumber === num))
+                    .filter(Boolean);
 
-            setProducts(res);
-            setCustomProducts(filtered);
+                setProducts(res);
+                setCustomProducts(filtered);
             }
         });
-        }, []);
+    }, []);
 
     useEffect(() => {
         const order = ["Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery"];
@@ -76,10 +111,18 @@ const Home = () => {
                     setCategories(sorted);
                 } else {
                     console.error("Expected array from /api/category/all but got:", res);
-                    setCategories([]); // prevent blank UI
+                    setCategories([]);
                 }
             });
     }, []);
+
+    useEffect(() => {
+        if (products.length > 0 && categories.length > 0) {
+            const firstCategoryName = categories[0]?.name;
+            const filtered = getCategoryProducts(firstCategoryName);
+            setCategoryProducts(filtered);
+        }
+    }, [products, categories]);
 
     return (
         <>
@@ -131,7 +174,7 @@ const Home = () => {
                                     onSwiper={(swiper) => { setSwiperInstance(swiper); requestAnimationFrame(() => { swiper.update();
                                         handleSwiperUpdate(swiper); }); }}
                                 >
-                                    {Array.isArray(products) ? products.map((item) => (
+                                    {Array.isArray(categoryProducts) ? categoryProducts.map((item) => (
                                         <SwiperSlide key={item._id}>
                                           <ProductItem item={item} />
                                         </SwiperSlide>

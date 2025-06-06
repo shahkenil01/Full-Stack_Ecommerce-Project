@@ -122,9 +122,9 @@ const Dashboard = () => {
                 </tr>
               ) : ( filteredProducts
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) 
-                .map((item, index) => (
+                .map((item) => (
                 <tr key={item._id}>
-                  <td>{page * rowsPerPage + index + 1}</td>
+                  <td>{item.indexNumber}</td>
                   <td>
                     <div className="d-flex align-items-center productBox">
                       <div className="imgWrapper">

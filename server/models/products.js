@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const productSchema = mongoose.Schema({
+  indexNumber: {
+    type: Number,
+    default: 0
+  },
   name: {
     type: String,
     required: [true, "Product name is required"],

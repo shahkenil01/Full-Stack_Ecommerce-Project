@@ -466,6 +466,9 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   padding: 5px 10px !important;
   text-transform: capitalize;
   transition: all .2s;}
+
+.css-hzcega-MuiTabs-list{
+  margin-right: -190px;}
 .css-1wxkzlj-MuiTabs-flexContainer{
   margin-right: -200px;}
 .css-a73olz{

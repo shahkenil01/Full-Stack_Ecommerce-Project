@@ -63,6 +63,10 @@ const Products = () => {
     })();
   }, []);
 
+  const filteredProducts = productList.filter((item) =>
+    categoryBy ? item.category?._id === categoryBy : true
+  );
+
   return (
     <div className="right-content w-100">
 
@@ -104,7 +108,10 @@ const Products = () => {
             <FormControl size="small" className="w-100">
               <CustomDropdown
                 value={categoryBy}
-                onChange={setCategoryBy}
+                onChange={(value) => {
+                  setCategoryBy(value);
+                  setPage(0);
+                }}
                 options={[{ value: '', label: 'All' },...categories.map((cat) => ({
                   value: cat._id,
                   label: cat.name
@@ -130,12 +137,11 @@ const Products = () => {
               </tr>
             </thead>
             <tbody>
-              {productList.length > 0 ? productList
-                .filter((item) => categoryBy ? item.category?._id === categoryBy : true)
+              {filteredProducts.length > 0 ? filteredProducts
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item, index) => (
+                .map((item) => (
                   <tr key={item._id}>
-                    <td>{page * rowsPerPage + index + 1}</td>
+                    <td>{item.indexNumber}</td>
                     <td>
                       <div className="d-flex align-items-center productBox">
                         <div className="imgWrapper">
@@ -181,7 +187,7 @@ const Products = () => {
             </tbody>
           </table>
         </div>
-        <TablePagination className='mt-3' style={{ marginBottom: '-20px' }} component="div" count={productList.length} page={page}
+        <TablePagination className='mt-3' style={{ marginBottom: '-20px' }} component="div" count={filteredProducts.length} page={page}
           onPageChange={(event, newPage) => setPage(newPage)} rowsPerPage={rowsPerPage}
           onRowsPerPageChange={(event) => {
             setRowsPerPage(parseInt(event.target.value, 10));

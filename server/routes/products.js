@@ -30,7 +30,10 @@ router.post('/create', async (req, res) => {
 
     const imgUrls = images;
 
-    const product = new Product({ name, description, images: imgUrls, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, productRAMS, productSIZE, productWEIGHT, numReviews });
+    const lastProduct = await Product.findOne().sort({ indexNumber: -1 }).limit(1);
+    const nextIndex = lastProduct ? lastProduct.indexNumber + 1 : 1;
+
+    const product = new Product({ indexNumber: nextIndex, name, description, images: imgUrls, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, productRAMS, productSIZE, productWEIGHT, numReviews });
     const savedProduct = await product.save();
 
     res.status(201).json(savedProduct);

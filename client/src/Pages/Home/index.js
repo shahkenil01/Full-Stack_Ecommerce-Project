@@ -239,6 +239,7 @@ const Home = () => {
                         <div className="product_row w-100 mt-2 position-relative">
                             <div className="slider-wrapper">
                                 <Swiper
+                                    speed={500}
                                     slidesPerView={5.15}
                                     spaceBetween={10}
                                     navigation={{ nextEl: ".recommended-next", prevEl: ".recommended-prev" }}
@@ -295,6 +296,7 @@ const Home = () => {
                         <div className="product_row w-100 mt-2 position-relative">
                             <div className="slider-wrapper">
                                 <Swiper
+                                    speed={500}
                                     slidesPerView={5.15}
                                     spaceBetween={10}
                                     navigation={{ nextEl: ".toprated-next", prevEl: ".toprated-prev" }}

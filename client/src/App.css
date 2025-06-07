@@ -875,6 +875,24 @@ footer .copyright p{
   font-size: 20px;
   color: rgba(0, 0, 0, 0.8)}
 /*Product zooming effect bydefault Start*/
+.zoomSliderBig .item {
+  position: relative;
+  height: 330px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 12px;}
+.zoomSliderBig .item img,
+.zoomSliderBig .item .iiz__img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: top;}
+
+.zoomSliderBig .item .iiz__hint {
+  display: none !important;}
+
 .productZoom {
   width: 100%;
   height: auto;
@@ -888,8 +906,6 @@ footer .copyright p{
   top: 20px; 
   left: 20px; 
   z-index: 12;}
-.zoomSliderBig{
-  width: 100% !important;}
 .zoomSlider{
   padding-top: 30px;}
 .zoomSlider .slick-slide {

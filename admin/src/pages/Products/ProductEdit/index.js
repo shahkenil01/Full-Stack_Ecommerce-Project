@@ -43,8 +43,8 @@ const ProductEdit = () => {
       if (res) {
         setFormFields({
           ...res,
-          oldPrice: typeof res.oldPrice === 'number' ? res.oldPrice : 0,
-          price: typeof res.price === 'number' ? res.price : 0,
+          oldPrice: res.oldPrice ?? '',
+          price: res.price ?? '',
           countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
         });
         setInitialData(res);
@@ -184,8 +184,8 @@ const ProductEdit = () => {
       if (res) {
         setFormFields({
           ...res,
-          oldPrice: typeof res.oldPrice === 'number' ? res.oldPrice : 0,
-          price: typeof res.price === 'number' ? res.price : 0,
+          oldPrice: res.oldPrice ?? '',
+          price: res.price ?? '',
           countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
         });
         setInitialData(res);

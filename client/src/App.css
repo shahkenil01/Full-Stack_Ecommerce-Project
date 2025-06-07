@@ -404,13 +404,14 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
-  top: 45%;
   justify-content: center;
   position: absolute;
+  top: 45%;
   z-index: 50;
-  cursor: pointer;}
+  cursor: pointer;
+  overflow: hidden;}
 .homeBanner-prev-btn:hover , .homeBanner-next-btn:hover , .related-products-prev-btn:hover , .related-products-next-btn:hover{
-  background: #ccc;}
+  background: #eeeeee;}
 .homeBanner-prev-btn {
   left: 45px;}
 .homeBanner-prev-btn.recommended-prev,.homeBanner-prev-btn.toprated-prev {
@@ -435,6 +436,24 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   color: black;}
 .homeBanner-prev-btn.swiper-button-disabled, .homeBanner-next-btn.swiper-button-disabled {
   opacity: 0;}
+
+.homeBanner-prev-btn::before, .homeBanner-next-btn::before, .related-products-prev-btn::before, .related-products-next-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: rgba(31, 31, 31, 0.267);  /* softer than before */
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  z-index: 1;
+  transition: transform 0.4s ease-out, opacity 0.5s ease-out;
+  pointer-events: none;}
+.homeBanner-prev-btn:active::before, .homeBanner-next-btn:active::before, .related-products-prev-btn:active::before, .related-products-next-btn:active::before {
+  transform: translate(-50%, -50%) scale(1.8);
+  opacity: 1;}
 /**Arrow Style End**/
 /**Home Banner Section End**/
 /**Home Banner Section Left Side Start**/

@@ -28,10 +28,16 @@ const ProductItem = ({ item, itemView }) => {
             <img className="w-100 hover-img" src={item.images[1]} alt="hover"/>
           )}
         </Link>
-        {oldPrice && oldPrice > price && (
-          <span className="badge badge-primary">
-            {Math.round(((oldPrice - price) / oldPrice) * 100)}%
-          </span>
+        {oldPrice && price && (
+          (() => {
+            const cleanOld = parseFloat(String(oldPrice).replace(/,/g, ''));
+            const cleanPrice = parseFloat(String(price).replace(/,/g, ''));
+            if (!isNaN(cleanOld) && !isNaN(cleanPrice) && cleanOld > cleanPrice) {
+              const percent = Math.round(((cleanOld - cleanPrice) / cleanOld) * 100);
+              return <span className="badge badge-primary">{percent}%</span>;
+            }
+            return null;
+          })()
         )}
         <div className="actions">
           <Button onClick={() => { setSelectedProduct(item); setIsOpenProductModal(true); }}>

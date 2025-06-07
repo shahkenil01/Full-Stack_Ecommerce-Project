@@ -444,7 +444,7 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   left: 50%;
   width: 100px;
   height: 100px;
-  background: rgba(31, 31, 31, 0.267);  /* softer than before */
+  background: rgba(31, 31, 31, 0.267);
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
   opacity: 0;

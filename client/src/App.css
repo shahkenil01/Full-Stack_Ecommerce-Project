@@ -16,6 +16,12 @@ body{
   .container, .container-lg, .container-md, .container-sm, .container-xl {
       max-width: 1280px;
   }}
+.slider-wrapper {
+  overflow: hidden;
+  margin-right: -5px;
+  height: 396px;
+  margin: 0 -5px;
+  padding: 0 5px;}
 /*
 .bg-blue{
   background: #233a95;
@@ -407,21 +413,27 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
   background: #ccc;}
 .homeBanner-prev-btn {
   left: 45px;}
+.homeBanner-prev-btn.recommended-prev,.homeBanner-prev-btn.toprated-prev {
+  left: 20px;
+  top: 40%;}
 .homeBanner-next-btn {
   right: 65px;}
+.homeBanner-next-btn.recommended-next,.homeBanner-next-btn.toprated-next {
+  right: 20px;
+  top: 40%;}
 .homeBanner-prev-btn::after, .related-products-prev-btn::after {
   content: "\f104";
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
-  font-size: 22px;
+  font-size: 20px;
   color: black;}
 .homeBanner-next-btn::after, .related-products-next-btn::after {
   content: "\f105";
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
-  font-size: 22px;
+  font-size: 20px;
   color: black;}
-.homeBanner-prev-btn.popular-products-prev.swiper-button-disabled, .homeBanner-next-btn.popular-products-next.swiper-button-disabled {
+.homeBanner-prev-btn.swiper-button-disabled, .homeBanner-next-btn.swiper-button-disabled {
   opacity: 0;}
 /**Arrow Style End**/
 /**Home Banner Section End**/
@@ -448,6 +460,8 @@ nav .navPart1 .catWrapper .sidebarNav ul li:hover .submenu button{
 .info-1 .info{
   margin-left: 10px;
   margin-right: 5%;}
+.info.m {
+  margin-right: 0;}
 .homeCat .hd{
   margin-left: 20px;}
 .hd{
@@ -786,7 +800,7 @@ footer{
   height: 500px;
   margin: auto;
   background: #fff;
-  padding: 25px 0px;}
+  margin-top: -5px;}
 footer .topInfo{
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding-bottom: 20px;}
@@ -1250,7 +1264,17 @@ footer .copyright p{
   width: 99% !important;}
 .Sidebar-container .swiper-slide{
   width: 19.3% !important;
-  height: 100% !important;}
+  height: 100% !important;
+  transition: transform 0.3s ease-in-out;}
+
+.bannerSlider .swiper-slide {
+  padding: 10px;}
+.bannerSlider .swiper-slide img {
+  object-fit: contain;
+  transition: transform 0.4s ease;
+  transform: scale(1);}
+.bannerSlider .swiper-slide:hover img {
+  transform: scale(1.1);}
 
 .related-products-prev-btn { 
   left: 0%;}

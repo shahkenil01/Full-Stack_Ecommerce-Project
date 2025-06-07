@@ -13,16 +13,16 @@ import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-const CustomNextArrow = ({ onClick, isDisabled }) => (
+const CustomNextArrow = ({ onClick, isDisabled, className }) => (
     <div
-        className={`homeBanner-next-btn popular-products-next ${isDisabled ? "disabled" : ""}`}
+        className={`homeBanner-next-btn ${className} ${isDisabled ? "disabled" : ""}`}
         onClick={!isDisabled ? onClick : null}
     />
 );
 
-const CustomPrevArrow = ({ onClick, isDisabled }) => (
+const CustomPrevArrow = ({ onClick, isDisabled, className }) => (
     <div
-        className={`homeBanner-prev-btn popular-products-prev ${isDisabled ? "disabled" : ""}`}
+        className={`homeBanner-prev-btn ${className} ${isDisabled ? "disabled" : ""}`}
         onClick={!isDisabled ? onClick : null}
     />
 );
@@ -63,8 +63,8 @@ const Home = () => {
         }));
 
         return allowedNumbers
-           .map((num) =>
-               numbered.find((item) =>
+            .map((num) =>
+                numbered.find((item) =>
                     item.displayNumber === num && item.category?.name === categoryName
                 )
             )
@@ -78,6 +78,12 @@ const Home = () => {
 
         const filtered = getCategoryProducts(selectedCategory);
         setCategoryProducts(filtered);
+
+        if (swiperInstance) {
+            requestAnimationFrame(() => {
+                swiperInstance.update();
+            });
+        }
     };
 
     useEffect(() => {
@@ -127,8 +133,8 @@ const Home = () => {
     return (
         <>
             <HomeBanner />
-            <HomeCat/>
-            
+            <HomeCat />
+
             <section className="homeProducts">
                 <div className="container">
                     <div className="row">
@@ -144,18 +150,24 @@ const Home = () => {
                         </div>
 
                         <div className="col-md-9 productRow">
+                            {/* Popular Products */}
                             <div className="info-1 d-flex align-item-center">
                                 <div className="info">
                                     <h3 className="mb-0 hd">Popular Products</h3>
                                     <p className="text-light text-sml mb-0">Do not miss the current offers until the end of May.</p>
                                 </div>
-                                <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', overflow: 'hidden' }} >
-                                    <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto"
-                                    allowScrollButtonsMobile aria-label="scrollable category tabs" 
-                                    sx={{  minHeight: 48, "& .MuiTabs-scrollButtons": { color: "#000" }}}>
+                                <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', overflow: 'hidden' }}>
+                                    <Tabs
+                                        value={value} onChange={handleChange} variant="scrollable"
+                                        scrollButtons="auto" allowScrollButtonsMobile
+                                        aria-label="scrollable category tabs"
+                                        sx={{ minHeight: 48, "& .MuiTabs-scrollButtons": { color: "#000" } }}
+                                    >
                                         {categories.map((cat, index) => (
-                                            <Tab key={cat._id} label={cat.name} className="item" 
-                                            sx={{ minWidth: 95,  maxWidth: 95, flexShrink: 0, textTransform: "capitalize", paddingX: 1 }}/>
+                                            <Tab
+                                                key={cat._id} label={cat.name} className="item"
+                                                sx={{ minWidth: 95, maxWidth: 95, flexShrink: 0, textTransform: "capitalize", paddingX: 1 }}
+                                            />
                                         ))}
                                     </Tabs>
                                 </Box>
@@ -163,6 +175,7 @@ const Home = () => {
 
                             <div className="product_row w-100 mt-2">
                                 <Swiper
+                                    speed={500}
                                     slidesPerView={4}
                                     spaceBetween={10}
                                     navigation={{ nextEl: ".popular-products-next", prevEl: ".popular-products-prev" }}
@@ -171,18 +184,24 @@ const Home = () => {
                                     modules={[Navigation]}
                                     className="mySwiper"
                                     onSlideChange={(swiper) => handleSwiperUpdate(swiper)}
-                                    onSwiper={(swiper) => { setSwiperInstance(swiper); requestAnimationFrame(() => { swiper.update();
-                                        handleSwiperUpdate(swiper); }); }}
+                                    onSwiper={(swiper) => {
+                                        setSwiperInstance(swiper);
+                                        requestAnimationFrame(() => {
+                                            swiper.update();
+                                            handleSwiperUpdate(swiper);
+                                        });
+                                    }}
                                 >
-                                    {Array.isArray(categoryProducts) ? categoryProducts.map((item) => (
-                                        <SwiperSlide key={item._id}>
-                                          <ProductItem item={item} />
-                                        </SwiperSlide>
-                                    )) : null}
+                                    {Array.isArray(categoryProducts) &&
+                                        categoryProducts.map((item) => (
+                                            <SwiperSlide key={item._id}>
+                                                <ProductItem item={item} />
+                                            </SwiperSlide>
+                                        ))}
                                 </Swiper>
 
-                                <CustomPrevArrow />
-                                <CustomNextArrow />
+                                <CustomPrevArrow className="popular-products-prev" />
+                                <CustomNextArrow className="popular-products-next" />
                             </div>
 
                             <div className="info-1 d-flex align-item-center mt-5">
@@ -202,16 +221,96 @@ const Home = () => {
                                 <div className="banner">
                                     <img src={images.banner3} className="cursor w-100" alt="Banner" />
                                 </div>
-
                                 <div className="banner">
                                     <img src={images.banner4} className="cursor w-100" alt="Banner" />
                                 </div>
-
                                 <div className="banner">
                                     <img src={images.banner5} className="cursor w-100" alt="Banner" />
                                 </div>
                             </div>
+                        </div>
 
+                        <div className="info-1 d-flex align-item-center mt-4">
+                            <div className="info m">
+                                <h3 className="mb-0 hd">Recommended For You</h3>
+                                <p className="text-light text-sml mb-0">Top picks based on your preferences.</p>
+                            </div>
+                        </div>
+                        <div className="product_row w-100 mt-2 position-relative">
+                            <div className="slider-wrapper">
+                                <Swiper
+                                    slidesPerView={5.15}
+                                    spaceBetween={10}
+                                    navigation={{ nextEl: ".recommended-next", prevEl: ".recommended-prev" }}
+                                    slidesPerGroup={3}
+                                    modules={[Navigation]}
+                                    className="mySwiper mt-2 w-100"
+                                >
+                                    {customProducts.slice(0, 8).map(item => (
+                                        <SwiperSlide key={`rec-${item._id}`}>
+                                            <ProductItem item={item} />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                                <CustomPrevArrow className="recommended-prev" />
+                                <CustomNextArrow className="recommended-next" />
+                            </div>
+                        </div>
+
+                        <div className="product_row w-100 mt-2 position-relative bannerSlider mt-2 mb-2">
+                            <Swiper
+                                slidesPerView={3}
+                                spaceBetween={10}
+                                navigation={{ nextEl: ".bannerSlide-next", prevEl: ".bannerSlide-prev" }}
+                                slidesPerGroup={1}
+                                modules={[Navigation]}
+                                className="mySwiper"
+                                breakpoints={{
+                                    320: { slidesPerView: 1.2 },
+                                    576: { slidesPerView: 2 },
+                                    768: { slidesPerView: 2.5 },
+                                    992: { slidesPerView: 3 },
+                                }}
+                            >
+                                {[
+                                    "https://api.spicezgold.com/download/file_1734525879105_banner-7.jpg",
+                                    "https://api.spicezgold.com/download/file_1734525868575_banner-9.jpg",
+                                    "https://api.spicezgold.com/download/file_1734525855497_banner-5.jpg"
+                                ].map((url, index) => (
+                                    <SwiperSlide key={index}>
+                                        <img src={url} alt={`Banner ${index + 1}`} className="w-100 rounded" />
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                            <CustomPrevArrow className="bannerSlide-prev" />
+                            <CustomNextArrow className="bannerSlide-next" />
+                        </div>
+
+                        <div className="info-1 d-flex align-item-center mt-3">
+                            <div className="info m">
+                                <h3 className="mb-0 hd">Top Rated Products</h3>
+                                <p className="text-light text-sml mb-0">Highly rated by our customers.</p>
+                            </div>
+                        </div>
+                        <div className="product_row w-100 mt-2 position-relative">
+                            <div className="slider-wrapper">
+                                <Swiper
+                                    slidesPerView={5.15}
+                                    spaceBetween={10}
+                                    navigation={{ nextEl: ".toprated-next", prevEl: ".toprated-prev" }}
+                                    slidesPerGroup={3}
+                                    modules={[Navigation]}
+                                    className="mySwiper mt-2 w-100"
+                                >
+                                    {customProducts.slice(8, 16).map(item => (
+                                        <SwiperSlide key={`top-${item._id}`}>
+                                            <ProductItem item={item} />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                                <CustomPrevArrow className="toprated-prev" />
+                                <CustomNextArrow className="toprated-next" />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -19,7 +19,6 @@ const ProductItem = ({ item, itemView }) => {
 
   return (
     <div className={`productItem ${itemView}`}>
-      <Link to={`/product/${id}`} className="fullLink"></Link>
 
       <div className="imgWrapper">
         <Link to={`/product/${id}`}>

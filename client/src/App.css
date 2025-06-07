@@ -1121,12 +1121,6 @@ footer .copyright p{
   width: 90px;
   margin-top: 10px;}
 
-.productItem .fullLink {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-
 .productListing{
   display: flex;
   gap: 20px;

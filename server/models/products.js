@@ -24,12 +24,12 @@ const productSchema = mongoose.Schema({
     trim: true
   },
   price: {
-    type: Number,
+    type: String,
     required: [true, "Product price is required"],
     min: [0, "Price must be at least 0"]
   },
   oldPrice: {
-    type: Number,
+    type: String,
     default: 0,
     min: [0, "Old price must be at least 0"]
   },

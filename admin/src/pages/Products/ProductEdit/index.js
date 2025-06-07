@@ -41,7 +41,12 @@ const ProductEdit = () => {
     (async () => {
       const res = await fetchDataFromApi(`/api/products/${id}`);
       if (res) {
-        setFormFields(res);
+        setFormFields({
+          ...res,
+          oldPrice: typeof res.oldPrice === 'number' ? res.oldPrice : 0,
+          price: typeof res.price === 'number' ? res.price : 0,
+          countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
+        });
         setInitialData(res);
       } else {
         enqueueSnackbar('Product not found!', { variant: 'error' });
@@ -124,11 +129,14 @@ const ProductEdit = () => {
   // ========================= HANDLE FORM INPUTS =========================
   const inputChange = (e) => {
     const { name, value } = e.target;
-    setFormFields((prev) => ({
-      ...prev,
-      [name]: ['price', 'oldPrice', 'countInStock'].includes(name)
+
+      const cleanValue = ['countInStock'].includes(name)
         ? Number(value)
-        : value,
+        : value;
+
+      setFormFields((prev) => ({
+        ...prev,
+        [name]: cleanValue,
     }));
   };
 
@@ -174,7 +182,12 @@ const ProductEdit = () => {
     (async () => {
       const res = await fetchDataFromApi(`/api/products/${id}`);
       if (res) {
-        setFormFields(res);
+        setFormFields({
+          ...res,
+          oldPrice: typeof res.oldPrice === 'number' ? res.oldPrice : 0,
+          price: typeof res.price === 'number' ? res.price : 0,
+          countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
+        });
         setInitialData(res);
         setRam(res.productRAMS || []);
         setSize(res.productSIZE || []);
@@ -400,7 +413,7 @@ const ProductEdit = () => {
             <div className="col">
               <div className="form-group">
                 <h6>OLD PRICE</h6>
-                <input type="text" name="oldPrice" value={formFields.oldPrice} onChange={inputChange}/>
+                <input type="text" name="oldPrice" value={formFields.oldPrice || ""} onChange={inputChange}/>
               </div>
             </div>
             <div className="col">

@@ -99,9 +99,10 @@ const ProductUpload = () => {
   // === SET FORM FIELD ON INDIVIDUAL CHANGE ===
   const inputChange = (e) => {
     const { name, value } = e.target;
+    const cleanValue = name === 'countInStock' ? Number(value) : value;
     setFormFields((prev) => ({
       ...prev,
-      [name]: ['price', 'oldPrice', 'countInStock'].includes(name) ? Number(value) : value,
+      [name]: cleanValue,
     }));
   };
 

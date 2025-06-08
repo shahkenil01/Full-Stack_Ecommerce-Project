@@ -36,6 +36,10 @@ const Home = () => {
     const [swiperInstance, setSwiperInstance] = useState(null);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [topRatedProducts, setTopRatedProducts] = useState([]);
+    const [topRatedCategoryName, setTopRatedCategoryName] = useState('');
+
 
     const handleSwiperUpdate = (swiper) => {
         if (!swiper) return;
@@ -100,8 +104,11 @@ const Home = () => {
                     .map((num) => numbered.find((item) => item.displayNumber === num))
                     .filter(Boolean);
 
+                const featured = res.filter((item) => item.isFeatured === true);
+
                 setProducts(res);
                 setCustomProducts(filtered);
+                setFeaturedProducts(featured);
             }
         });
     }, []);
@@ -127,6 +134,21 @@ const Home = () => {
             const firstCategoryName = categories[0]?.name;
             const filtered = getCategoryProducts(firstCategoryName);
             setCategoryProducts(filtered);
+        }
+    }, [products, categories]);
+
+    useEffect(() => {
+        if (products.length > 0 && categories.length > 0) {
+            // Pick random category
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            setTopRatedCategoryName(randomCategory.name);
+
+            // Filter top rated products of that category
+            const filtered = products
+                .filter(p => p.category?.name === randomCategory.name)
+                .sort((a, b) => b.rating - a.rating)
+                .slice(0, 10); // limit to top 10
+            setTopRatedProducts(filtered);
         }
     }, [products, categories]);
 
@@ -243,11 +265,11 @@ const Home = () => {
                                     slidesPerView={5.15}
                                     spaceBetween={10}
                                     navigation={{ nextEl: ".recommended-next", prevEl: ".recommended-prev" }}
-                                    slidesPerGroup={3}
+                                    slidesPerGroup={4}
                                     modules={[Navigation]}
                                     className="mySwiper mt-2 w-100"
                                 >
-                                    {customProducts.slice(0, 8).map(item => (
+                                    {featuredProducts.map(item => (
                                         <SwiperSlide key={`rec-${item._id}`}>
                                             <ProductItem item={item} />
                                         </SwiperSlide>
@@ -289,8 +311,8 @@ const Home = () => {
 
                         <div className="info-1 d-flex align-item-center mt-3">
                             <div className="info m">
-                                <h3 className="mb-0 hd">Top Rated Products</h3>
-                                <p className="text-light text-sml mb-0">Highly rated by our customers.</p>
+                                <h3 className="mb-0 hd">Top Rated in {topRatedCategoryName}</h3>
+                                <p className="text-light text-sml mb-0">Highly rated in {topRatedCategoryName} category.</p>
                             </div>
                         </div>
                         <div className="product_row w-100 mt-2 position-relative">
@@ -304,7 +326,7 @@ const Home = () => {
                                     modules={[Navigation]}
                                     className="mySwiper mt-2 w-100"
                                 >
-                                    {customProducts.slice(8, 16).map(item => (
+                                    {topRatedProducts.map(item => (
                                         <SwiperSlide key={`top-${item._id}`}>
                                             <ProductItem item={item} />
                                         </SwiperSlide>

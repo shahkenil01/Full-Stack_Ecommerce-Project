@@ -287,7 +287,7 @@ const Home = () => {
                                 navigation={{ nextEl: ".bannerSlide-next", prevEl: ".bannerSlide-prev" }}
                                 slidesPerGroup={1}
                                 modules={[Navigation]}
-                                className="mySwiper"
+                                className="mySwiper w-100"
                                 breakpoints={{
                                     320: { slidesPerView: 1.2 },
                                     576: { slidesPerView: 2 },

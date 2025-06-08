@@ -30,11 +30,23 @@ const ProductDetails = () =>{
         });
     }, [id]);
 
-    if (loading || !product) return <div className="text-center mt-5">Loading...</div>;
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [id]);
+
     return(
         <>
             <section className="productDetails section">
                 <div className="container">
+                    {loading || !product ? (
+                        <div className="text-center mt-5 mb-5">
+                            <div
+                                className="spinner-border mt-5 mb-5"
+                                role="status"
+                                style={{ width: '3rem', height: '3rem', color: '#6d4aae' }}>
+                            </div>
+                        </div>
+                    ) : (
                     <div className="row">
                         <div className="col-md-4">
                             <ProductZoom images={product.images} price={product.price} oldPrice={product.oldPrice}/>
@@ -102,7 +114,7 @@ const ProductDetails = () =>{
                                 <Tooltip title="Add to Wishlist" placement="top"><Button className='btn-blue btn-lg btn-big btn-circle ml-4'><FaRegHeart/></Button></Tooltip>
                             </div>
                         </div>
-                    </div>
+                    </div>)}
 
                     <br/>
 
@@ -294,7 +306,9 @@ const ProductDetails = () =>{
 
                     <br/>
 
-                    <RelatedProducts/>
+                    {product && (
+                        <RelatedProducts key={product._id} subcategoryId={product.subcategory?._id} categoryId={product.category?._id} currentProductId={product._id} />
+                    )}
 
                 </div>
             </section>

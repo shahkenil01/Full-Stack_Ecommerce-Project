@@ -930,8 +930,10 @@ footer .copyright p{
   height: 100%;
   width: 100%;
   object-fit: cover;
-  object-position: top;}
-
+  object-position: top;
+  border-radius: 15px;}
+.iiz{
+  border-radius: 15px;}
 .zoomSliderBig .item .iiz__hint {
   display: none !important;}
 
@@ -1188,7 +1190,8 @@ footer .copyright p{
 .productDetails .btn-circle:hover{
   background: #ccc !important;}
 .productZoom.position-relative {
-  height: auto;}
+  height: auto;
+  width: auto;}
 .zoomSlider .item {
   border-radius: 8px;
   cursor: pointer;

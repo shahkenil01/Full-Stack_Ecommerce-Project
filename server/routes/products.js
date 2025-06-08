@@ -45,7 +45,9 @@ router.post('/create', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+      .populate("subcategory")
+      .populate("category");
     if (!product) return res.status(404).json({ message: 'Product not found.' });
     res.status(200).json(product);
   } catch (error) {

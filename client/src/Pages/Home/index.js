@@ -45,14 +45,14 @@ const Home = () => {
 
     const getCategoryProducts = (categoryName) => {
         const allowedNumbersByCategory = {
-            "Fashion": [35, 36, 37, 38, 39, 40],
-            "Electronics": [8, 9, 10, 11, 12],
-            "Bags": [16, 17, 27, 47],
-            "Footwear": [2, 6, 7, 19],
-            "Groceries": [1, 3, 59],
-            "Beauty": [25, 26, 54],
-            "Wellness": [4, 5, 28, 29, 30],
-            "Jewellery": [20]
+            "Fashion": [18, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 48, 49, 52, 53, 79],
+            "Electronics": [8, 9, 45, 77, 10, 11, 12, 13, 14, 15, 21, 22, 23, 24, 50, 94],
+            "Bags": [16, 17, 27, 47, 81, 82, 89, 90, 91, 104, 105, 106],
+            "Footwear": [2, 6, 7, 19, 74, 75, 76, 83, 84, 85, 86, 87],
+            "Groceries": [1, 3, 59, 64, 69, 70, 71, 72, 73, 92, 93, 96],
+            "Beauty": [25, 26, 54, 65, 66, 67, 68, 109],
+            "Wellness": [4, 5, 28, 29, 30, 31, 32, 33],
+            "Jewellery": [20, 60, 61, 62, 63, 80, 107, 108]
         };
 
         const allowedNumbers = allowedNumbersByCategory[categoryName] || [];
@@ -176,10 +176,10 @@ const Home = () => {
                             <div className="product_row w-100 mt-2">
                                 <Swiper
                                     speed={500}
-                                    slidesPerView={4}
+                                    slidesPerView={4.1}
                                     spaceBetween={10}
                                     navigation={{ nextEl: ".popular-products-next", prevEl: ".popular-products-prev" }}
-                                    slidesPerGroup={2}
+                                    slidesPerGroup={4}
                                     pagination={{ clickable: true }}
                                     modules={[Navigation]}
                                     className="mySwiper"

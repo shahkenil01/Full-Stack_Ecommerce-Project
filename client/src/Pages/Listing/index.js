@@ -58,10 +58,8 @@ const Listing = () => {
                 return price >= priceRange[0] && price <= priceRange[1];
             });
 
-            if (statusFilter === "inStock") {
-                filtered = filtered.filter(item => item.countInStock > 0);
-            } else if (statusFilter === "onSale") {
-                filtered = filtered.filter(item => parseFloat(item.oldPrice || 0) > parseFloat(item.price || 0));
+            if (statusFilter) {
+                filtered = filtered.filter(item => Math.floor(item.rating || 0) === parseInt(statusFilter));
             }
 
             setProducts(filtered);

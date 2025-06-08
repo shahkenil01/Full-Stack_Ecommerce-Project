@@ -1450,12 +1450,21 @@ a:hover{
   top: 1px;}
 /*signUpPage Page End*/
 
+.priceRange{
+  cursor: default;
+  user-select: none;}
 .simple-input {
   width: 80px;
-  padding: 2px 6px;
-  font-size: 13px;
+  padding: 2px 0;
+  font-size: 15px;
+  color: #343a40!important;
+  font-weight: bolder;
   border: none;
   outline: none;
   box-shadow: none;
   appearance: textfield;
   -moz-appearance: textfield;}
+.simple-input::-webkit-inner-spin-button, 
+.simple-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;}

@@ -3,10 +3,12 @@ import Rating from '@mui/material/Rating';
 import QuantityBox from "../../Components/QuantityBox";
 import { Button } from "@mui/material";
 import { BsCartFill } from "react-icons/bs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { FaRegHeart } from "react-icons/fa";
 import Tooltip from '@mui/material/Tooltip';
 import RelatedProducts from "./RelatedProducts";
+import { fetchDataFromApi } from "../../utils/api";
 
 const ProductDetails = () =>{
 
@@ -17,56 +19,83 @@ const ProductDetails = () =>{
         setActiveSize(index);
     }
 
+    const { id } = useParams();
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchDataFromApi(`/api/products/${id}`).then(res => {
+            setProduct(res);
+            setLoading(false);
+        });
+    }, [id]);
+
+    if (loading || !product) return <div className="text-center mt-5">Loading...</div>;
     return(
         <>
             <section className="productDetails section">
                 <div className="container">
                     <div className="row">
                         <div className="col-md-4">
-                            <ProductZoom/>
+                            <ProductZoom images={product.images} price={product.price} oldPrice={product.oldPrice}/>
                         </div>
 
                         <div className="col-md-8">
-                            <h2 className="hd text-capitalize">Men Alias-N Regular Fit Spread Collar Shirt</h2>
+                            <h2 className="hd text-capitalize">{product.name}</h2>
                             <ul className="list list-inline d-flex align-items-center">
                                 <li className="list-inline-item">
                                     <div className="d-flex align-items-center">
                                         <span className="text-light mr-2">Brands :</span>
-                                        <span>Welch's</span>
+                                        <span>{product.brand}</span>
                                     </div>
                                 </li>
                                 <li className="list-inline-item">
                                     <div className="d-flex align-items-center">
-                                        <Rating name="read-only" value={4.5} precision={0.5} size="small" readOnly />
+                                        <Rating name="read-only" value={product.rating || 0} precision={0.5} size="small" readOnly />
                                         <span className="text-light cursor ml-2">1 Review</span>
                                     </div>
                                 </li>
                             </ul>
                             <div className="d-flex info">
-                                <span className="oldPrice">Rs: 1000</span>
-                                <span className="netPrice text-danger ml-2">Rs: 500</span>
+                                <span className="oldPrice">Rs: {product.oldPrice}</span>
+                                <span className="netPrice text-danger ml-2">Rs: {product.price}</span>
                             </div>
-                            <span className="badge bg-success mt-3">IN STOCK</span>
-                            <p className="mt-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            </p>
-                            <div className="productSize d-flex align-items-center mt-4">
-                                <span>Size / Weight:</span>
-                                <ul className="list list-inline mb-0 pl-4">
-                                    <li className='list-inline-item'>
-                                        <a className={`tag ${activeSize === 0 ? 'active' : ''}`} onClick={() => isActive(0)}>50G</a>
-                                    </li>
-                                    <li className='list-inline-item'>
-                                        <a className={`tag ${activeSize === 1 ? 'active' : ''}`} onClick={() => isActive(1)}>100G</a>
-                                    </li>
-                                    <li className='list-inline-item'>
-                                        <a className={`tag ${activeSize === 2 ? 'active' : ''}`} onClick={() => isActive(2)}>150G</a>
-                                    </li>
-                                    <li className='list-inline-item'>
-                                        <a className={`tag ${activeSize === 3 ? 'active' : ''}`} onClick={() => isActive(3)}>200G</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <span className={`badge mt-3 ${product.countInStock > 0 ? 'bg-success' : 'bg-danger'}`}>
+                                {product.countInStock > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                            </span>
+                            <p className="mt-3">{product.description}</p>
+                            {(product.productRAMS?.length > 0 || product.productSIZE?.length > 0 || product.productWEIGHT?.length > 0) && (
+                                <div className="productSize d-flex align-items-center mt-4">
+                                    <span>
+                                        {product.productRAMS?.length > 0 && "RAM:"}
+                                        {product.productSIZE?.length > 0 && "Size:"}
+                                        {product.productWEIGHT?.length > 0 && "Weight:"}
+                                    </span>
+                                    <ul className="list list-inline mb-0 pl-4">
+                                        {product.productRAMS?.map((ram, idx) => (
+                                            <li className='list-inline-item' key={`ram-${idx}`}>
+                                                <a className={`tag ${activeSize === idx ? 'active' : ''}`} onClick={() => isActive(idx)}>
+                                                    {ram}
+                                                </a>
+                                            </li>
+                                        ))}
+                                        {product.productSIZE?.map((size, idx) => (
+                                            <li className='list-inline-item' key={`size-${idx}`}>
+                                                <a className={`tag ${activeSize === idx ? 'active' : ''}`} onClick={() => isActive(idx)}>
+                                                    {size}
+                                                </a>
+                                            </li>
+                                        ))}
+                                        {product.productWEIGHT?.map((weight, idx) => (
+                                            <li className='list-inline-item' key={`weight-${idx}`}>
+                                                <a className={`tag ${activeSize === idx ? 'active' : ''}`} onClick={() => isActive(idx)}>
+                                                    {weight}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                             <div className="d-flex align-items-center mt-4">
                                 <QuantityBox/>
                                 <Button className='btn-blue btn-lg btn-big btn-round bg-red ml-1'><BsCartFill/>&nbsp;Add to Cart</Button>

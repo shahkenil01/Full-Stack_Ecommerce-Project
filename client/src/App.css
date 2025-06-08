@@ -911,6 +911,12 @@ footer .copyright p{
   font-size: 20px;
   color: rgba(0, 0, 0, 0.8)}
 /*Product zooming effect bydefault Start*/
+.productDetails .zoomSliderBig .item {
+  height: auto !important;}
+.productDetails .productZoom {
+  display: flex;
+  flex-direction: column;}
+
 .zoomSliderBig .item {
   position: relative;
   height: 360px;
@@ -1182,7 +1188,7 @@ footer .copyright p{
 .productDetails .btn-circle:hover{
   background: #ccc !important;}
 .productZoom.position-relative {
-  height: 350px;}
+  height: auto;}
 .zoomSlider .item {
   border-radius: 8px;
   cursor: pointer;

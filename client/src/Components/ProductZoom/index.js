@@ -6,6 +6,7 @@ import { useRef } from 'react';
 const ProductZoom = ({ images = [], price, oldPrice }) => {
     const zoomSliderBig = useRef();
     const zoomSlider = useRef();
+    const zoomWrapperRef = useRef();
 
     const goto = (index) => {
         if (zoomSlider.current?.slickGoTo) zoomSlider.current.slickGoTo(index);
@@ -28,6 +29,15 @@ const ProductZoom = ({ images = [], price, oldPrice }) => {
         slidesToShow: 1,
         slidesToScroll: 1,
         arrows: false,
+        afterChange: (index) => {
+            setTimeout(() => {
+                const activeSlide = zoomWrapperRef.current?.querySelector('.slick-slide.slick-active .iiz__img');
+                const wrapper = zoomWrapperRef.current;
+                if (activeSlide && wrapper) {
+                    wrapper.style.height = activeSlide.clientHeight + "px";
+                }
+            }, 100);
+        }
     };
 
     if (!images || images.length === 0) return null;
@@ -46,6 +56,7 @@ const ProductZoom = ({ images = [], price, oldPrice }) => {
                         return null;
                     })()
                 )}
+                <div ref={zoomWrapperRef}>
                 <Slider {...settings2} className='zoomSliderBig' ref={zoomSliderBig}>
                     {images.map((img, i) => (
                         <div className='item' key={i}>
@@ -53,6 +64,7 @@ const ProductZoom = ({ images = [], price, oldPrice }) => {
                         </div>
                     ))}
                 </Slider>
+                </div>
             </div>
 
             <Slider {...settings} className='zoomSlider' ref={zoomSlider}>

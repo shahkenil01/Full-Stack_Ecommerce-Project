@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useState, useContext } from 'react';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import { MdClose } from "react-icons/md";
@@ -13,6 +13,8 @@ import { MyContext } from '../../App';
 const ProductModel = ({ isOpen, closeProductModal }) => {
 
     const { selectedProduct } = useContext(MyContext);
+    const [activeOption, setActiveOption] = useState(null);
+
     if (!selectedProduct) return null;
 
     const { name, brand, price, oldPrice, images, rating, countInStock, description } = selectedProduct;
@@ -43,6 +45,49 @@ const ProductModel = ({ isOpen, closeProductModal }) => {
                             {countInStock > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
                         </span>
                         <p className='mt-3'>{description}</p>
+                        {(selectedProduct.productRAMS?.length > 0 || selectedProduct.productSIZE?.length > 0 || selectedProduct.productWEIGHT?.length > 0) && (
+                            <>
+                                {selectedProduct.productRAMS?.length > 0 && (
+                                    <div className="productSize d-flex align-items-center mt-4">
+                                        <span className="mr-2">RAM:</span>
+                                        <ul className="list list-inline mb-0 pl-4">
+                                            {selectedProduct.productRAMS.map((ram, idx) => (
+                                                <li className='list-inline-item' key={`ram-${idx}`}>
+                                                    <a className={`tag ${activeOption === `ram-${idx}` ? 'active' : ''}`}
+                                                        onClick={() => setActiveOption(`ram-${idx}`)}>{ram}</a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {selectedProduct.productSIZE?.length > 0 && (
+                                    <div className="productSize d-flex align-items-center mt-4">
+                                        <span className="mr-2">Size:</span>
+                                        <ul className="list list-inline mb-0 pl-4">
+                                            {selectedProduct.productSIZE.map((size, idx) => (
+                                                <li className='list-inline-item' key={`size-${idx}`}>
+                                                    <a className={`tag ${activeOption === `size-${idx}` ? 'active' : ''}`}
+                                                        onClick={() => setActiveOption(`size-${idx}`)}>{size}</a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {selectedProduct.productWEIGHT?.length > 0 && (
+                                    <div className="productSize d-flex align-items-center mt-4">
+                                        <span className="mr-2">Weight:</span>
+                                        <ul className="list list-inline mb-0 pl-4">
+                                            {selectedProduct.productWEIGHT.map((weight, idx) => (
+                                                <li className='list-inline-item' key={`weight-${idx}`}>
+                                                    <a className={`tag ${activeOption === `weight-${idx}` ? 'active' : ''}`}
+                                                        onClick={() => setActiveOption(`weight-${idx}`)}>{weight}</a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </>
+                        )}
                         <div className='d-flex align-items-center'>
                             <QuantityBox/>
                             <Button className='btn-blue btn-lg btn-big bg-red btn-round ml-3'><BsCartFill/>&nbsp;Add to Cart</Button>

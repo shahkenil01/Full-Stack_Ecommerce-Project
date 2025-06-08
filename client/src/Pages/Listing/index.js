@@ -7,12 +7,14 @@ import { FaAngleDown } from "react-icons/fa6";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
+import { useParams } from "react-router-dom";
 import ProductItem from "../../Components/ProductItem";
 import { useEffect, useState } from "react";
 import { fetchDataFromApi } from "../../utils/api";
 
 const Listing = () => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [productView, setProductView] = useState('four');
     const openDropdown = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -24,13 +26,28 @@ const Listing = () => {
 
     const [products, setProducts] = useState([]);
 
+    const { id } = useParams();
+    const path = window.location.pathname;
+
+    const isSubCategory = path.includes('/subcat/');
+
     useEffect(() => {
+      setIsLoading(true);
       fetchDataFromApi('/api/products').then(res => {
         if (Array.isArray(res)) {
-          setProducts(res);
+            let filtered = res;
+
+            if (isSubCategory) {
+                filtered = res.filter(item => item.subcategory?._id === id);
+            } else if (id) {
+                filtered = res.filter(item => item.category?._id === id);
+            }
+
+            setProducts(filtered);
         }
+        setIsLoading(false);
       });
-    }, []);
+    }, [id]);
     return (
         <>
             <section className="product_Listing_Page">
@@ -68,12 +85,22 @@ const Listing = () => {
                                     </div>
                                 </div>
 
+                                {isLoading ? (
+                                    <div className="text-center mt-5" >
+                                        <div
+                                            className="spinner-border mt-5"
+                                            role="status"
+                                            style={{ width: '3rem', height: '3rem', color: '#000' }}>
+                                            <span className="sr-only">Loading...</span>
+                                        </div>
+                                    </div>
+                                ) : (
                                 <div className="productListing">
                                     {products.map((item) => (
                                         <ProductItem key={item._id} item={item} itemView={productView} />
                                     ))}
                                 </div>
-
+                                )}
                             </div>
                         </div>
                 </div>

@@ -51,7 +51,7 @@ const getSubCats = (categoryId) =>
                                     const subs = getSubCats(cat._id);
                                     return (
                                       <li key={cat._id}>
-                                        <Link to={`/cat/${cat._id}`}>
+                                        <Link to={`/products/cat/${cat._id}`}>
                                           <Button>
                                             <img src={images[cat.name]} width="20" className="mr-2" alt={cat.name} />
                                             {cat.name}
@@ -61,7 +61,7 @@ const getSubCats = (categoryId) =>
                                         {subs.length > 0 && (
                                           <div className="submenu">
                                             {subs.map((sub) => (
-                                              <Link to={`/subcat/${sub._id}`} key={sub._id}>
+                                              <Link to={`/products/subcat/${sub._id}`} key={sub._id}>
                                                 <Button className="custom">{sub.subCat}</Button>
                                               </Link>
                                             ))}
@@ -82,7 +82,7 @@ const getSubCats = (categoryId) =>
                               const subs = getSubCats(cat._id);
                               return (
                                 <li className='list-inline-item' key={cat._id}>
-                                  <Link to={`/cat/${cat._id}`}>
+                                  <Link to={`/products/cat/${cat._id}`}>
                                     <Button>
                                       <img src={images[cat.name]} width="20" className="mr-2" alt={cat.name} />
                                       {cat.name.toLowerCase()}
@@ -92,7 +92,7 @@ const getSubCats = (categoryId) =>
                                   {subs.length > 0 && (
                                     <div className="submenu shadow">
                                       {subs.map(sub => (
-                                        <Link to={`/subcat/${sub._id}`} key={sub._id}>
+                                        <Link to={`/products/subcat/${sub._id}`} key={sub._id}>
                                           <Button>{sub.subCat}</Button>
                                         </Link>
                                       ))}

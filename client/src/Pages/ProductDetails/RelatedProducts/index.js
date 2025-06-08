@@ -15,7 +15,6 @@ const RelatedProducts = ({ subcategoryId, categoryId, currentProductId }) => {
 
       let filtered = [];
 
-      // ✅ Subcategory match (check _id OR direct string)
       if (subcategoryId) {
         filtered = res.filter(
           (p) =>
@@ -24,7 +23,6 @@ const RelatedProducts = ({ subcategoryId, categoryId, currentProductId }) => {
         );
       }
 
-      // ✅ Fallback to category if subcategory missing or no results
       if ((!subcategoryId || filtered.length === 0) && categoryId) {
         filtered = res.filter(
           (p) =>

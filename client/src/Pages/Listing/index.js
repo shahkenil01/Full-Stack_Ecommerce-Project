@@ -25,11 +25,11 @@ const Listing = () => {
     };
 
     const [products, setProducts] = useState([]);
-
     const { id } = useParams();
     const path = window.location.pathname;
 
     const isSubCategory = path.includes('/subcat/');
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
       setIsLoading(true);
@@ -65,7 +65,7 @@ const Listing = () => {
                                     </div>
 
                                     <div className="ml-auto showByFilter">
-                                        <Button onClick={handleClick}>Show 10<FaAngleDown/></Button>
+                                        <Button onClick={handleClick}>Show {itemsPerPage}<FaAngleDown/></Button>
                                         <Menu
                                             className="w-100 showPerPageDropdown"
                                             id="basic-menu"
@@ -76,11 +76,11 @@ const Listing = () => {
                                               'aria-labelledby': 'basic-button',
                                             }}
                                         >
-                                            <MenuItem onClick={handleClose}>10</MenuItem>
-                                            <MenuItem onClick={handleClose}>20</MenuItem>
-                                            <MenuItem onClick={handleClose}>30</MenuItem>
-                                            <MenuItem onClick={handleClose}>40</MenuItem>
-                                            <MenuItem onClick={handleClose}>50</MenuItem>
+                                            <MenuItem onClick={() => { setItemsPerPage(10); handleClose(); }}>10</MenuItem>
+                                            <MenuItem onClick={() => { setItemsPerPage(20); handleClose(); }}>20</MenuItem>
+                                            <MenuItem onClick={() => { setItemsPerPage(30); handleClose(); }}>30</MenuItem>
+                                            <MenuItem onClick={() => { setItemsPerPage(40); handleClose(); }}>40</MenuItem>
+                                            <MenuItem onClick={() => { setItemsPerPage(50); handleClose(); }}>50</MenuItem>
                                         </Menu>
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@ const Listing = () => {
                                     </div>
                                 ) : (
                                 <div className="productListing">
-                                    {products.map((item) => (
+                                    {products.slice(0, itemsPerPage).map((item) => (
                                         <ProductItem key={item._id} item={item} itemView={productView} />
                                     ))}
                                 </div>

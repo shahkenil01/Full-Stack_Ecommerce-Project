@@ -31,6 +31,10 @@ const Listing = () => {
     const isSubCategory = path.includes('/subcat/');
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const [selectedSubs, setSelectedSubs] = useState([]);
+    const [priceRange, setPriceRange] = useState([100, 70000]);
+    const [statusFilter, setStatusFilter] = useState("");
+
     useEffect(() => {
       setIsLoading(true);
       fetchDataFromApi('/api/products').then(res => {
@@ -43,17 +47,35 @@ const Listing = () => {
                 filtered = res.filter(item => item.category?._id === id);
             }
 
+            if (selectedSubs.length > 0) {
+                filtered = filtered.filter(item =>
+                    item.subcategory && selectedSubs.includes(item.subcategory._id)
+                );
+            }
+
+            filtered = filtered.filter(item => {
+                const price = parseFloat(item.price || 0);
+                return price >= priceRange[0] && price <= priceRange[1];
+            });
+
+            if (statusFilter === "inStock") {
+                filtered = filtered.filter(item => item.countInStock > 0);
+            } else if (statusFilter === "onSale") {
+                filtered = filtered.filter(item => parseFloat(item.oldPrice || 0) > parseFloat(item.price || 0));
+            }
+
             setProducts(filtered);
         }
         setIsLoading(false);
       });
-    }, [id]);
+    }, [id, selectedSubs, priceRange, statusFilter]);
     return (
         <>
             <section className="product_Listing_Page">
                 <div className="container">
                         <div className="productListing d-flex">
-                            <Sidebar />
+                            <Sidebar selectedSubs={selectedSubs} setSelectedSubs={setSelectedSubs} priceRange={priceRange} 
+                                     setPriceRange={setPriceRange} statusFilter={statusFilter} setStatusFilter={setStatusFilter}/>
 
                             <div className="content_right">
 

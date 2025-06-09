@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation, matchRoutes, useParams } fro
 import { createContext, useEffect, useState } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css';
+import './assets/css/responsive.css';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import TopLoadingBar from './components/TopLoadingBar';
@@ -10,6 +11,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
+import OtpVerify from './pages/SignUp/OtpVerify';
 import NotFound from './pages/NotFound';
 import HomeBannerSlide from './pages/HomeBannerSlide';
 import HomeBannerSlideAdd from './pages/HomeBannerSlide/AddHomeBannerSlide';
@@ -83,6 +85,7 @@ function AppWrapper() {
     { path: '/dashboard' },
     { path: '/login' },
     { path: '/signup' },
+    { path: '/verify-account'},
     { path: '/homeBannerSlide/list'},
     { path: '/homeBannerSlide/add'},
     { path: '/category' },
@@ -109,6 +112,7 @@ function AppWrapper() {
     '/productRAMS/add',
     '/productWEIGHT/add',
     '/productSIZE/add',
+    '/verify-account'
   ];
   const dynamicSkipRoutes = ['/category/edit/', '/product/edit/'];
 
@@ -117,7 +121,7 @@ function AppWrapper() {
     skipLoaderRoutes.includes(currentPath) ||
     dynamicSkipRoutes.some((path) => currentPath.startsWith(path));
 
-  const hideLayout = ['/login', '/signUp'].includes(currentPath);
+  const hideLayout = ['/login', '/signUp', '/verify-account'].includes(currentPath);
 
   return (
     <MyContext.Provider value={values}>
@@ -134,6 +138,7 @@ function AppWrapper() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signUp" element={<SignUp />} />
+            <Route path="/verify-account" element={<OtpVerify />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Dashboard />} />

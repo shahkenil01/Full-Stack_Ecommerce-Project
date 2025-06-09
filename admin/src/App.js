@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation, matchRoutes, useParams } fro
 import { createContext, useEffect, useState } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css';
+import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import TopLoadingBar from './components/TopLoadingBar';
 import Dashboard from './pages/Dashboard';
@@ -130,24 +131,29 @@ function AppWrapper() {
 
         <div className={`content ${hideLayout ? 'full' : ''} ${isToggleSidebar ? 'toggle' : ''}`}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signUp" element={<SignUp />} />
-            <Route path="/homeBannerSlide/list" element={<HomeBannerSlide />} />
-            <Route path="/homeBannerSlide/add" element={<HomeBannerSlideAdd />} />
-            <Route path="/category" element={<Category />} />
-            <Route path="/category/add" element={<CategoryAdd />} />
-            <Route path="/category/edit/:id" element={<CategoryEdit />} />
-            <Route path="/subCategory" element={<SubCategory />} />
-            <Route path="/subCategory/add" element={<SubCategoryAdd />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/product/details" element={<ProductDetails />} />
-            <Route path="/product/upload" element={<ProductUpload />} />
-            <Route path="/product/edit/:id" element={<ProductEdit />} />
-            <Route path="/productRAMS/add" element={<ProductsRam />} />
-            <Route path="/productWEIGHT/add" element={<ProductsWeight />} />
-            <Route path="/productSIZE/add" element={<ProductsSize />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/homeBannerSlide/list" element={<HomeBannerSlide />} />
+              <Route path="/homeBannerSlide/add" element={<HomeBannerSlideAdd />} />
+              <Route path="/category" element={<Category />} />
+              <Route path="/category/add" element={<CategoryAdd />} />
+              <Route path="/category/edit/:id" element={<CategoryEdit />} />
+              <Route path="/subCategory" element={<SubCategory />} />
+              <Route path="/subCategory/add" element={<SubCategoryAdd />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/details" element={<ProductDetails />} />
+              <Route path="/product/upload" element={<ProductUpload />} />
+              <Route path="/product/edit/:id" element={<ProductEdit />} />
+              <Route path="/productRAMS/add" element={<ProductsRam />} />
+              <Route path="/productWEIGHT/add" element={<ProductsWeight />} />
+              <Route path="/productSIZE/add" element={<ProductsSize />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

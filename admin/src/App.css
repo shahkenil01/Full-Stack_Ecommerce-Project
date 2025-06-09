@@ -822,6 +822,8 @@ body.dark .css-mmygx2-MuiSelect-select-MuiInputBase-input, body.dark .css-1yxt9m
   position: relative;
   z-index: 100;
   padding: 35px 25px 15px 25px;}
+.loginSection .loginBox .wrapper.signup{
+  height: 540px;}
 
 .loginSection .loginBox .wrapper .form-control{
   background: #fff;
@@ -1293,3 +1295,6 @@ textarea {
 .dashCat {
   margin-top: -10px !important;
   margin-bottom: -1px;}
+
+.go3963613292, .go3651055292{
+  min-width: auto !important;}

@@ -14,7 +14,7 @@ const SnackbarCloseButton = ({ snackbarKey }) => {
 };
 
 const NotistackProvider = ({ children }) => (
-  <SnackbarProvider maxSnack={3} autoHideDuration={3000} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} 
+  <SnackbarProvider maxSnack={6} autoHideDuration={3000} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} TransitionProps={{ direction: 'left' }}
     action={(key) => <SnackbarCloseButton snackbarKey={key} />} >
     {children}
   </SnackbarProvider>

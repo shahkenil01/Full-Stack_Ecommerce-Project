@@ -1,18 +1,17 @@
 import { useState, useContext} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { RiLockPasswordFill } from "react-icons/ri";
+import { IoMdEye, IoMdEyeOff} from "react-icons/io";
+import { MdEmail } from "react-icons/md";
+import { Button } from '@mui/material';
 import Logo from '../../assets/images/logo.png';
 import pattern from '../../assets/images/pattern.webp';
-import { MdEmail } from "react-icons/md";
-import { RiLockPasswordFill } from "react-icons/ri";
-import { IoMdEye } from "react-icons/io";
-import { IoMdEyeOff } from "react-icons/io";
-import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
 import Google_Icons from '../../assets/images/Google_Icons.png';
-import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import { MyContext } from '../../App';
 
 const Login = ()=>{
-
+  const { enqueueSnackbar } = useSnackbar();
   const [inputIndex, setInputIndex] = useState(null);
   const [isShowPassword, setIsShowPassword] = useState(false);
 
@@ -33,6 +32,11 @@ const Login = ()=>{
     e.preventDefault();
     const { email, password } = formData;
 
+    if (!email.trim() || !password.trim()) {
+      enqueueSnackbar("Please fill all fields", { variant: 'error' });
+      return;
+    }
+
     try {
       const res = await fetch("http://localhost:4000/api/user/signin", {
         method: "POST",
@@ -49,7 +53,7 @@ const Login = ()=>{
       context.setIsLogin(true);
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err.message);
+      enqueueSnackbar(err.message, { variant: 'error' });
     }
   };
 

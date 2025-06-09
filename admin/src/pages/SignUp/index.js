@@ -1,25 +1,26 @@
-import { useState, useRef } from 'react';
-import Logo from '../../assets/images/logo.png';
-import pattern from '../../assets/images/pattern.webp';
+import { useState, useRef, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdEmail } from "react-icons/md";
+import { TiHome } from "react-icons/ti";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaPhoneAlt } from "react-icons/fa";
 import { IoShieldCheckmarkSharp } from "react-icons/io5";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Button } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
 import Google_Icons from '../../assets/images/Google_Icons.png';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import { TiHome } from "react-icons/ti";
+import Logo from '../../assets/images/logo.png';
+import pattern from '../../assets/images/pattern.webp';
+import { MyContext } from '../../App';
+import { useSnackbar } from 'notistack';
 
 const SignUp = () => {
   const [inputIndex, setInputIndex] = useState(null);
   const [isShowPassword, setIsShowPassword] = useState(false);
+  const context = useContext(MyContext);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ name: '', email: '' ,phone: '', password: '', confirmPassword: '' });
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
@@ -32,10 +33,15 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, confirmPassword } = formData;
+    const { name, email, phone, password, confirmPassword } = formData;
+
+    if (!name || !email || !password || !confirmPassword) {
+      enqueueSnackbar("Please fill all fields", { variant: "error" });
+      return;
+    }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      enqueueSnackbar("Passwords does not match", { variant: "error" });
       return;
     }
 
@@ -43,16 +49,22 @@ const SignUp = () => {
       const res = await fetch("http://localhost:4000/api/user/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, phone: "0000000000" }) // dummy phone
+        body: JSON.stringify({ name, email, password, phone })
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.msg || "Signup failed");
 
-      console.log("Signup successful:", data);
+      localStorage.setItem("userInfo", JSON.stringify(data.user));
+      localStorage.setItem("userToken", data.token);
+      enqueueSnackbar("Account created successfully!", { variant: "success" });
+
+      context.setUser(data.user);
+      context.setIsLogin(true);
+
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err.message);
+      enqueueSnackbar(err.message, { variant: "error" });
     }
   };
 
@@ -91,7 +103,7 @@ const SignUp = () => {
                 <h5 className="font-weight-bold">Register a new account</h5>
               </div>
 
-              <div className="wrapper mt-3 card">
+              <div className="wrapper signup mt-3 card">
                 <form onSubmit={handleSubmit}>
                   <div className={`form-group position-relative ${inputIndex === 0 && 'focus'}`}>
                     <span className="icon"><FaUserCircle /></span>
@@ -105,6 +117,13 @@ const SignUp = () => {
                     <input type="email" className="form-control" placeholder="enter your email" name="email"
                       onFocus={() => focusInput(1)} onBlur={() => setInputIndex(null)}
                       onChange={handleChange} value={formData.email} />
+                  </div>
+
+                  <div className={`form-group position-relative ${inputIndex === 1 && 'focus'}`}>
+                    <span className="icon"><FaPhoneAlt /></span>
+                    <input type="number" className="form-control" placeholder="enter your Phone Number" name="phone"
+                      onFocus={() => focusInput(1)} onBlur={() => setInputIndex(null)}
+                      onChange={handleChange} value={formData.phone} />
                   </div>
 
                   <div className={`form-group position-relative ${inputIndex === 2 && 'focus'}`}>
@@ -140,10 +159,6 @@ const SignUp = () => {
                       </span>
                     )}
                   </div>
-
-                  <FormControlLabel required control={<Checkbox />} label="I agree to all Terms & Conditions" />
-
-                  {error && <p style={{ color: 'red' }}>{error}</p>}
 
                   <div className="form-group">
                     <Button className="btn-blue btn-lg btn-big w-100" type="submit">Sign Up</Button>

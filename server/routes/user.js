@@ -47,13 +47,13 @@ router.post('/signin', async (req, res) => {
     const existingUser = await User.findOne({ email: email });
 
     if (!existingUser) {
-      return res.status(404).json({ msg: "User already exist" })
+      return res.status(404).json({ msg: "User not found" });
     } 
 
     const matchPassword = await bcrypt.compare(password, existingUser.password);
 
     if(!matchPassword){
-      return res.status(400).json({ msg: "Invalid credntials"})
+      return res.status(400).json({ msg: "Incorrect password" });
     }
 
     const token = jwt.sign({ email:existingUser.email, id: existingUser._id, role: existingUser.role }, process.env.JSON_WEB_TOKEN_SECRECT_KEY, { expiresIn: '1h' });

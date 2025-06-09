@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext} from 'react';
 import Logo from '../../assets/images/logo.png';
 import pattern from '../../assets/images/pattern.webp';
 import { MdEmail } from "react-icons/md";
@@ -7,7 +7,9 @@ import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import Google_Icons from '../../assets/images/Google_Icons.png'
+import Google_Icons from '../../assets/images/Google_Icons.png';
+import { useNavigate } from 'react-router-dom';
+import { MyContext } from '../../App';
 
 const Login = ()=>{
 
@@ -17,6 +19,39 @@ const Login = ()=>{
   const focusInput=(index)=>{
     setInputIndex(index);
   }
+
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const context = useContext(MyContext);
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = formData;
+
+    try {
+      const res = await fetch("http://localhost:4000/api/user/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Login failed");
+
+      localStorage.setItem("userInfo", JSON.stringify(data.user));
+      localStorage.setItem("userToken", data.token);
+      context.setUser(data.user);
+      context.setIsLogin(true);
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return(
     <>
@@ -29,10 +64,10 @@ const Login = ()=>{
           </div>
 
           <div className='wrapper mt-3 card border'>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className={`form-group position-relative ${inputIndex===0 && 'focus'}`}>
                 <span className='icon'><MdEmail/></span>
-                <input type='email' className='form-control' placeholder='enter your email' 
+                <input type='email' name='email' value={formData.email} onChange={handleChange} className='form-control' placeholder='enter your email' 
                   onFocus={()=>focusInput(0)}
                   onBlur={()=>setInputIndex(null)} autoFocus/>
               </div>
@@ -40,7 +75,7 @@ const Login = ()=>{
               <div className={`form-group position-relative ${inputIndex===1 && 'focus'}`}>
                 <span className='icon'><RiLockPasswordFill/></span>
                 <input className="form-control" placeholder="enter your password" 
-                  type={isShowPassword ? 'text' : 'password'}
+                  type={isShowPassword ? 'text' : 'password'} name='password' value={formData.password} onChange={handleChange}
                   onFocus={() => focusInput(1)}
                   onBlur={(e) => {
                     if (!e.relatedTarget || !e.relatedTarget.classList.contains('toggleShowPassword')) {
@@ -60,7 +95,7 @@ const Login = ()=>{
               </div>
 
               <div className='form-group'>
-                <Button className="btn-blue btn-lg btn-big w-100">Sign In</Button>
+                <Button className="btn-blue btn-lg btn-big w-100" type="submit">Sign In</Button>
               </div>
 
               <div className='form-group text-center mb-0'>

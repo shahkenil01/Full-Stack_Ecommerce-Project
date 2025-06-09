@@ -31,11 +31,25 @@ function AppWrapper() {
   const location = useLocation();
 
   const [isToggleSidebar, setIsToggleSidebar] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
   const [themeMode, setThemeMode] = useState(() => {
     const savedTheme = localStorage.getItem('themeMode');
     return savedTheme ? savedTheme === 'light' : true;
   });
+
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("userInfo");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    const userData = localStorage.getItem("userInfo");
+    if (token && userData) {
+      setIsLogin(true);
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   useEffect(()=>{
   if(themeMode===true){
@@ -55,7 +69,9 @@ function AppWrapper() {
     isLogin,
     setIsLogin,
     themeMode,
-    setThemeMode
+    setThemeMode,
+    user,
+    setUser,
   };
 
   const routes = [
@@ -82,7 +98,7 @@ function AppWrapper() {
   const matchedRoutes = matchRoutes(routes, location);
   const skipLoaderRoutes = [
     '/login',
-    '/signup',
+    '/signUp',
     '/homeBannerSlide/list',
     '/homeBannerSlide/add',
     '/category/add',
@@ -93,7 +109,7 @@ function AppWrapper() {
   ];
   const dynamicSkipRoutes = ['/category/edit/', '/product/edit/'];
 
-  const hideLayout = !matchedRoutes || ['/login', '/signup'].includes(location.pathname);
+  const hideLayout = !matchedRoutes || ['/login', '/signUp'].includes(location.pathname);
   
   const isNotFoundPage = !matchedRoutes;
   const skipLoader =
@@ -104,7 +120,7 @@ function AppWrapper() {
   return (
     <MyContext.Provider value={values}>
       <TopLoadingBar skip={skipLoader} />
-      {!hideLayout && <Header />}
+      {!hideLayout && <Header key={isLogin ? user?.email : "guest"} />}
       <div className="main d-flex">
         {!hideLayout && (
           <div className={`sidebarWrapper ${isToggleSidebar ? 'toggle' : ''}`}>
@@ -117,7 +133,7 @@ function AppWrapper() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signUp" element={<SignUp />} />
             <Route path="/homeBannerSlide/list" element={<HomeBannerSlide />} />
             <Route path="/homeBannerSlide/add" element={<HomeBannerSlideAdd />} />
             <Route path="/category" element={<Category />} />

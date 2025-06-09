@@ -7,7 +7,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { IoShieldCheckmarkSharp } from "react-icons/io5";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Google_Icons from '../../assets/images/Google_Icons.png';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -17,13 +17,44 @@ const SignUp = () => {
   const [inputIndex, setInputIndex] = useState(null);
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
-  const focusInput = (index) => {
-    setInputIndex(index);
-  }
+  const focusInput = (index) => setInputIndex(index);
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { name, email, password, confirmPassword } = formData;
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:4000/api/user/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, phone: "0000000000" }) // dummy phone
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Signup failed");
+
+      console.log("Signup successful:", data);
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <>
@@ -61,27 +92,26 @@ const SignUp = () => {
               </div>
 
               <div className="wrapper mt-3 card">
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className={`form-group position-relative ${inputIndex === 0 && 'focus'}`}>
                     <span className="icon"><FaUserCircle /></span>
-                    <input type="text" className="form-control" placeholder="enter your name" onFocus={() => focusInput(0)} onBlur={() => setInputIndex(null)} autoFocus/>
+                    <input type="text" className="form-control" placeholder="enter your name" name="name"
+                      onFocus={() => focusInput(0)} onBlur={() => setInputIndex(null)} autoFocus
+                      onChange={handleChange} value={formData.name} />
                   </div>
 
                   <div className={`form-group position-relative ${inputIndex === 1 && 'focus'}`}>
                     <span className="icon"><MdEmail /></span>
-                    <input type="email" className="form-control" placeholder="enter your email" onFocus={() => focusInput(1)} onBlur={() => setInputIndex(null)}/>
+                    <input type="email" className="form-control" placeholder="enter your email" name="email"
+                      onFocus={() => focusInput(1)} onBlur={() => setInputIndex(null)}
+                      onChange={handleChange} value={formData.email} />
                   </div>
 
                   <div className={`form-group position-relative ${inputIndex === 2 && 'focus'}`}>
                     <span className="icon"><RiLockPasswordFill /></span>
-                    <input ref={passwordRef} className="form-control" placeholder="enter your password" 
-                      type={isShowPassword ? "text" : "password"} onFocus={() => focusInput(2)} 
-                      onBlur={(e) => {
-                        if (!e.relatedTarget || !e.relatedTarget.classList.contains('toggleShowPassword')) {
-                          setInputIndex(null);
-                        }
-                      }}/>
-                      
+                    <input ref={passwordRef} className="form-control" placeholder="enter your password" name="password"
+                      type={isShowPassword ? "text" : "password"} onFocus={() => focusInput(2)}
+                      onBlur={() => setInputIndex(null)} onChange={handleChange} value={formData.password} />
                     {inputIndex === 2 && (
                       <span className="toggleShowPassword" tabIndex="0"
                         onMouseDown={(e) => {
@@ -96,14 +126,9 @@ const SignUp = () => {
 
                   <div className={`form-group position-relative ${inputIndex === 3 && 'focus'}`}>
                     <span className="icon"><IoShieldCheckmarkSharp /></span>
-                    <input ref={confirmPasswordRef} className="form-control" placeholder="confirm your password"
+                    <input ref={confirmPasswordRef} className="form-control" placeholder="confirm your password" name="confirmPassword"
                       type={isShowConfirmPassword ? "text" : "password"} onFocus={() => focusInput(3)}
-                      onBlur={(e) => {
-                        if (!e.relatedTarget || !e.relatedTarget.classList.contains('toggleShowPassword')) {
-                          setInputIndex(null);
-                        }
-                      }}/>
-
+                      onBlur={() => setInputIndex(null)} onChange={handleChange} value={formData.confirmPassword} />
                     {inputIndex === 3 && (
                       <span className="toggleShowPassword" tabIndex="0"
                         onMouseDown={(e) => {
@@ -116,12 +141,12 @@ const SignUp = () => {
                     )}
                   </div>
 
-                  <div className="d-flex align-items-center">
                   <FormControlLabel required control={<Checkbox />} label="I agree to all Terms & Conditions" />
-                  </div>
+
+                  {error && <p style={{ color: 'red' }}>{error}</p>}
 
                   <div className="form-group">
-                    <Button className="btn-blue btn-lg btn-big w-100">Sign Up</Button>
+                    <Button className="btn-blue btn-lg btn-big w-100" type="submit">Sign Up</Button>
                   </div>
 
                   <div className="d-flex align-items-center justify-content-center or mt-3 mb-3">
@@ -131,20 +156,19 @@ const SignUp = () => {
                   <Button variant="outlined" className="w-100 btn-lg btn-big loginWithGoogle">
                     <img src={Google_Icons} width="25px" alt="Google Icon" /> &nbsp; Sign Up with Google
                   </Button>
-
                 </form>
+
                 <span className="text-center d-block mt-3">
                   Already have an account?
                   <Link to={'/login'} className="link color ml-2">Sign In</Link>
                 </span>
               </div>
-
             </div>
           </div>
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
 export default SignUp;

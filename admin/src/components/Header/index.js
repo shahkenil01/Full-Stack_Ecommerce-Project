@@ -230,8 +230,17 @@ const Header = () => {
                   <UserAvatarImgComponent img={'https://mironcoder-hotash.netlify.app/images/avatar/01.webp'}/>
 
                   <div className="userInfo">
-                    <h4>Kenil Shah</h4>
-                    <p className="mb-0">@Kenil</p>
+                    {context.user ? (
+                      <>
+                        <h4>{context.user.name}</h4>
+                        <p className="mb-0">{context.user.email}</p>
+                      </>
+                    ) : (
+                      <>
+                        <h4>Loading...</h4>
+                        <p className="mb-0">Please wait</p>
+                      </>
+                    )}
                   </div>
                 </Button>
 
@@ -252,7 +261,8 @@ const Header = () => {
                     <ListItemIcon> <IoShieldHalfSharp/> </ListItemIcon>
                     Reset Password
                   </MenuItem>
-                  <MenuItem onClick={handleCloseMyAccDrop}>
+                  <MenuItem onClick={() => { localStorage.removeItem("userToken"); localStorage.removeItem("userInfo");
+                   context.setIsLogin(false); context.setUser(null); window.location.href = "/login";  }}>
                     <ListItemIcon> <Logout fontSize="small" /> </ListItemIcon>
                     Logout
                   </MenuItem>

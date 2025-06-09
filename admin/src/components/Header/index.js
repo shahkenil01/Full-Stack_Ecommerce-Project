@@ -230,17 +230,8 @@ const Header = () => {
                   <UserAvatarImgComponent img={'https://mironcoder-hotash.netlify.app/images/avatar/01.webp'}/>
 
                   <div className="userInfo">
-                    {context.user ? (
-                      <>
-                        <h4>{context.user.name}</h4>
-                        <p className="mb-0">{context.user.email}</p>
-                      </>
-                    ) : (
-                      <>
-                        <h4>Loading...</h4>
-                        <p className="mb-0">Please wait</p>
-                      </>
-                    )}
+                    <h4>{context?.user?.name || "User"}</h4>
+                    <p className="mb-0">{context?.user?.email || "email@example.com"}</p>
                   </div>
                 </Button>
 

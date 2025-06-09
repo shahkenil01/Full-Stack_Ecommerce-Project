@@ -33,6 +33,7 @@ function AppWrapper() {
 
   const [isToggleSidebar, setIsToggleSidebar] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [themeMode, setThemeMode] = useState(() => {
     const savedTheme = localStorage.getItem('themeMode');
     return savedTheme ? savedTheme === 'light' : true;
@@ -50,6 +51,7 @@ function AppWrapper() {
       setIsLogin(true);
       setUser(JSON.parse(userData));
     }
+    setIsAuthLoading(false);
   }, []);
 
   useEffect(()=>{
@@ -73,6 +75,7 @@ function AppWrapper() {
     setThemeMode,
     user,
     setUser,
+    isAuthLoading,
   };
 
   const routes = [
@@ -129,7 +132,6 @@ function AppWrapper() {
 
         <div className={`content ${hideLayout ? 'full' : ''} ${isToggleSidebar ? 'toggle' : ''}`}>
           <Routes>
-            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signUp" element={<SignUp />} />
 

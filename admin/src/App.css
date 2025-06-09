@@ -222,7 +222,7 @@ body.dark .Mui-disabled .MuiSvgIcon-root { color: rgba(255, 255, 255, 0.3) !impo
 .myAcc{
   text-align: left !important;
   color: #0858f7 !important; 
-  text-transform: capitalize !important;}
+  text-transform: none !important;}
 .userImg{
   display: flex;
   align-items: center;

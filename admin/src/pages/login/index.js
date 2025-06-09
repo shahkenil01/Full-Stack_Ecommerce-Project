@@ -20,7 +20,6 @@ const Login = ()=>{
   }
 
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
   const navigate = useNavigate();
   const context = useContext(MyContext);
 
@@ -51,6 +50,7 @@ const Login = ()=>{
       localStorage.setItem("userToken", data.token);
       context.setUser(data.user);
       context.setIsLogin(true);
+      enqueueSnackbar("Login successful!", { variant: 'success' });
       navigate("/", { replace: true });
     } catch (err) {
       enqueueSnackbar(err.message, { variant: 'error' });

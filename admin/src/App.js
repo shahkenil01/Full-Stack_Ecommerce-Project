@@ -96,7 +96,6 @@ function AppWrapper() {
     { path: '/productSIZE/add' },
   ];
 
-  const matchedRoutes = matchRoutes(routes, location);
   const skipLoaderRoutes = [
     '/login',
     '/signUp',
@@ -110,13 +109,12 @@ function AppWrapper() {
   ];
   const dynamicSkipRoutes = ['/category/edit/', '/product/edit/'];
 
-  const hideLayout = !matchedRoutes || ['/login', '/signUp'].includes(location.pathname);
-  
-  const isNotFoundPage = !matchedRoutes;
+  const currentPath = location.pathname;
   const skipLoader =
-    isNotFoundPage ||
-    skipLoaderRoutes.includes(location.pathname) ||
-    dynamicSkipRoutes.some((path) => location.pathname.startsWith(path));
+    skipLoaderRoutes.includes(currentPath) ||
+    dynamicSkipRoutes.some((path) => currentPath.startsWith(path));
+
+  const hideLayout = ['/login', '/signUp'].includes(currentPath);
 
   return (
     <MyContext.Provider value={values}>

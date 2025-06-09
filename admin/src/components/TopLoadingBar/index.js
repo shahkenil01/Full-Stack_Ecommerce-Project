@@ -10,6 +10,7 @@ function TopLoadingBar({ skip }) {
 
   useEffect(() => {
     if (skip) {
+      NProgress.done();
       return;
     }
 
@@ -21,7 +22,7 @@ function TopLoadingBar({ skip }) {
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [location.pathname, navType]);
+  }, [location.pathname]);
 
   return null;
 }

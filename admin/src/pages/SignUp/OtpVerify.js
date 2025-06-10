@@ -113,10 +113,10 @@ const VerifyAccount = () => {
       <img src={patern} className="loginPatern" />
       <section className="loginSection">
         <div className="loginBox">
-          <Link to="/" className="d-flex align-items-center flex-column logo">
+          <div className="d-flex align-items-center flex-column logo">
             <img src={Logo} />
             <span className="ml-2">ECOMMERCE</span>
-          </Link>
+          </div>
 
           <div className="wrapper mt-3 card border text-center">
             <form onSubmit={verify}>

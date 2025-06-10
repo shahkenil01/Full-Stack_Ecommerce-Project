@@ -46,26 +46,28 @@ const SignUp = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/api/user/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, phone })
-      });
+  // Step 1: Send OTP first
+  const otpRes = await fetch("http://localhost:4000/api/user/request-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }), // send only email to trigger OTP
+  });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Signup failed");
+  const otpData = await otpRes.json();
+  if (!otpRes.ok) throw new Error(otpData.msg || "Failed to send OTP");
 
-      localStorage.setItem("userInfo", JSON.stringify(data.user));
-      localStorage.setItem("userToken", data.token);
-      enqueueSnackbar("Account created successfully!", { variant: "success" });
+  enqueueSnackbar("OTP sent to your email!", { variant: "info" });
 
-      context.setUser(data.user);
-      context.setIsLogin(true);
+  // Step 2: Store required info for verifying later
+  localStorage.setItem("pendingEmail", email);
+  localStorage.setItem("pendingUserData", JSON.stringify({ name, email, password, phone }));
 
-      navigate("/", { replace: true });
-    } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
-    }
+  // Step 3: Navigate to verify page
+  navigate("/verify-account");
+
+} catch (err) {
+  enqueueSnackbar(err.message, { variant: "error" });
+}
   };
 
   return (

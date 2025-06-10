@@ -5,6 +5,9 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('../middleware/auth');
+const sendOTPEmail = require('../utils/sendOTP');
+
+const pendingOtps = {};
 
 // POST SignUp
 router.post('/signup', async (req, res) => {
@@ -35,7 +38,6 @@ router.post('/signup', async (req, res) => {
       token:token
     })
   } catch (error) {
-    console.log(error);
     res.status(500).json({msg:"somthing went wrong"});
   }
 });
@@ -177,6 +179,35 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
+});
+
+// Request Otp
+router.post('/request-otp', async (req, res) => {
+  const { email } = req.body;
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  try {
+    await sendOTPEmail(email, otp);
+    pendingOtps[email] = { otp, createdAt: Date.now() };
+    res.status(200).json({ msg: "OTP sent to email." });
+  } catch (error) {
+    res.status(500).json({ msg: "Failed to send OTP." });
+  }
+});
+
+// Verify Otp
+router.post('/verify-otp', (req, res) => {
+  const { email, otp } = req.body;
+  const record = pendingOtps[email];
+
+  if (!record) return res.status(400).json({ msg: "No OTP found for this email." });
+  if (record.otp !== otp) return res.status(400).json({ msg: "Invalid OTP" });
+
+  const otpAge = Date.now() - record.createdAt;
+  if (otpAge > 5 * 60 * 1000) return res.status(400).json({ msg: "OTP expired" });
+
+  delete pendingOtps[email];
+  res.status(200).json({ msg: "OTP verified successfully" });
 });
 
 module.exports = router;

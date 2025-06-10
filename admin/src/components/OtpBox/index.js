@@ -5,7 +5,7 @@ const OtpInput = ({ length = 6, onChange = () => {} }) => {
 
   const handleChange = (e, index) => {
     const value = e.target.value;
-    if (!/^\d?$/.test(value)) return; // Only allow digits or empty
+    if (!/^\d?$/.test(value)) return; 
 
     const updatedOtp = [...otp];
     updatedOtp[index] = value;

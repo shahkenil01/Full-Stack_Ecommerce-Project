@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const OtpInput = ({ length = 6, onChange = () => {} }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
+  const firstInputRef = useRef(null);
+
+  useEffect(() => {
+    if (firstInputRef.current) firstInputRef.current.focus();
+  }, []);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -37,6 +42,7 @@ const OtpInput = ({ length = 6, onChange = () => {} }) => {
           value={value}
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
+          ref={index === 0 ? firstInputRef : null}
           style={{
             width: "45px",
             height: "45px",

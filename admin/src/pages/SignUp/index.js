@@ -14,6 +14,7 @@ import { MyContext } from '../../App';
 import { useSnackbar } from 'notistack';
 
 const SignUp = () => {
+  const [loading, setLoading] = useState(false);
   const [inputIndex, setInputIndex] = useState(null);
   const [isShowPassword, setIsShowPassword] = useState(false);
   const context = useContext(MyContext);
@@ -34,39 +35,41 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, phone, password, confirmPassword } = formData;
+    setLoading(true);
 
     if (!name || !email || !password || !confirmPassword) {
       enqueueSnackbar("Please fill all fields", { variant: "error" });
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       enqueueSnackbar("Passwords does not match", { variant: "error" });
+      setLoading(false);
       return;
     }
 
     try {
-  // Step 1: Send OTP first
   const otpRes = await fetch("http://localhost:4000/api/user/request-otp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }), // send only email to trigger OTP
+    body: JSON.stringify({ email }),
   });
 
   const otpData = await otpRes.json();
   if (!otpRes.ok) throw new Error(otpData.msg || "Failed to send OTP");
 
-  enqueueSnackbar("OTP sent to your email!", { variant: "info" });
+  enqueueSnackbar("OTP sent to your email!", { variant: "success" });
 
-  // Step 2: Store required info for verifying later
   localStorage.setItem("pendingEmail", email);
   localStorage.setItem("pendingUserData", JSON.stringify({ name, email, password, phone }));
 
-  // Step 3: Navigate to verify page
   navigate("/verify-account");
 
 } catch (err) {
   enqueueSnackbar(err.message, { variant: "error" });
+} finally {
+  setLoading(false);
 }
   };
 
@@ -163,7 +166,9 @@ const SignUp = () => {
                   </div>
 
                   <div className="form-group">
-                    <Button className="btn-blue btn-lg btn-big w-100" type="submit">Sign Up</Button>
+                    <Button type="submit" className="btn-blue btn-lg btn-big w-100" disabled={loading} >
+                      {loading ? ( <span className="dot-loader"></span> ) : ( 'Sign Up' )}
+                    </Button>
                   </div>
 
                   <div className="d-flex align-items-center justify-content-center or mt-3 mb-3">

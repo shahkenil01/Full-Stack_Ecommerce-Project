@@ -1,17 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 import Logo from "../../assets/images/logo.png";
 import patern from "../../assets/images/pattern.webp";
-import Button from "@mui/material/Button";
-import { Link, useNavigate } from "react-router-dom";
-import OtpBox from "../../components/OtpBox";
 import { useSnackbar } from 'notistack';
+import { MyContext } from "../../App";
+import OtpBox from "../../components/OtpBox";
 
 const VerifyAccount = () => {
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(30);
+  const [resending, setResending] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const email = localStorage.getItem("pendingEmail");
+
+  const { setIsLogin, setUser } = useContext(MyContext);
+
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdown);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(countdown);
+  }, [resending]);
+
+  useEffect(() => {
+    const email = localStorage.getItem("pendingEmail");
+    const userData = localStorage.getItem("pendingUserData");
+
+    if (!email || !userData) {
+      navigate("/signup", { replace: true });
+    }
+  }, []);
 
   const handleOtpChange = (value) => setOtp(value);
 
@@ -47,6 +74,8 @@ const VerifyAccount = () => {
 
       localStorage.setItem("userToken", signupData.token);
       localStorage.setItem("userInfo", JSON.stringify(signupData.user));
+      setIsLogin(true);
+      setUser(signupData.user);
 
       localStorage.removeItem("pendingEmail");
       localStorage.removeItem("pendingUserData");
@@ -57,6 +86,25 @@ const VerifyAccount = () => {
       enqueueSnackbar(err.message, { variant: "error" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resendOtp = async () => {
+    try {
+      setResending(true);
+      setTimer(30);
+      const res = await fetch("http://localhost:4000/api/user/request-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Failed to resend OTP");
+
+      enqueueSnackbar("OTP resent to your email!", { variant: "info" });
+    } catch (err) {
+      enqueueSnackbar(err.message, { variant: "error" });
     }
   };
 
@@ -85,12 +133,12 @@ const VerifyAccount = () => {
             </form>
           </div>
 
-          <div className="wrapper mt-3 card border footer p-3">
-            <span className="text-center">
-              <Link to="/" className="link color ml-2">
-                Resend OTP
-              </Link>
-            </span>
+          <div className="wrapper mt-3 card border footer p-3 text-center">
+            {timer > 0 ? (
+              <span className="text-muted">Resend OTP in {timer}s</span>
+            ) : (
+              <Button className="btn-blue btn-lg w-100 btn-big" onClick={resendOtp}> Resend OTP </Button>
+            )}
           </div>
         </div>
       </section>

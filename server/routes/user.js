@@ -5,6 +5,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 const sendOTPEmail = require('../utils/sendOTP');
 
 const pendingOtps = {};
@@ -72,7 +73,7 @@ router.post('/signin', async (req, res) => {
 });
 
 // Get User
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const userList = await User.find();
 
@@ -117,7 +118,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // delete User by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ msg: 'Invalid User ID format' });
   }
@@ -136,7 +137,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Count Total User
-router.get('/get/count', async (req, res) => {
+router.get('/get/count', verifyToken, isAdmin, async (req, res) => {
   try {
     const userCount = await User.countDocuments();
 

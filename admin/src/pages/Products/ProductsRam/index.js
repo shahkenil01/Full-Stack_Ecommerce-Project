@@ -12,6 +12,7 @@ const ProductsRam = () => {
 
   const [ram, setRam] = useState('');
   const [rams, setRams] = useState([]);
+  const [originalRam, setOriginalRam] = useState('');
   const [editId, setEditId] = useState(null);
 
   const fetchRams = async () => {
@@ -37,6 +38,17 @@ const ProductsRam = () => {
     }
 
     if (editId) {
+    if (ram === originalRam) {
+      enqueueSnackbar("Please change the value before updating", { variant: "error" });
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+      if (!user || user.role !== "admin") {
+        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+        return;
+      }
+     
       const res = await putData(`/api/rams/${editId}`, { name: ram });
       if (res?.success === false) {
         enqueueSnackbar(res.message || "Update failed", { variant: "error" });
@@ -44,9 +56,16 @@ const ProductsRam = () => {
         enqueueSnackbar("RAM updated successfully!", { variant: "success" });
         setEditId(null);
         setRam('');
+        setOriginalRam('');
         fetchRams();
       }
     } else {
+      const user = JSON.parse(localStorage.getItem("userDetails"));
+      if (!user || user.role !== "admin") {
+        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+        return;
+      }
+
       const res = await postData('/api/rams', { name: ram });
       if (res?.success === false) {
         enqueueSnackbar(res.message || "Failed to add RAM", { variant: "error" });
@@ -61,9 +80,16 @@ const ProductsRam = () => {
   const handleEditClick = (item) => {
     setEditId(item._id);
     setRam(item.name);
+    setOriginalRam(item.name);
   };
 
   const handleDelete = async (id) => {
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      return;
+    }
+
     await deleteData(`/api/rams/${id}`);
     enqueueSnackbar("RAM deleted!", { variant: "success" });
     fetchRams();

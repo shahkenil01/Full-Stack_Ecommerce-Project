@@ -12,6 +12,7 @@ const ProductsWeight = () => {
 
   const [weight, setWeight] = useState('');
   const [weights, setWeights] = useState([]);
+  const [originalWeight, setOriginalWeight] = useState('');
   const [editId, setEditId] = useState(null);
 
   const fetchWeights = async () => {
@@ -31,6 +32,17 @@ const ProductsWeight = () => {
     }
 
     if (editId) {
+      if (weight === originalWeight) {
+        enqueueSnackbar("Please change the value before updating", { variant: "error" });
+        return;
+      }
+
+      const user = JSON.parse(localStorage.getItem("userDetails"));
+      if (!user || user.role !== "admin") {
+        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+        return;
+      }
+
       const res = await putData(`/api/weights/${editId}`, { name: weight });
       if (res?.success === false) {
         enqueueSnackbar(res.message || "Update failed", { variant: "error" });
@@ -38,9 +50,16 @@ const ProductsWeight = () => {
         enqueueSnackbar("Weight updated successfully!", { variant: "success" });
         setEditId(null);
         setWeight('');
+        setOriginalWeight('');
         fetchWeights();
       }
     } else {
+      const user = JSON.parse(localStorage.getItem("userDetails"));
+      if (!user || user.role !== "admin") {
+        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+        return;
+      }
+
       const res = await postData('/api/weights', { name: weight });
       if (res?.success === false) {
         enqueueSnackbar(res.message || "Failed to add weight", { variant: "error" });
@@ -55,9 +74,16 @@ const ProductsWeight = () => {
   const handleEditClick = (item) => {
     setEditId(item._id);
     setWeight(item.name);
+    setOriginalWeight(item.name);
   };
 
   const handleDelete = async (id) => {
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      return;
+    }
+
     await deleteData(`/api/weights/${id}`);
     enqueueSnackbar("Weight deleted!", { variant: "success" });
     fetchWeights();

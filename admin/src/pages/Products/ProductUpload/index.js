@@ -194,6 +194,14 @@ const ProductUpload = () => {
       return;
     }
 
+    // === ADMIN CHECK HERE ===
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can upload products", { variant: "error" });
+      setLoading(false);
+      return;
+    }
+
     // Prepare final data with uploaded image URLs
     const finalData = { ...formFields, images: [] };
 

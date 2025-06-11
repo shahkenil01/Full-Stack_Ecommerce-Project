@@ -13,6 +13,7 @@ const ProductsRam = () => {
 
   const [size, setSize] = useState('');
   const [sizes, setSizes] = useState([]);
+  const [originalSize, setOriginalSize] = useState('');
   const [editId, setEditId] = useState(null);
 
   const fetchSizes = async () => {
@@ -38,6 +39,17 @@ const ProductsRam = () => {
     }
 
     if (editId) {
+      if (size === originalSize) {
+        enqueueSnackbar("Please change the value before updating", { variant: "error" });
+        return;
+      }
+
+      const user = JSON.parse(localStorage.getItem("userDetails"));
+      if (!user || user.role !== "admin") {
+        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+        return;
+      }
+
       const res = await putData(`/api/sizes/${editId}`, { name: size });
       if (res?.success === false) {
         enqueueSnackbar(res.message || "Failed to update", { variant: "error" });
@@ -45,9 +57,16 @@ const ProductsRam = () => {
         enqueueSnackbar("Size updated successfully!", { variant: "success" });
         setEditId(null);
         setSize('');
+        setOriginalSize('');
         fetchSizes();
       }
     } else {
+      const user = JSON.parse(localStorage.getItem("userDetails"));
+      if (!user || user.role !== "admin") {
+        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+        return;
+      }
+
       const res = await postData('/api/sizes', { name: size });
       if (res?.success === false) {
         enqueueSnackbar(res.message || "Failed to add", { variant: "error" });
@@ -62,9 +81,16 @@ const ProductsRam = () => {
   const handleEditClick = (size) => {
     setEditId(size._id);
     setSize(size.name);
+    setOriginalSize(size.name);
   };
 
   const handleDelete = async (id) => {
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      return;
+    }
+
     await deleteData(`/api/sizes/${id}`);
     enqueueSnackbar("Size deleted!", { variant: "success" });
     fetchSizes();

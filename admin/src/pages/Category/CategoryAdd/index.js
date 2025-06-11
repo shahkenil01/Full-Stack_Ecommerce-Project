@@ -42,17 +42,38 @@ const CategoryAdd = () => {
   const addCategory = async (e) => {
     e.preventDefault();
     const { name, color, images } = formFields;
+    let hasError = false;
 
-    if (!name.trim() || !color.trim()) {
-      return enqueueSnackbar("Please fill all the details", { variant: "error" });
+    if (!name.trim()) {
+      enqueueSnackbar("Please fill name", { variant: "error" });
+      hasError = true;
     }
 
-    if (inputType === 'url' && (!images[0] || !images[0].trim())) {
-      return enqueueSnackbar("Please provide image URL", { variant: "error" });
+    if (!color.trim()) {
+      enqueueSnackbar("Please fill color", { variant: "error" });
+      hasError = true;
     }
 
-    if (inputType === 'file' && !uploadedFile) {
-      return enqueueSnackbar("Please upload an image", { variant: "error" });
+    if (inputType === 'url') {
+      if (!images[0] || !images[0].trim()) {
+        enqueueSnackbar("Please provide image URL", { variant: "error" });
+        hasError = true;
+      }
+    }
+
+    if (inputType === 'file') {
+      if (!uploadedFile) {
+        enqueueSnackbar("Please upload an image", { variant: "error" });
+        hasError = true;
+      }
+    }
+
+    if (hasError) return;
+
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      return;
     }
 
     const finalData = { name: name.trim(), color: color.trim(), images: [] };

@@ -33,6 +33,12 @@ const Products = () => {
   }, [location.state, enqueueSnackbar]);
 
   const handleDelete = async (id) => {
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      return;
+    }
+
     const res = await deleteData(`/api/products/${id}`);
     if (res?.message === "Product deleted successfully") {
       const updated = await fetchDataFromApi("/api/products");

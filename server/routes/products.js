@@ -4,6 +4,8 @@ const express = require('express');
 const router = express.Router();
 
 const cloudinary = require('cloudinary').v2;
+const verifyToken = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -20,7 +22,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/create', async (req, res) => {
+router.post('/create', verifyToken, isAdmin, async (req, res) => {
   try {
     const { name, description, images, brand, price, oldPrice, category, subcategory, countInStock, rating, isFeatured, productRAMS, productSIZE, productWEIGHT, numReviews } = req.body;
 
@@ -55,7 +57,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -77,7 +79,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   const pLimit = await import('p-limit').then(mod => mod.default);
   const limit = pLimit(2);
   const { name, description, brand, price, oldPrice, category: categoryId, subcategory, countInStock, rating, isFeatured, images, productRAMS, productSIZE, productWEIGHT } = req.body;

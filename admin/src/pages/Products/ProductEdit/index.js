@@ -10,6 +10,7 @@ import { fetchDataFromApi, putData } from '../../../utils/api';
 import { useSnackbar } from 'notistack';
 
 const ProductEdit = () => {
+
   const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -40,19 +41,46 @@ const ProductEdit = () => {
   useEffect(() => {
     (async () => {
       const res = await fetchDataFromApi(`/api/products/${id}`);
-      if (res) {
-        setFormFields({
-          ...res,
-          oldPrice: res.oldPrice ?? '',
-          price: res.price ?? '',
-          countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
-        });
-        setInitialData(res);
-      } else {
+      if (!res) {
         enqueueSnackbar('Product not found!', { variant: 'error' });
+        return;
       }
+
+      const categoryId = typeof res.category === 'object' ? res.category._id : res.category;
+      const subcategoryId = res.subcategory ? typeof res.subcategory === 'object' ? res.subcategory._id : res.subcategory : '';
+
+      const subRes = await fetchDataFromApi(`/api/SubCat/by-category/${categoryId}`);
+      const subOptions = Array.isArray(subRes)
+        ? subRes.map((sub) => ({ value: sub._id, label: sub.subCat }))
+        : [];
+
+      setSubcategories(subOptions);
+      setSubcategory(subcategoryId);
+
+      setFormFields({
+        ...res,
+        category: categoryId,
+        subcategory: subOptions.find((opt) => opt.value === subcategoryId) || '',
+        oldPrice: res.oldPrice ?? '',
+        price: res.price ?? '',
+        countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
+      });
+
+      setInitialData(res);
+      setRam(res.productRAMS || []);
+      setSize(res.productSIZE || []);
+      setWeight(res.productWEIGHT || []);
     })();
   }, [id]);
+
+  useEffect(() => {
+    if (subcategory && subcategories.length > 0) {
+      const found = subcategories.find((opt) => opt.value === subcategory);
+      if (found) {
+        setFormFields((prev) => ({ ...prev, subcategory: found.value }));
+      }
+    }
+  }, [subcategory, subcategories]);
 
   // ========================= FETCH CATEGORIES =========================
   useEffect(() => {
@@ -72,49 +100,26 @@ const ProductEdit = () => {
     })();
   }, []);
 
-  // Sync selected category to formFields
-  useEffect(() => {
-    setFormFields((prev) => ({ ...prev, subcategory: '' }));
-  }, [formFields.category]);
-
   // ========================= FETCH SUBCATEGORIES =========================
   useEffect(() => {
-    if (!formFields.category || typeof formFields.category !== 'string') {
-      setSubcategories([]);
-      setSubcategory('');
-      return;
-    }
-
     (async () => {
+      if (!formFields.category) return;
+
       const res = await fetchDataFromApi(`/api/SubCat/by-category/${formFields.category}`);
       if (res && res.length > 0) {
         const options = res.map((sub) => ({ value: sub._id, label: sub.subCat }));
         setSubcategories(options);
-        
-        if (formFields.subcategory) {
-          const found = options.find((o) => o.value === formFields.subcategory || o.value === formFields.subcategory._id);
-          if (found) {
-            setSubcategory(found.value);
-          } else {
-            setSubcategory('');
-          }
-        }
+
+        const matched = options.find((o) =>
+          o.value === formFields.subcategory || o.value === formFields.subcategory?._id
+        );
+        setSubcategory(matched ? matched.value : '');
       } else {
         setSubcategories([]);
         setSubcategory('');
-
-        setFormFields((prev) => ({ ...prev, subcategory: '' }));
       }
     })();
   }, [formFields.category, formFields.subcategory]);
-
-  // Sync selected subcategory to formFields
-  useEffect(() => {
-    setFormFields((prev) => ({
-      ...prev,
-      subcategory: typeof subcategory === 'object' ? subcategory.value : subcategory,
-    }));
-  }, [subcategory]);
 
   // Sync feature flag to formFields
   useEffect(() => {
@@ -178,26 +183,6 @@ const ProductEdit = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const res = await fetchDataFromApi(`/api/products/${id}`);
-      if (res) {
-        setFormFields({
-          ...res,
-          oldPrice: res.oldPrice ?? '',
-          price: res.price ?? '',
-          countInStock: typeof res.countInStock === 'number' ? res.countInStock : 0,
-        });
-        setInitialData(res);
-        setRam(res.productRAMS || []);
-        setSize(res.productSIZE || []);
-        setWeight(res.productWEIGHT || []);
-      } else {
-        enqueueSnackbar('Product not found!', { variant: 'error' });
-      }
-    })();
-  }, [id]);
-
   // ========================= IMAGE UPLOAD FUNCTIONS =========================
   const uploadImageViaServer = async (file) => {
     const formData = new FormData();
@@ -239,35 +224,20 @@ const ProductEdit = () => {
     const url = imageUrlInput.trim();
     if (!url || formFields.images.includes(url)) return;
 
-    setAddingUrl(true);
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/cloudinary/upload`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url }),
-        },
-      );
+    setFormFields((prev) => ({
+      ...prev,
+      images: [...prev.images, url],
+    }));
 
-      const data = await res.json();
-      if (data.secure_url) {
-        setFormFields((prev) => ({
-          ...prev,
-          images: [...prev.images, data.secure_url],
-        }));
-        setImageUrlInput('');
-      } else {
-        enqueueSnackbar('Image upload failed!', { variant: 'error' });
-      }
-    } catch (err) {
-      enqueueSnackbar('Image upload failed!', { variant: 'error' });
-    } finally {
-      setAddingUrl(false);
-    }
+    setImageUrlInput('');
   };
 
   const removeImage = (index) => {
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can delete images", { variant: "error" });
+      return;
+    }
     setFormFields((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
@@ -296,7 +266,6 @@ const ProductEdit = () => {
       return;
     }
 
-    // No change detection
     const isSame = initialData && Object.entries(initialData).every(([key, value]) => {
       const newVal = formFields[key];
 
@@ -318,13 +287,18 @@ const ProductEdit = () => {
       return;
     }
 
+    const token = localStorage.getItem("userToken");
     const payload = { ...formFields };
       if (!payload.subcategory) {
       delete payload.subcategory;
     }
 
     // Submit update to backend
-    const res = await putData(`/api/products/${id}`, payload);
+    const res = await putData(`/api/products/${id}`, payload, token);
+    if (!res) {
+      setLoadingSubmit(false);
+      return;
+    }
     if (res?.message?.toLowerCase().includes('updated')) {
       enqueueSnackbar('Product updated successfully!', { variant: 'success' });
       navigate('/products');
@@ -368,7 +342,9 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={formFields.category} options={categories} placeholder="None"
+                  <CustomDropdown value={ typeof formFields.category === "object" ? formFields.category._id : formFields.category }
+                    options={categories.map(cat => ({ value: cat.value?.toString(), label: cat.label }))}
+                    placeholder="None"
                     onChange={(val) => {
                       setFormFields((prev) => ({
                         ...prev,
@@ -385,13 +361,10 @@ const ProductEdit = () => {
               <div className="form-group">
                 <h6>SUB CATEGORY</h6>
                 <FormControl size="small" className="w-100">
-                  <CustomDropdown value={formFields.subcategory}
+                  <CustomDropdown value={formFields.subcategory || null}
                     onChange={(val) => {
-                      setFormFields((prev) => ({
-                        ...prev,
-                        subcategory: typeof val === 'object' ? val.value : val,
-                      }));
-                      setSubcategory(typeof val === 'object' ? val.value : val);
+                      setFormFields((prev) => ({ ...prev, subcategory: val }));
+                      setSubcategory(val?.value || '');
                     }} options={subcategories} 
                     placeholder={ !formFields.category 
                       ? "Select Category": subcategories.length > 0 
@@ -516,9 +489,7 @@ const ProductEdit = () => {
               <div className="form-group bottom">
                 <div className="position-relative inputBtn mb-3" style={{ minHeight: 48 }}>
                   <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" style={{ paddingRight: '80px' }}/>
-                  <Button className="btn-blue" type="button" disabled={addingUrl} onClick={handleImageUrlInput}>
-                    {addingUrl ? ( <span className="dot-loader-sm"></span> ) : ( 'Add' )}
-                  </Button>
+                  <Button className="btn-blue" type="button" disabled={addingUrl} onClick={handleImageUrlInput}> Add </Button>
                 </div>
                 <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
                   {formFields.images.map((src, i) => (

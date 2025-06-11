@@ -1,4 +1,5 @@
 import axios from "axios";
+import { enqueueSnackbar } from "notistack";
 
 const BASE_URL = process.env.NODE_ENV === "development"
     ? process.env.REACT_APP_BACKEND_URL
@@ -20,6 +21,9 @@ export const postData = async (url, formData) => {
     return data;
   } catch (error) {
     console.error("POST error:", error);
+    if (error?.response?.status === 403 && error?.response?.data?.msg?.toLowerCase()?.includes("admin")) {
+      enqueueSnackbar(error.response.data.msg, { variant: "error" });
+    }
     return {
       success: false,
       message: error?.response?.data?.message || "Something went wrong",
@@ -27,16 +31,27 @@ export const postData = async (url, formData) => {
   }
 };
 
-export const putData = async (url, formData) => {
+export const putData = async (url, formData, token) => {
   try {
-    const { data } = await axios.put(BASE_URL + url, formData);
+    const { data } = await axios.put(BASE_URL + url, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return data;
   } catch (error) {
     console.error("PUT error:", error);
-    return {
-      success: false,
-      message: error?.response?.data?.message || "Something went wrong",
-    };
+    const msg = error?.response?.data?.msg || "Something went wrong";
+    const status = error?.response?.status;
+
+    if (status === 403 && msg.toLowerCase().includes("admin")) {
+      enqueueSnackbar(msg, { variant: "error" });
+
+      return null;
+    }
+
+    enqueueSnackbar(msg, { variant: "error" });
+    return null;
   }
 };
 
@@ -46,6 +61,9 @@ export const deleteData = async (url) => {
     return data;
   } catch (error) {
     console.error("DELETE error:", error);
+    if (error?.response?.status === 403 && error?.response?.data?.msg?.toLowerCase()?.includes("admin")) {
+      enqueueSnackbar(error.response.data.msg, { variant: "error" });
+    }
     return null;
   }
 };

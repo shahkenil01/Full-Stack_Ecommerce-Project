@@ -38,42 +38,29 @@ const ProductsRam = () => {
     }
 
     if (editId) {
-    if (ram === originalRam) {
-      enqueueSnackbar("Please change the value before updating", { variant: "error" });
-      return;
-    }
-
-    const user = JSON.parse(localStorage.getItem("userDetails"));
-      if (!user || user.role !== "admin") {
-        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      if (ram === originalRam) {
+        enqueueSnackbar("Please change the value before updating", { variant: "error" });
         return;
       }
-     
-      const res = await putData(`/api/rams/${editId}`, { name: ram });
-      if (res?.success === false) {
-        enqueueSnackbar(res.message || "Update failed", { variant: "error" });
-      } else {
+      const token = localStorage.getItem("userToken");
+      const res = await putData(`/api/rams/${editId}`, { name: ram }, token);
+      if (!res || res?.success === false) {
+        return;
+      }
         enqueueSnackbar("RAM updated successfully!", { variant: "success" });
         setEditId(null);
         setRam('');
         setOriginalRam('');
         fetchRams();
-      }
     } else {
-      const user = JSON.parse(localStorage.getItem("userDetails"));
-      if (!user || user.role !== "admin") {
-        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      const token = localStorage.getItem("userToken");
+      const res = await postData('/api/rams', { name: ram }, token);
+      if (!res || res?.success === false) {
         return;
       }
-
-      const res = await postData('/api/rams', { name: ram });
-      if (res?.success === false) {
-        enqueueSnackbar(res.message || "Failed to add RAM", { variant: "error" });
-      } else {
         enqueueSnackbar("RAM added successfully!", { variant: "success" });
         setRam('');
         fetchRams();
-      }
     }
   };
 
@@ -84,13 +71,11 @@ const ProductsRam = () => {
   };
 
   const handleDelete = async (id) => {
-    const user = JSON.parse(localStorage.getItem("userDetails"));
-    if (!user || user.role !== "admin") {
-      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-      return;
-    }
+    const token = localStorage.getItem("userToken");
+    const res = await deleteData(`/api/rams/${id}`, token);
 
-    await deleteData(`/api/rams/${id}`);
+    if (!res || res.success === false) return;
+
     enqueueSnackbar("RAM deleted!", { variant: "success" });
     fetchRams();
   };

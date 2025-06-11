@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const ProductWeight = require('../models/productWeight');
+const verifyToken = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 
-// GET all
+// GET
 router.get('/', async (req, res) => {
   const weights = await ProductWeight.find().sort({ dateCreated: 1 });
   res.json({ success: true, data: weights });
 });
 
-// POST new
-router.post('/', async (req, res) => {
+// POST
+router.post('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const weight = new ProductWeight({ name: req.body.name });
     await weight.save();
@@ -19,8 +21,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT update
-router.put('/:id', async (req, res) => {
+// PUT
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const updatedWeight = await ProductWeight.findByIdAndUpdate(
       req.params.id,
@@ -34,9 +36,13 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE
-router.delete('/:id', async (req, res) => {
-  await ProductWeight.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Deleted successfully' });
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    await ProductWeight.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
 });
 
 module.exports = router;

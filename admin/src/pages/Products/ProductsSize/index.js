@@ -34,48 +34,40 @@ const ProductsRam = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!size.trim()) {
-      enqueueSnackbar("Please fill the field", { variant: "error" });
+      enqueueSnackbar("Please fill the field", { variant: "error", preventDuplicate: true });
       return;
     }
 
+    const token = localStorage.getItem("userToken");
+
+    let res;
     if (editId) {
       if (size === originalSize) {
-        enqueueSnackbar("Please change the value before updating", { variant: "error" });
+        enqueueSnackbar("Please change the value before updating", { variant: "error", preventDuplicate: true });
         return;
       }
 
-      const user = JSON.parse(localStorage.getItem("userDetails"));
-      if (!user || user.role !== "admin") {
-        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-        return;
-      }
-
-      const res = await putData(`/api/sizes/${editId}`, { name: size });
-      if (res?.success === false) {
-        enqueueSnackbar(res.message || "Failed to update", { variant: "error" });
-      } else {
-        enqueueSnackbar("Size updated successfully!", { variant: "success" });
-        setEditId(null);
-        setSize('');
-        setOriginalSize('');
-        fetchSizes();
-      }
+      res = await putData(`/api/sizes/${editId}`, { name: size }, token);
     } else {
-      const user = JSON.parse(localStorage.getItem("userDetails"));
-      if (!user || user.role !== "admin") {
-        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-        return;
-      }
-
-      const res = await postData('/api/sizes', { name: size });
-      if (res?.success === false) {
-        enqueueSnackbar(res.message || "Failed to add", { variant: "error" });
-      } else {
-        enqueueSnackbar("Size added successfully!", { variant: "success" });
-        setSize('');
-        fetchSizes();
-      }
+      res = await postData('/api/sizes', { name: size }, token);
     }
+
+    if (!res || res.success === false) {
+      if (res?.message) {
+        enqueueSnackbar(res.message, { variant: "error", preventDuplicate: true });
+      }
+      return;
+    }
+
+    enqueueSnackbar(editId ? "Size updated successfully!" : "Size added successfully!", {
+      variant: "success",
+      preventDuplicate: true,
+    });
+
+    setEditId(null);
+    setSize('');
+    setOriginalSize('');
+    fetchSizes();
   };
 
   const handleEditClick = (size) => {
@@ -85,14 +77,17 @@ const ProductsRam = () => {
   };
 
   const handleDelete = async (id) => {
-    const user = JSON.parse(localStorage.getItem("userDetails"));
-    if (!user || user.role !== "admin") {
-      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+    const token = localStorage.getItem("userToken");
+    const res = await deleteData(`/api/sizes/${id}`, token);
+
+    if (!res || res.success === false) {
+      if (res?.message) {
+        enqueueSnackbar(res.message, { variant: "error", preventDuplicate: true });
+      }
       return;
     }
 
-    await deleteData(`/api/sizes/${id}`);
-    enqueueSnackbar("Size deleted!", { variant: "success" });
+    enqueueSnackbar("Size deleted!", { variant: "success", preventDuplicate: true });
     fetchSizes();
   };
 

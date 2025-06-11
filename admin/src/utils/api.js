@@ -37,18 +37,19 @@ export const fetchDataFromApi = async (url) => {
   }
 };
 
-export const postData = async (url, formData) => {
+export const postData = async (url, formData, token) => {
   try {
-    const { data } = await axiosInstance.post(url, formData);
+    const { data } = await axiosInstance.post(url, formData, token ? {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    } : {});
     return data;
   } catch (error) {
     console.error("POST error:", error);
-    const msg = error?.response?.data?.msg || "Something went wrong";
+    const msg = error?.response?.data?.msg || error?.response?.data?.message || "Something went wrong";
     enqueueSnackbar(msg, { variant: "error" });
-    return {
-      success: false,
-      message: msg,
-    };
+    return { success: false, message: msg };
   }
 };
 
@@ -77,7 +78,6 @@ export const deleteData = async (url, token) => {
     });
     return data;
   } catch (error) {
-    console.error("DELETE error:", error);
     const msg = error?.response?.data?.msg || "Something went wrong";
     enqueueSnackbar(msg, { variant: "error" });
     return null;

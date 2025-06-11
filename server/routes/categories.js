@@ -1,6 +1,8 @@
 const Category = require('../models/category');
 const express = require('express');
 const router = express.Router();
+const verifyToken = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 
 const cloudinary = require('cloudinary').v2;
 
@@ -70,7 +72,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/create', async (req, res) => {
+router.post('/create', verifyToken, isAdmin, async (req, res) => {
   try {
     const pLimit = await import('p-limit').then(mod => mod.default);
     const limit = pLimit(2);

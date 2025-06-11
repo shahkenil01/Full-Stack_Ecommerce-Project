@@ -27,48 +27,36 @@ const ProductsWeight = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!weight.trim()) {
-      enqueueSnackbar("Please fill the field", { variant: "error" });
+      enqueueSnackbar("Please fill the field", { variant: "error", preventDuplicate: true });
       return;
     }
 
+    const token = localStorage.getItem("userToken");
+    let res;
+
     if (editId) {
       if (weight === originalWeight) {
-        enqueueSnackbar("Please change the value before updating", { variant: "error" });
+        enqueueSnackbar("Please change the value before updating", { variant: "error", preventDuplicate: true });
         return;
       }
-
-      const user = JSON.parse(localStorage.getItem("userDetails"));
-      if (!user || user.role !== "admin") {
-        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-        return;
-      }
-
-      const res = await putData(`/api/weights/${editId}`, { name: weight });
-      if (res?.success === false) {
-        enqueueSnackbar(res.message || "Update failed", { variant: "error" });
-      } else {
-        enqueueSnackbar("Weight updated successfully!", { variant: "success" });
-        setEditId(null);
-        setWeight('');
-        setOriginalWeight('');
-        fetchWeights();
-      }
+      res = await putData(`/api/weights/${editId}`, { name: weight }, token);
     } else {
-      const user = JSON.parse(localStorage.getItem("userDetails"));
-      if (!user || user.role !== "admin") {
-        enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-        return;
-      }
-
-      const res = await postData('/api/weights', { name: weight });
-      if (res?.success === false) {
-        enqueueSnackbar(res.message || "Failed to add weight", { variant: "error" });
-      } else {
-        enqueueSnackbar("Weight added successfully!", { variant: "success" });
-        setWeight('');
-        fetchWeights();
-      }
+      res = await postData('/api/weights', { name: weight }, token);
     }
+
+    if (!res || res.success === false) {
+    enqueueSnackbar(res?.message || "Operation failed", { variant: "error", preventDuplicate: true });
+      return;
+    }
+
+    enqueueSnackbar(editId ? "Weight updated successfully!" : "Weight added successfully!", {
+      variant: "success", preventDuplicate: true
+    });
+
+    setEditId(null);
+    setWeight('');
+    setOriginalWeight('');
+    fetchWeights();
   };
 
   const handleEditClick = (item) => {
@@ -78,14 +66,13 @@ const ProductsWeight = () => {
   };
 
   const handleDelete = async (id) => {
-    const user = JSON.parse(localStorage.getItem("userDetails"));
-    if (!user || user.role !== "admin") {
-      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-      return;
-    }
+    const token = localStorage.getItem("userToken");
+    const res = await deleteData(`/api/weights/${id}`, token);
 
-    await deleteData(`/api/weights/${id}`);
-    enqueueSnackbar("Weight deleted!", { variant: "success" });
+    if (!res) return;
+    if (res.success === false) return;
+
+    enqueueSnackbar("Weight deleted!", { variant: "success", preventDuplicate: true });
     fetchWeights();
   };
 

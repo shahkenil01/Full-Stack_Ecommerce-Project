@@ -70,12 +70,6 @@ const CategoryAdd = () => {
 
     if (hasError) return;
 
-    const user = JSON.parse(localStorage.getItem("userDetails"));
-    if (!user || user.role !== "admin") {
-      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
-      return;
-    }
-
     const finalData = { name: name.trim(), color: color.trim(), images: [] };
 
     if (inputType === 'file') {
@@ -91,20 +85,13 @@ const CategoryAdd = () => {
     }
 
     setLoading(true);
-    const res = await postData('/api/category/create', finalData);
+    const res = await postData('/api/category/create', finalData, localStorage.getItem("userToken"));
     setLoading(false);
 
-    if (res?.success) {
-      enqueueSnackbar("Category created successfully!", { variant: "success" });
-      navigate("/category");
-    } else {
-      enqueueSnackbar(
-        res?.message === "Category name already exists"
-          ? "Category name already exists!"
-          : res?.message || "Failed to create category.",
-        { variant: "error" }
-      );
-    }
+    if (!res || res.success === false) return;
+
+    enqueueSnackbar("Category created successfully!", { variant: "success", preventDuplicate: true });
+    navigate("/category");
   };
 
   return (

@@ -68,45 +68,51 @@ const CategoryEdit = () => {
     e.preventDefault();
 
     if (!formFields.name.trim() || !formFields.color.trim()) {
-      enqueueSnackbar("Please provide image URL", { variant: "error" });
+      enqueueSnackbar("Please provide all required fields", { variant: "error", preventDuplicate: true });
       return;
     }
 
     if (inputType === 'url' && (!formFields.images || !formFields.images[0]?.trim())) {
-      enqueueSnackbar("Please upload a new image or Details", { variant: "error" });
+      enqueueSnackbar("Please upload or provide an image", { variant: "error", preventDuplicate: true });
       return;
     }
 
-    if (inputType === 'file') {
-      if (uploadedFiles.length === 0) {
-        enqueueSnackbar("Please upload a new image or Details", { variant: "error" });
-        return;
+    if (inputType === 'file' && uploadedFiles.length === 0) {
+      enqueueSnackbar("Please upload a new image", { variant: "error", preventDuplicate: true });
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      if (inputType === 'file') {
+        const toBase64 = (file) => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+
+        const base64Images = await Promise.all(
+          Array.from(uploadedFiles).map((file) => toBase64(file))
+        );
+        formFields.images = base64Images;
       }
+      const token = localStorage.getItem("userToken");
+      const res = await putData(`/api/category/${id}`, formFields, token);
+      setLoading(false);
 
-      const toBase64 = file => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
-
-      const base64Images = await Promise.all(
-        Array.from(uploadedFiles).map(file => toBase64(file))
-      );
-      formFields.images = base64Images;
+      if (res?.success) {
+        if (res.message === "Nothing to update") {
+          enqueueSnackbar("Nothing to update", { variant: "error", preventDuplicate: true });
+        } else {
+          enqueueSnackbar("Category updated successfully!", { variant: "success", preventDuplicate: true });
+          navigate("/category");
+        }
+      }
+    } catch (error) {
+      setLoading(false);
     }
-
-    setLoading(true);
-    const res = await putData(`/api/category/${id}`, formFields);
-
-    if (res?.message === "Category updated") {
-      enqueueSnackbar("Category updated successfully!", { variant: "success" });
-      navigate("/category");
-    } else {
-      enqueueSnackbar(res?.message || "Failed to update category.", { variant: "error" });
-    }
-
-    setLoading(false);
   };
 
   return (

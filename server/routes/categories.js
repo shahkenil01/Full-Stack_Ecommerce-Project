@@ -162,7 +162,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const pLimit = await import('p-limit').then(mod => mod.default);
     const limit = pLimit(2);
@@ -238,7 +238,7 @@ router.put('/:id', async (req, res) => {
     return res.status(200).json({ success: true, message: "Category updated", data: updatedCategory });
 
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong", error: error.message });
+    return res.status(500).json({ success: false, message: error.message || "Something went wrong" });
   }
 });
 

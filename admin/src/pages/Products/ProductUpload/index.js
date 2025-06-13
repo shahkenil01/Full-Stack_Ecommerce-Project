@@ -184,13 +184,15 @@ const ProductUpload = () => {
     setLoading(true);
 
     // Validate required fields
-    const requiredFields = ['name', 'description', 'brand', 'price', 'category', 'countInStock'];
+    const requiredFields = ['name', 'description', 'brand','oldPrice', 'price', 'category', 'countInStock', 'rating'];
     const missingFields = requiredFields.filter((f) => !formFields[f]);
     if (imagesData.length === 0) missingFields.push('Image');
 
     if (missingFields.length > 0) {
+      
+      const formatted = missingFields.join(', ');
+      enqueueSnackbar(`Please fill: ${formatted}`, { variant: 'error', preventDuplicate: true });
       setLoading(false);
-      showToasts(missingFields.map((f) => `Please fill ${f}`));
       return;
     }
 

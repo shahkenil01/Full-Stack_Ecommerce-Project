@@ -128,40 +128,6 @@ router.post('/create', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
-  try {
-    const category = await Category.findById(req.params.id);
-
-    if (!category) {
-      return res.status(404).json({
-        message: 'Category not found!',
-        success: false
-      });
-    }
-
-    if (category.images && category.images.length > 0) {
-      for (const url of category.images) {
-        const parts = url.split('/');
-        const publicIdWithExtension = parts[parts.length - 1];
-        const publicId = publicIdWithExtension.split('.')[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-    }
-
-    await Category.findByIdAndDelete(req.params.id);
-
-    return res.status(200).json({
-      success: true,
-      message: 'Category and its images deleted!'
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: 'Something went wrong.',
-      error: error.message
-    });
-  }
-});
-
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const pLimit = await import('p-limit').then(mod => mod.default);
@@ -239,6 +205,61 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message || "Something went wrong" });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({
+        message: 'Category not found!',
+        success: false
+      });
+    }
+
+    if (category.images && category.images.length > 0) {
+      for (const url of category.images) {
+        const parts = url.split('/');
+        const publicIdWithExtension = parts[parts.length - 1];
+        const publicId = publicIdWithExtension.split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    await Category.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Category and its images deleted!'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Something went wrong.',
+      error: error.message
+    });
+  }
+});
+
+router.delete('/remove-image/:id', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category || !category.images?.length) {
+      return res.status(404).json({ message: 'Category or image not found' });
+    }
+
+    const imageUrl = category.images[0];
+    const parts = imageUrl.split('/');
+    const publicId = parts[parts.length - 1].split('.')[0];
+
+    await cloudinary.uploader.destroy(publicId);
+    category.images = [];
+    await category.save();
+
+    return res.status(200).json({ success: true, message: 'Image deleted' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 

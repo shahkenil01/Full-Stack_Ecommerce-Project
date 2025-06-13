@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Breadcrumbs, Typography, Link as MuiLink, Button } from '@mui/material';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { IoMdHome } from "react-icons/io";
-import { FaCloudUploadAlt, FaRegImage } from "react-icons/fa";
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { IoMdHome } from 'react-icons/io';
+import { FaCloudUploadAlt, FaRegImage } from 'react-icons/fa';
 import { IoCloseSharp } from 'react-icons/io5';
+import { useSnackbar } from 'notistack';
 
 import { fetchDataFromApi, putData } from '../../../utils/api';
-import { useSnackbar } from 'notistack';
 
 const CategoryEdit = () => {
   const { id } = useParams();
@@ -15,28 +15,23 @@ const CategoryEdit = () => {
 
   const [loading, setLoading] = useState(false);
   const [inputType, setInputType] = useState('url');
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [imageData, setImageData] = useState([]);
 
   const [formFields, setFormFields] = useState({
     name: '',
-    images: [],
     color: ''
   });
-
-  const [images, setImages] = useState([]);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   useEffect(() => {
     if (id) {
       fetchDataFromApi(`/api/category/${id}`).then((res) => {
         if (res) {
-          setFormFields({
-            name: res.name,
-            images: res.images,
-            color: res.color
-          });
+          setFormFields({ name: res.name || '', color: res.color || '' });
 
-          if (res.images?.length) {
-            setImages([{ preview: res.images[0] }]);
+          if (Array.isArray(res.images) && res.images.length > 0) {
+            setImageData([{ src: res.images[0], type: 'url' }]);
+            setInputType(res.images[0].includes('cloudinary') ? 'url' : 'file');
           }
         }
       });
@@ -44,85 +39,99 @@ const CategoryEdit = () => {
   }, [id]);
 
   const changeInput = (e) => {
-    setFormFields((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    const { name, value } = e.target;
+    setFormFields((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addImgUrl = (e) => {
-    setFormFields((prev) => ({
-      ...prev,
-      images: [e.target.value]
-    }));
-    setImages([{ preview: e.target.value }]);
+  const addImageUrl = () => {
+    const url = imageUrlInput.trim();
+    if (!url || imageData.length > 0) return;
+    setImageData([{ src: url, type: 'url' }]);
+    setImageUrlInput('');
   };
 
-  const removeImage = () => {
-    setImages([]);
-    setUploadedFiles([]);
-    setFormFields((prev) => ({ ...prev, images: [] }));
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file || imageData.length > 0) return;
+
+    const src = URL.createObjectURL(file);
+    setImageData([{ src, type: 'file', file }]);
   };
 
-  const addCategory = async (e) => {
+  const removeImage = async () => {
+    const token = localStorage.getItem('userToken');
+    try {
+      const res = await fetch(`/api/category/remove-image/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message || result.msg || 'Failed to delete image');
+      }
+
+      enqueueSnackbar('Image deleted successfully!', { variant: 'success' });
+      setImageData([]);
+      setImageUrlInput('');
+    } catch (err) {
+      enqueueSnackbar(err.message || 'Error deleting image', { variant: 'error' });
+    }
+  };
+
+  const updateCategory = async (e) => {
     e.preventDefault();
 
-    if (!formFields.name.trim() || !formFields.color.trim()) {
-      enqueueSnackbar("Please provide all required fields", { variant: "error", preventDuplicate: true });
+    const { name, color } = formFields;
+    const missing = [];
+    if (!name.trim()) missing.push('name');
+    if (!color.trim()) missing.push('color');
+    if (imageData.length === 0) missing.push('image');
+
+    if (missing.length > 0) {
+      enqueueSnackbar(`Please fill ${missing.join(', ')}`, { variant: 'error' });
       return;
     }
 
-    if (inputType === 'url' && (!formFields.images || !formFields.images[0]?.trim())) {
-      enqueueSnackbar("Please upload or provide an image", { variant: "error", preventDuplicate: true });
-      return;
+    const finalData = { ...formFields, images: [] };
+
+    const toBase64 = (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+
+    if (imageData[0].type === 'url') {
+      finalData.images = [imageData[0].src];
+    } else if (imageData[0].type === 'file') {
+      finalData.images = [await toBase64(imageData[0].file)];
     }
 
-    if (inputType === 'file' && uploadedFiles.length === 0) {
-      enqueueSnackbar("Please upload a new image", { variant: "error", preventDuplicate: true });
-      return;
-    }
+    setLoading(true);
+    const token = localStorage.getItem('userToken');
+    const res = await putData(`/api/category/${id}`, finalData, token);
+    setLoading(false);
 
-    try {
-      setLoading(true);
-
-      if (inputType === 'file') {
-        const toBase64 = (file) => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
-
-        const base64Images = await Promise.all(
-          Array.from(uploadedFiles).map((file) => toBase64(file))
-        );
-        formFields.images = base64Images;
+    if (res?.success) {
+      if (res.message === 'Nothing to update') {
+        enqueueSnackbar('Nothing to update', { variant: 'error', preventDuplicate: true });
+      } else {
+        enqueueSnackbar('Category updated successfully!', { variant: 'success', preventDuplicate: true });
+        navigate('/category');
       }
-      const token = localStorage.getItem("userToken");
-      const res = await putData(`/api/category/${id}`, formFields, token);
-      setLoading(false);
-
-      if (res?.success) {
-        if (res.message === "Nothing to update") {
-          enqueueSnackbar("Nothing to update", { variant: "error", preventDuplicate: true });
-        } else {
-          enqueueSnackbar("Category updated successfully!", { variant: "success", preventDuplicate: true });
-          navigate("/category");
-        }
-      }
-    } catch (error) {
-      setLoading(false);
     }
   };
 
   return (
     <div className="right-content w-100 product-upload">
-
       <div className="card shadow border-0 w-100 flex-row p-4 align-items-center justify-content-between mb-4 breadcrumbCard">
         <h5 className="mb-0">Edit Category</h5>
         <Breadcrumbs aria-label="breadcrumb">
           <MuiLink component={Link} to="/" underline="hover" color="inherit" className="breadcrumb-link">
-            <IoMdHome />Dashboard
+            <IoMdHome /> Dashboard
           </MuiLink>
           <MuiLink component={Link} to="/category" underline="hover" color="inherit" className="breadcrumb-link">
             Category
@@ -133,7 +142,7 @@ const CategoryEdit = () => {
         </Breadcrumbs>
       </div>
 
-      <form className='form' onSubmit={addCategory}>
+      <form className="form" onSubmit={updateCategory}>
         <div className="row">
           <div className="col-md-12">
             <div className="card p-4 mt-0">
@@ -141,68 +150,76 @@ const CategoryEdit = () => {
                 <h6>Category Name</h6>
                 <input type="text" name="name" value={formFields.name} onChange={changeInput} />
               </div>
+
               <div className="form-group">
                 <h6>Color</h6>
                 <input type="text" name="color" value={formFields.color} onChange={changeInput} />
               </div>
 
-              <div className="form-group-radio">
+              <div className="form-group-radio mt-3">
                 <h6>Image Input Type</h6>
                 <div>
                   <label>
-                    <input type="radio" name="imageInputType" value="url" checked={inputType === 'url'} onChange={() => setInputType('url')} />
-                    &nbsp;Image URL
+                    <input type="radio" value="url" checked={inputType === 'url'} onChange={() => setInputType('url')} disabled={imageData.length > 0} /> Image URL
                   </label>
                   &nbsp;&nbsp;
                   <label>
-                    <input type="radio" name="imageInputType" value="file" checked={inputType === 'file'} onChange={() => setInputType('file')} />
-                    &nbsp;Upload Image
+                    <input type="radio" value="file" checked={inputType === 'file'} onChange={() => setInputType('file')} disabled={imageData.length > 0} /> Upload Image
                   </label>
                 </div>
               </div>
 
-              {inputType === 'file' && (
-                <div className='imagesUploadSec mt-3'>
-                  <h5 className="mb-4">Upload Image</h5>
-                  <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
-                    {images.length > 0 && (
-                      <div className="uploadBox">
-                        <span className="remove" onClick={removeImage}><IoCloseSharp /></span>
-                        <div className="box">
-                          <img className="w-100" src={images[0].preview} alt="preview" />
-                        </div>
-                      </div>
-                    )}
-                    <div className="uploadBox">
-                      <input type="file" accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const preview = URL.createObjectURL(file);
-                            setImages([{ file, preview }]);
-                            setUploadedFiles([file]);
-                          }
-                        }} />
-                      <div className="info">
-                        <FaRegImage />
-                        <h5>image upload</h5>
-                      </div>
-                    </div>
+              {inputType === 'url' && imageData.length === 0 && (
+                <div className="form-group mt-3 be1">
+                  <h6 className="text-uppercase">Category Image</h6>
+                  <div className="position-relative inputBtn mb-3">
+                    <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" style={{ paddingRight: '80px' }} />
+                    <Button className="btn-blue" type="button" onClick={addImageUrl} disabled={imageData.length > 0}>Add</Button>
                   </div>
                 </div>
               )}
 
-              {inputType === 'url' && (
-                <div className="form-group mt-3">
-                  <h6>Image Url</h6>
-                  <input type="text" name="images" value={formFields.images[0] || ''} onChange={addImgUrl} />
+              {inputType === 'file' && (
+                <div className="imagesUploadSec mt-3 mb-4">
+                  <h5 className="mb-3">Upload Image</h5>
+                  <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
+                    {imageData.map((img, idx) => (
+                      <div className="uploadBox" key={idx}>
+                        <span className="remove" onClick={removeImage}><IoCloseSharp /></span>
+                        <div className="box">
+                          <img className="w-100" src={img.src} alt="preview" />
+                        </div>
+                      </div>
+                    ))}
+                    {imageData.length === 0 && (
+                      <div className="uploadBox">
+                        <input type="file" accept="image/*" onChange={handleFileChange} />
+                        <div className="info">
+                          <FaRegImage />
+                          <h5>image upload</h5>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
-              <Button type='submit' className='btn-blue btn-lg btn-big w-100' disabled={loading}>
-                <FaCloudUploadAlt />
-                &nbsp;
-                {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}
+              {imageData.length > 0 && inputType === 'url' && (
+                <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3 mt-3 mb-3">
+                  {imageData.map((img, i) => (
+                    <div className="uploadBox" key={i}>
+                      <span className="remove" onClick={removeImage}><IoCloseSharp /></span>
+                      <div className="box">
+                        <img className="w-100 preview" src={img.src} alt={`preview-${i}`} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button type="submit" className="btn-blue btn-lg btn-big w-100" disabled={loading}>
+                <FaCloudUploadAlt /> &nbsp;
+                {loading ? <span className="dot-loader"></span> : 'PUBLISH AND VIEW'}
               </Button>
             </div>
           </div>

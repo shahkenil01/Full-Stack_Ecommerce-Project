@@ -36,11 +36,7 @@ const CategoryAdd = () => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const newFiles = files.map(file => ({
-      src: URL.createObjectURL(file),
-      type: 'file',
-      file
-    }));
+    const newFiles = files.map(file => ({ src: URL.createObjectURL(file), type: 'file', file }));
 
     const existingKeys = new Set(imageData.map(img => img.file?.name + img.file?.lastModified));
     const uniqueFiles = newFiles.filter(img => {
@@ -143,18 +139,23 @@ const CategoryAdd = () => {
                 </div>
               </div>
 
-               {inputType === 'url' && (
-                <div className="form-group mt-3 be1">
-                  <h6 className="text-uppercase">Category Image</h6>
-                  <div className="position-relative inputBtn">
-                    <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)} placeholder="Enter image URL" style={{ paddingRight: '80px' }} />
-                    <Button className="btn-blue" type="button" onClick={addImageUrl}>Add</Button>
-                  </div>
+              {inputType === 'url' && (
+                <div className="form-group mb-0">
+                  <h6 className="text-uppercase mt-2">Category Image</h6>
+                  {imageData.length === 0 && (
+                    <div className="position-relative inputBtn">
+                      <input type="text" value={imageUrlInput} onChange={(e) => setImageUrlInput(e.target.value)}
+                        placeholder="Enter image URL" style={{ paddingRight: '80px' }} />
+                      <Button className="btn-blue" type="button" onClick={addImageUrl}> Add </Button>
+                    </div>
+                  )}
 
-                  <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3 mt-3 mb-3">
+                  <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3 mt-3">
                     {imageData.map((img, i) => (
-                      <div className="uploadBox" key={i}>
-                        <span className="remove" onClick={() => removeImage(i)}><IoCloseSharp /></span>
+                      <div className="uploadBox mb-3" key={i}>
+                        <span className="remove" onClick={() => removeImage(i)}>
+                          <IoCloseSharp />
+                        </span>
                         <div className="box">
                           <img className="w-100 preview" src={img.src} alt={`preview-${i}`} />
                         </div>
@@ -165,24 +166,28 @@ const CategoryAdd = () => {
               )}
 
               {inputType === 'file' && (
-                <div className="imagesUploadSec mt-3 mb-4">
+                <div className="imagesUploadSec mt-3 mb-3">
                   <h5 className="mb-3">Upload Image</h5>
                   <div className="imgUploadBox d-flex align-items-center flex-wrap gap-3">
                     {imageData.map((img, idx) => (
                       <div className="uploadBox" key={idx}>
-                        <span className="remove" onClick={() => removeImage(idx)}><IoCloseSharp /></span>
+                        <span className="remove" onClick={() => removeImage(idx)}>
+                          <IoCloseSharp />
+                        </span>
                         <div className="box">
                           <img className="w-100" src={img.src} alt="preview" />
                         </div>
                       </div>
                     ))}
-                    <div className="uploadBox">
-                      <input type="file" accept="image/*" onChange={handleFileChange} />
-                      <div className="info">
-                        <FaRegImage />
-                        <h5>image upload</h5>
+                    {imageData.length === 0 && (
+                      <div className="uploadBox">
+                        <input type="file" accept="image/*" onChange={handleFileChange} />
+                        <div className="info">
+                          <FaRegImage />
+                          <h5>image upload</h5>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}

@@ -295,16 +295,10 @@ const ProductEdit = () => {
 
     // Submit update to backend
     const res = await putData(`/api/products/${id}`, payload, token);
-    if (!res) {
-      setLoadingSubmit(false);
-      return;
-    }
-    if (res?.message?.toLowerCase().includes('updated')) {
-      enqueueSnackbar('Product updated successfully!', { variant: 'success' });
-      navigate('/products');
-    } else {
-      enqueueSnackbar(res?.message || 'Update failed', { variant: 'error' });
-    }
+    if (!res || res.success === false) { setLoadingSubmit(false); return; }
+    
+    enqueueSnackbar('Product updated successfully!', { variant: 'success' });
+    navigate('/products');
     setLoadingSubmit(false);
   };
 

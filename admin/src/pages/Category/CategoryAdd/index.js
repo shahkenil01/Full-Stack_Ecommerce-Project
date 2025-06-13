@@ -138,7 +138,7 @@ const CategoryAdd = () => {
                   </label>
                   &nbsp;&nbsp;
                   <label>
-                    <input type="radio" value="file" checked={inputType === 'file'} onChange={() =>  setInputType('file')}/> Upload Image
+                    <input type="radio" value="file" checked={inputType === 'file'} onChange={() => setInputType('file')}/> Upload Image
                   </label>
                 </div>
               </div>

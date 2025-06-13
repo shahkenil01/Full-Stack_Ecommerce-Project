@@ -208,7 +208,7 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
 

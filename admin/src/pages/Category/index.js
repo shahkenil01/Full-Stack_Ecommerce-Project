@@ -33,7 +33,8 @@ const Category = () => {
   }, [location.state, enqueueSnackbar]);
 
   const handleDelete = async (id) => {
-    const res = await deleteData(`/api/category/${id}`);
+    const token = localStorage.getItem("userToken");
+    const res = await deleteData(`/api/category/${id}`, token);
     if (res?.success || res?.message === 'Category and images deleted!') {
       const currentPage = catData.page;
       const totalItems = catData.categoryList.length - 1;
@@ -45,9 +46,7 @@ const Category = () => {
       setCatData(updated);
       
       enqueueSnackbar("Category deleted successfully!", { variant: "success" });
-    } else {
-      enqueueSnackbar(res?.message || "Failed to delete category.", { variant: "error" });
-    }
+    } 
   };  
 
   const handleChange = (event, value) => {

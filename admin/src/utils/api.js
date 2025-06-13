@@ -71,10 +71,7 @@ export const putData = async (url, formData, token) => {
 
 export const deleteData = async (url, token) => {
   try {
-    const { data } = await axiosInstance.delete(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const { data } = await axiosInstance.delete(url, { headers: { Authorization: `Bearer ${token}`, },
     });
     return data;
   } catch (error) {

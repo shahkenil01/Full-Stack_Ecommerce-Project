@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-
+import { Link } from 'react-router-dom';
 import { FaUserCircle, FaEye, FaPencilAlt } from "react-icons/fa";
 import { IoMdCart } from "react-icons/io";
 import { MdShoppingBag, MdDelete } from "react-icons/md";
 import { GiStarsStack } from "react-icons/gi";
 import { Button, FormControl, Rating, TablePagination } from "@mui/material";
-
 import { fetchDataFromApi } from "../../utils/api";
-
 import DashboardBox from './components/dashboardBox';
 import CustomDropdown from '../../components/CustomDropdown';
 import SearchBox from "../../components/SearchBox";
@@ -56,6 +54,23 @@ const Dashboard = () => {
   useEffect(() => {
     setPage(0);
   }, [categoryBy, searchQuery]);
+
+  const handleDelete = async (id) => {
+    const user = JSON.parse(localStorage.getItem("userDetails"));
+    if (!user || user.role !== "admin") {
+      enqueueSnackbar("Only admin can perform this action", { variant: "error" });
+      return;
+    }
+  
+    const res = await deleteData(`/api/products/${id}`);
+    if (res?.message === "Product deleted successfully") {
+      const updated = await fetchDataFromApi("/api/products");
+      setProductList(Array.isArray(updated) ? updated : (updated?.productList || []));
+      enqueueSnackbar("Product deleted successfully!", { variant: "success" });
+    } else {
+      enqueueSnackbar(res?.message || "Failed to delete product.", { variant: "error" });
+    }
+  };
 
   return (
     <div className="right-content home w-100">
@@ -152,9 +167,13 @@ const Dashboard = () => {
                   </td>
                   <td>
                     <div className="actions d-flex align-items-center">
-                      <Button className='secondary' color="secondary"><FaEye /></Button>
-                      <Button className='success' color="success"><FaPencilAlt /></Button>
-                      <Button className='error' color="error"><MdDelete /></Button>
+                        <Link to="/product/details">
+                          <Button className='secondary' color="secondary"><FaEye /></Button>
+                        </Link>
+                        <Link to={`/product/edit/${item._id}`}>
+                          <Button className='success' color="success"><FaPencilAlt /></Button>
+                        </Link>
+                        <Button className='error' color="error" onClick={() => handleDelete(item._id)}><MdDelete /></Button>
                     </div>
                   </td>
                 </tr>

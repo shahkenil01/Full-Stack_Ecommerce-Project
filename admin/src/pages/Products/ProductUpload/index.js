@@ -194,14 +194,6 @@ const ProductUpload = () => {
       return;
     }
 
-    // === ADMIN CHECK HERE ===
-    const user = JSON.parse(localStorage.getItem("userDetails"));
-    if (!user || user.role !== "admin") {
-      enqueueSnackbar("Only admin can upload products", { variant: "error" });
-      setLoading(false);
-      return;
-    }
-
     // Prepare final data with uploaded image URLs
     const finalData = { ...formFields, images: [] };
 
@@ -234,7 +226,8 @@ const ProductUpload = () => {
     finalData.images = cloudinaryUrls;
 
     // Post to API
-    const res = await postData('/api/products/create', finalData);
+    const token = localStorage.getItem("userToken");
+    const res = await postData('/api/products/create', finalData, token);
     setLoading(false);
 
     if (res && res._id) {
@@ -246,8 +239,6 @@ const ProductUpload = () => {
       setImagesData([]);
       enqueueSnackbar('Product uploaded successfully!', { variant: 'success' });
       navigate('/products');
-    } else {
-      enqueueSnackbar(res?.message || 'Failed to upload product.', { variant: 'error' });
     }
   };
 

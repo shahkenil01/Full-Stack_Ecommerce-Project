@@ -69,8 +69,7 @@ const ProductsWeight = () => {
     const token = localStorage.getItem("userToken");
     const res = await deleteData(`/api/weights/${id}`, token);
 
-    if (!res) return;
-    if (res.success === false) return;
+    if (!res || res.success === false) return;
 
     enqueueSnackbar("Weight deleted!", { variant: "success", preventDuplicate: true });
     fetchWeights();

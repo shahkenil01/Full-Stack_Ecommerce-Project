@@ -78,8 +78,8 @@ export const deleteData = async (url, token) => {
     });
     return data;
   } catch (error) {
-    const msg = error?.response?.data?.msg || "Something went wrong";
-    enqueueSnackbar(msg, { variant: "error" });
-    return null;
+    const msg = error?.response?.data?.message || error?.response?.data?.msg || "Something went wrong";
+    enqueueSnackbar(msg, { variant: "error", preventDuplicate: true });
+    return { success: false, message: msg };
   }
 };

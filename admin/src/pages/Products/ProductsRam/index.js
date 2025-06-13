@@ -76,7 +76,7 @@ const ProductsRam = () => {
 
     if (!res || res.success === false) return;
 
-    enqueueSnackbar("RAM deleted!", { variant: "success" });
+    enqueueSnackbar("RAM deleted!", { variant: "success", preventDuplicate: true });
     fetchRams();
   };
 

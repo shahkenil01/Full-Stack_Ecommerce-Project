@@ -8,7 +8,7 @@ import { MdDelete } from "react-icons/md";
 import { useSnackbar } from 'notistack';
 import { postData, fetchDataFromApi, putData,deleteData } from '../../../utils/api';
 
-const ProductsRam = () => {
+const ProductsSize = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [size, setSize] = useState('');
@@ -80,12 +80,7 @@ const ProductsRam = () => {
     const token = localStorage.getItem("userToken");
     const res = await deleteData(`/api/sizes/${id}`, token);
 
-    if (!res || res.success === false) {
-      if (res?.message) {
-        enqueueSnackbar(res.message, { variant: "error", preventDuplicate: true });
-      }
-      return;
-    }
+    if (!res || res.success === false) return;
 
     enqueueSnackbar("Size deleted!", { variant: "success", preventDuplicate: true });
     fetchSizes();
@@ -168,4 +163,4 @@ const ProductsRam = () => {
   );
 };
 
-export default ProductsRam;
+export default ProductsSize;

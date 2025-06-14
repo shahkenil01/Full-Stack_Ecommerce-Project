@@ -42,18 +42,13 @@ const Category = () => {
   }, {});
 
   const handleDelete = async (id) => {
-    try {
-      const res = await deleteData(`/api/subCat/${id}`);
+      const token = localStorage.getItem("userToken");
+      const res = await deleteData(`/api/subCat/${id}`, token);
 
       if (res?.success) {
         setSubCategories((prev) => prev.filter((item) => item._id !== id));
         enqueueSnackbar("Sub Category deleted successfully!", { variant: "success" });
-      } else {
-        enqueueSnackbar(res?.message || "Failed to delete sub category", { variant: "error" });
       }
-    } catch (err) {
-      enqueueSnackbar("An error occurred while deleting", { variant: "error" });
-    }
   };
 
   return (
@@ -108,11 +103,7 @@ const Category = () => {
                         {cat.subCats.map((s) => (
                           <span className="badge badge-primary mx-1" key={s.id}>
                             {s.name}
-                            <IoIosClose
-                              className="cursor"
-                              style={{ fontSize: '20px', marginTop: '-2px' }}
-                              onClick={() => handleDelete(s.id)}
-                            />
+                            <IoIosClose className="cursor" style={{ fontSize: '20px', marginTop: '-2px' }} onClick={() => handleDelete(s.id)} />
                           </span>
                         ))}
                       </td>

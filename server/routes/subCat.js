@@ -85,27 +85,17 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
-    
     const deletedSubCat = await SubCategory.findByIdAndDelete(req.params.id);
 
     if (!deletedSubCat) {
-      return res.status(404).json({
-        message: 'Sub Category not found!',
-        success: false
-      });
+      return res.status(404).json({ message: 'Sub Category not found!', success: false });
     }
 
-    return res.status(200).json({
-      success: true,
-      message: 'Sub Category deleted!'
-    });
+    return res.status(200).json({ message: 'Sub Category deleted!' , success: true });
   } catch (error) {
-    return res.status(500).json({
-      message: 'Something went wrong.',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Something went wrong.', error: error.message });
   }
 });
 

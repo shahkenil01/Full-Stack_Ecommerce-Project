@@ -71,8 +71,6 @@ const CategoryAdd = () => {
     if (result?.success) {
       enqueueSnackbar('Sub Category created successfully!', { variant: 'success' });
       navigate("/subCategory");
-    } else {
-      enqueueSnackbar(result.message || 'Failed to add Sub Category.', { variant: 'error' });
     }
   };
 
@@ -94,7 +92,7 @@ const CategoryAdd = () => {
         </Breadcrumbs>
       </div>
 
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <div className="row">
           <div className="col-md-12">
             <div className="card p-4 mt-0">
@@ -110,7 +108,7 @@ const CategoryAdd = () => {
                 <input type="text" name="subCategory" value={formFields.subCategory} onChange={changeInput} />
               </div>
 
-              <Button className="btn-blue btn-lg btn-big w-100" onClick={handleSubmit} disabled={loading}>
+              <Button className="btn-blue btn-lg btn-big w-100" type="submit" disabled={loading}>
                 <FaCloudUploadAlt /> &nbsp; {loading ? <span className="dot-loader"></span> : "PUBLISH AND VIEW"}
               </Button>
             </div>

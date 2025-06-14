@@ -50,14 +50,17 @@ const SignUp = () => {
     }
 
     try {
-  const otpRes = await fetch("http://localhost:4000/api/user/request-otp", {
+  const otpRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
 
   const otpData = await otpRes.json();
-  if (!otpRes.ok) throw new Error(otpData.msg || "Failed to send OTP");
+  if (!otpRes.ok) {
+    const errorMessage = otpData?.msg || otpData?.message || "Something went wrong";
+    throw new Error(errorMessage);
+  }
 
   enqueueSnackbar("OTP sent to your email!", { variant: "success" });
 

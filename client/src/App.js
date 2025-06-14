@@ -25,6 +25,7 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isHeaderFooterShow, setisHeaderFooterShow] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     getCountry('https://countriesnow.space/api/v0.1/countries/');
@@ -35,6 +36,14 @@ function App() {
       setCountryList(res.data.data);
     });
   };
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      setUser(JSON.parse(userInfo));
+      setIsLogin(true);
+    }
+  }, []);
 
   const values = {
     countryList,
@@ -48,6 +57,8 @@ function App() {
     setisHeaderFooterShow,
     isLogin,
     setIsLogin,
+    user,
+    setUser,
   };
 
   return (

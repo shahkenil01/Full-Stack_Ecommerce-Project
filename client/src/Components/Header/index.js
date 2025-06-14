@@ -8,6 +8,7 @@ import { IoBagOutline } from "react-icons/io5";
 import Navigation from './Navigation';
 import { useContext } from 'react';
 import { MyContext } from '../../App';
+import UserMenu from '../Header/UserMenu';
 
 const Header= ()=>{
 
@@ -40,7 +41,7 @@ const Header= ()=>{
                                     {
                                         context.isLogin!==true ? 
                                         <Link to="/signIn"><Button className='btn-blue btn-round bg-blue mr-3'>Sign In</Button></Link> : 
-                                        <Button className='circle mr-3'><FiUser/></Button>
+                                        <UserMenu/>
                                     }
                                     <div className='ml-auto cartTab d-flex align-items-center'>
                                         {context.isLogin && <span className='price'>₹0.00</span>}

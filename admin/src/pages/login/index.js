@@ -37,13 +37,7 @@ const Login = ()=>{
     }
 
     try {
-      const BACKEND_URL =
-        process.env.REACT_APP_BACKEND_URL ||
-          (window.location.hostname === "localhost"
-            ? "http://localhost:4000"
-            : "https://full-stack-ecommerce-project-u0om.onrender.com");
-
-        const res = await fetch(`${BACKEND_URL}/api/user/signin`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

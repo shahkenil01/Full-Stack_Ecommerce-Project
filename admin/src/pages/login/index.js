@@ -31,8 +31,12 @@ const Login = ()=>{
     e.preventDefault();
     const { email, password } = formData;
 
-    if (!email.trim() || !password.trim()) {
-      enqueueSnackbar("Please fill all fields", { variant: 'error' });
+    const missing = [];
+    if (!email.trim()) missing.push("email");
+    if (!password.trim()) missing.push("password");
+
+    if (missing.length > 0) {
+      enqueueSnackbar(`Please fill: ${missing.join(', ')}`, { variant: 'error' });
       return;
     }
 

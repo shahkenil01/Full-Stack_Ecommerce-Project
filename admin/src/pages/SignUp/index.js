@@ -37,8 +37,15 @@ const SignUp = () => {
     const { name, email, phone, password, confirmPassword } = formData;
     setLoading(true);
 
-    if (!name || !email || !password || !confirmPassword) {
-      enqueueSnackbar("Please fill all fields", { variant: "error" });
+    const missingFields = [];
+    if (!name.trim()) missingFields.push("name");
+    if (!email.trim()) missingFields.push("email");
+    if (!phone.trim()) missingFields.push("phone");
+    if (!password.trim()) missingFields.push("password");
+    if (!confirmPassword.trim()) missingFields.push("confirmPassword");
+
+    if (missingFields.length > 0) {
+      enqueueSnackbar(`Please fill: ${missingFields.join(', ')}`, { variant: 'error' });
       setLoading(false);
       return;
     }
@@ -50,30 +57,40 @@ const SignUp = () => {
     }
 
     try {
-  const otpRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
+      const checkRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/check-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const checkData = await checkRes.json();
 
-  const otpData = await otpRes.json();
-  if (!otpRes.ok) {
-    const errorMessage = otpData?.msg || otpData?.message || "Something went wrong";
-    throw new Error(errorMessage);
-  }
+      if (!checkRes.ok) {
+        throw new Error(checkData.msg || "User already exists");
+      }
 
-  enqueueSnackbar("OTP sent to your email!", { variant: "success" });
+      const otpRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-  localStorage.setItem("pendingEmail", email);
-  localStorage.setItem("pendingUserData", JSON.stringify({ name, email, password, phone }));
+      const otpData = await otpRes.json();
+      if (!otpRes.ok) {
+        const errorMessage = otpData?.msg || otpData?.message || "Something went wrong";
+        throw new Error(errorMessage);
+      }
 
-  navigate("/verify-account");
+      enqueueSnackbar("OTP sent to your email!", { variant: "success" });
 
-} catch (err) {
-  enqueueSnackbar(err.message, { variant: "error" });
-} finally {
-  setLoading(false);
-}
+      localStorage.setItem("pendingEmail", email);
+      localStorage.setItem("pendingUserData", JSON.stringify({ name, email, password, phone }));
+      navigate("/verify-account");
+
+    } catch (err) {
+      enqueueSnackbar(err.message, { variant: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -127,19 +144,19 @@ const SignUp = () => {
                       onChange={handleChange} value={formData.email} />
                   </div>
 
-                  <div className={`form-group position-relative ${inputIndex === 1 && 'focus'}`}>
+                  <div className={`form-group position-relative ${inputIndex === 2 && 'focus'}`}>
                     <span className="icon"><FaPhoneAlt /></span>
                     <input type="number" className="form-control" placeholder="enter your Phone Number" name="phone"
-                      onFocus={() => focusInput(1)} onBlur={() => setInputIndex(null)}
+                      onFocus={() => focusInput(2)} onBlur={() => setInputIndex(null)}
                       onChange={handleChange} value={formData.phone} />
                   </div>
 
-                  <div className={`form-group position-relative ${inputIndex === 2 && 'focus'}`}>
+                  <div className={`form-group position-relative ${inputIndex === 3 && 'focus'}`}>
                     <span className="icon"><RiLockPasswordFill /></span>
                     <input ref={passwordRef} className="form-control" placeholder="enter your password" name="password"
-                      type={isShowPassword ? "text" : "password"} onFocus={() => focusInput(2)}
+                      type={isShowPassword ? "text" : "password"} onFocus={() => focusInput(3)}
                       onBlur={() => setInputIndex(null)} onChange={handleChange} value={formData.password} />
-                    {inputIndex === 2 && (
+                    {inputIndex === 3 && (
                       <span className="toggleShowPassword" tabIndex="0"
                         onMouseDown={(e) => {
                           e.preventDefault();
@@ -151,12 +168,12 @@ const SignUp = () => {
                     )}
                   </div>
 
-                  <div className={`form-group position-relative ${inputIndex === 3 && 'focus'}`}>
+                  <div className={`form-group position-relative ${inputIndex === 4 && 'focus'}`}>
                     <span className="icon"><IoShieldCheckmarkSharp /></span>
                     <input ref={confirmPasswordRef} className="form-control" placeholder="confirm your password" name="confirmPassword"
-                      type={isShowConfirmPassword ? "text" : "password"} onFocus={() => focusInput(3)}
+                      type={isShowConfirmPassword ? "text" : "password"} onFocus={() => focusInput(4)}
                       onBlur={() => setInputIndex(null)} onChange={handleChange} value={formData.confirmPassword} />
-                    {inputIndex === 3 && (
+                    {inputIndex === 4 && (
                       <span className="toggleShowPassword" tabIndex="0"
                         onMouseDown={(e) => {
                           e.preventDefault();

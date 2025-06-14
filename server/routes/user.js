@@ -10,9 +10,36 @@ const sendOTPEmail = require('../utils/sendOTP');
 
 const pendingOtps = {};
 
+// POST: Check if email already exists
+router.post('/check-email', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ msg: 'Invalid email' });
+  }
+
+  const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
+  if (existingUser) {
+    return res.status(400).json({ msg: 'User already exists' });
+  }
+
+  return res.status(200).json({ msg: 'Email is available' });
+});
+
 // POST SignUp
 router.post('/signup', async (req, res) => {
   const { name, phone, email, password, role } = req.body;
+
+  const missingFields = [];
+  if (!name) missingFields.push("name");
+  if (!email) missingFields.push("email");
+  if (!password) missingFields.push("password");
+  if (!phone) missingFields.push("phone");
+
+  if (missingFields.length > 0) {
+    return res.status(400).json({ msg: `Please fill: ${missingFields.join(', ')}` });
+  }
+
   try {
     const existingUser = await User.findOne({ email: email });
 
@@ -46,15 +73,22 @@ router.post('/signup', async (req, res) => {
 // POST SignIn
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const existingUser = await User.findOne({ email: email });
 
+  const missing = [];
+  if (!email) missing.push('email');
+  if (!password) missing.push('password');
+
+  if (missing.length > 0) {
+    return res.status(400).json({ msg: `Please fill: ${missing.join(', ')}` });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(404).json({ msg: "User not found" });
     } 
 
     const matchPassword = await bcrypt.compare(password, existingUser.password);
-
     if(!matchPassword){
       return res.status(400).json({ msg: "Incorrect password" });
     }

@@ -1,5 +1,6 @@
 const images = {
     logo: require("./images/logo.jpeg"),
+    shield: require("./images/shield.png"),
     slider1: require("./images/slider1.jpg"),
     slider2: require("./images/slider2.jpg"),
     slider3: require("./images/slider3.jpg"),

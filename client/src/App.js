@@ -13,6 +13,7 @@ import Cart from './Pages/Cart';
 import ScrollToTop from './ScrollToTop';
 import SignIn from './Pages/SignIn';
 import SignUp from './Pages/SignUp';
+import OtpVerify from './Pages/SignUp/OtpVerify';
 import NotFound from './Pages/NotFound';
 
 const MyContext = createContext();
@@ -63,6 +64,7 @@ function App() {
           <Route exact={true} path="/cart" element={<Cart />} />
           <Route exact={true} path="/signIn" element={<SignIn />} />
           <Route exact={true} path="/signUp" element={<SignUp />} />
+          <Route exact={true} path="/verifyOTP" element={<OtpVerify />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
 

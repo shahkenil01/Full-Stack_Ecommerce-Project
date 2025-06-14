@@ -1457,6 +1457,15 @@ a:hover{
   margin-bottom: 15px;}
 .signUpPage .box .txt{
   top: 1px;}
+.otpBox input {
+  border: 1px solid #0000004d!important;
+  border-radius: 4px;
+  outline: none!important}
+.otpBox input:focus {
+  border: 1px solid #000000b3!important}
+.otpPage .container {
+  display: flex;
+  height: 90vh}
 /*signUpPage Page End*/
 
 .priceRange{

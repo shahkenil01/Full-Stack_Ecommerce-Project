@@ -1,9 +1,8 @@
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 
-const BASE_URL = process.env.NODE_ENV === "development"
-  ? process.env.REACT_APP_BACKEND_URL
-  : "https://full-stack-ecommerce-project-u0om.onrender.com";// https://full-stack-ecommerce-project-u0om.onrender.com, full-stackecommerce-project-production.up.railway.app, https://savory-jumpy-gym.glitch.me
+const BASE_URL = "https://full-stack-ecommerce-project-u0om.onrender.com";
+// https://full-stack-ecommerce-project-u0om.onrender.com, full-stackecommerce-project-production.up.railway.app, https://savory-jumpy-gym.glitch.me
 
 const logout = () => {
   localStorage.removeItem("userToken");

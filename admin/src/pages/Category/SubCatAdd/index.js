@@ -47,22 +47,29 @@ const CategoryAdd = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formFields.subCategory || !formFields.category) {
-      enqueueSnackbar('Please fill in all fields.', { variant: 'error' });
+    const { subCategory, category } = formFields;
+    const missing = [];
+
+    if (!category) missing.push('parent category');
+    if (!subCategory.trim()) missing.push('sub category');
+
+    if (missing.length > 0) {
+      enqueueSnackbar(`Please fill: ${missing.join(', ')}`, { variant: 'error' });
       return;
     }
 
     const payload = {
-      subCat: formFields.subCategory,
-      category: formFields.category,
+      subCat: subCategory.trim(),
+      category,
     };
 
     setLoading(true);
-    const result = await postData('/api/subCat/create', payload);
+    const token = localStorage.getItem("userToken");
+    const result = await postData('/api/subCat/create', payload, token);
     setLoading(false);
 
     if (result?.success) {
-      enqueueSnackbar( 'Sub Category created successfully!', { variant: 'success' });
+      enqueueSnackbar('Sub Category created successfully!', { variant: 'success' });
       navigate("/subCategory");
     } else {
       enqueueSnackbar(result.message || 'Failed to add Sub Category.', { variant: 'error' });

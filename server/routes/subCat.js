@@ -1,43 +1,10 @@
 const { SubCategory } = require('../models/subCat')
 const express = require('express');
 const router = express.Router();
+const verifyToken = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 
-router.get('/', async (req, res) => {
-  try{
-    const subCat = await SubCategory.find().populate("category");
-    if (!subCat) {
-      res.status(500).json({ success: false })
-    }
-    return res.status(200).json(subCat);
-  }catch(error){
-    res.status(500).json({ success: false})
-  }
-});
-
-router.get('/by-category/:categoryId', async (req, res) => {
-  try {
-    const subCats = await SubCategory.find({ category: req.params.categoryId });
-    res.status(200).json(subCats);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch subcategories', error: error.message });
-  }
-});
-
-router.get('/:id', async (req, res) => {
-  try {
-    const subCat = await SubCategory.findById(req.params.id).populate("category");
-
-    if (!subCat) {
-      return res.status(404).json({ message: 'The sub category with the given ID was not found.' });
-    }
-
-    return res.status(200).send(subCat);
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error: error.message });
-  }
-});
-
-router.post('/create', async (req, res) => {
+router.post('/create', verifyToken, isAdmin, async (req, res) => {
   try {
 
   let subCat = new SubCategory({
@@ -62,27 +29,38 @@ router.post('/create', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
-  try {
-    
-    const deletedSubCat = await SubCategory.findByIdAndDelete(req.params.id);
+router.get('/', async (req, res) => {
+  try{
+    const subCat = await SubCategory.find().populate("category");
+    if (!subCat) {
+      res.status(500).json({ success: false })
+    }
+    return res.status(200).json(subCat);
+  }catch(error){
+    res.status(500).json({ success: false})
+  }
+});
 
-    if (!deletedSubCat) {
-      return res.status(404).json({
-        message: 'Sub Category not found!',
-        success: false
-      });
+router.get('/:id', async (req, res) => {
+  try {
+    const subCat = await SubCategory.findById(req.params.id).populate("category");
+
+    if (!subCat) {
+      return res.status(404).json({ message: 'The sub category with the given ID was not found.' });
     }
 
-    return res.status(200).json({
-      success: true,
-      message: 'Sub Category deleted!'
-    });
+    return res.status(200).send(subCat);
   } catch (error) {
-    return res.status(500).json({
-      message: 'Something went wrong.',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Something went wrong.', error: error.message });
+  }
+});
+
+router.get('/by-category/:categoryId', async (req, res) => {
+  try {
+    const subCats = await SubCategory.find({ category: req.params.categoryId });
+    res.status(200).json(subCats);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch subcategories', error: error.message });
   }
 });
 
@@ -104,6 +82,30 @@ router.put('/:id', async (req, res) => {
     res.status(200).json({ success: true, data: subCat });
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong.', error: error.message });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    
+    const deletedSubCat = await SubCategory.findByIdAndDelete(req.params.id);
+
+    if (!deletedSubCat) {
+      return res.status(404).json({
+        message: 'Sub Category not found!',
+        success: false
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Sub Category deleted!'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Something went wrong.',
+      error: error.message
+    });
   }
 });
 

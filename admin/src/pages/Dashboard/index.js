@@ -5,10 +5,11 @@ import { IoMdCart } from "react-icons/io";
 import { MdShoppingBag, MdDelete } from "react-icons/md";
 import { GiStarsStack } from "react-icons/gi";
 import { Button, FormControl, Rating, TablePagination } from "@mui/material";
-import { fetchDataFromApi } from "../../utils/api";
+import { fetchDataFromApi, deleteData } from "../../utils/api";
 import DashboardBox from './components/dashboardBox';
 import CustomDropdown from '../../components/CustomDropdown';
 import SearchBox from "../../components/SearchBox";
+import { useSnackbar } from 'notistack';
 
 const Dashboard = () => {
   const [categoryBy, setCategoryBy] = useState('');
@@ -16,6 +17,7 @@ const Dashboard = () => {
   const [productList, setProductList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [prevFilteredCount, setPrevFilteredCount] = useState(0);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);

@@ -10,6 +10,7 @@ const SignUp = () => {
   const context = useContext(MyContext);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,6 +31,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const { name, email, password, phone } = formData;
 
     const missing = [];
@@ -40,6 +42,7 @@ const SignUp = () => {
 
     if (missing.length > 0) {
       enqueueSnackbar(`Please enter: ${missing.join(", ")}`, { variant: "error" });
+      setLoading(false);
       return;
     }
 
@@ -70,6 +73,8 @@ const SignUp = () => {
 
     } catch (err) {
       enqueueSnackbar(err.message, { variant: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,7 +123,9 @@ const SignUp = () => {
             <a href="/" className="border-effect cursor txt">Forgot Password?</a>
 
             <div className="d-flex align-items-center mt-3 mb-3">
-              <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue">Sign Up</Button>
+              <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue" disabled={loading} style={{ height: "45px"}}>
+                {loading ? <span className="dot-loader"></span> : "Sign Up"}
+              </Button>
               <Link to="/" className="d-block col">
                 <Button className="cancel-btn btn-lg btn-big col" variant="outlined"
                   onClick={() => { setTimeout(() => { context.setisHeaderFooterShow(true); }, 0); }}>

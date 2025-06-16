@@ -12,9 +12,9 @@ const OtpVerify = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(30);
   const [resending, setResending] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const email = localStorage.getItem("pendingEmail");
   const userData = localStorage.getItem("pendingUserData");

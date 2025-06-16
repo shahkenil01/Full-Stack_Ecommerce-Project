@@ -13,6 +13,7 @@ const SignIn = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,6 +31,8 @@ const SignIn = () => {
       enqueueSnackbar(`Please fill: ${missing.join(", ")}`, { variant: "error" });
       return;
     }
+
+    setLoading(true);
 
     try {
       const data = await postData("/api/user/signin", { email, password });
@@ -50,6 +53,8 @@ const SignIn = () => {
       navigate("/", { replace: true });
     } catch (err) {
       enqueueSnackbar(err.message, { variant: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,16 +79,18 @@ const SignIn = () => {
           <form className="mt-3" onSubmit={handleLogin}>
             <h2 className="mb-4">Sign In</h2>
             <div className="form-group">
-              <TextField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} variant="standard" className="w-100" />
+              <TextField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} variant="standard" className="w-100" autoComplete="off"/>
             </div>
             <div className="form-group">
-              <TextField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} variant="standard" className="w-100" />
+              <TextField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} variant="standard" className="w-100" autoComplete="off"/>
             </div>
 
             <a href="/" className="border-effect cursor txt">Forgot Password?</a>
 
             <div className="d-flex align-items-center mt-3 mb-3">
-              <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue">Sign In</Button>
+              <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue" disabled={loading} style={{ height: "45px"}}>
+                {loading ? <span className="dot-loader"></span> : "Sign In"}
+              </Button>
               <Link to="/"><Button className="cancel-btn btn-lg btn-big col ml-3" variant="outlined" onClick={() => { setTimeout(() => { context.setisHeaderFooterShow(true); }, 0); }}>Cancel</Button></Link>
             </div>
 

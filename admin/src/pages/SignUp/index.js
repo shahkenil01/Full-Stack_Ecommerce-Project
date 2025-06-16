@@ -186,7 +186,7 @@ const SignUp = () => {
                   </div>
 
                   <div className="form-group">
-                    <Button type="submit" className="btn-blue btn-lg btn-big w-100" disabled={loading} >
+                    <Button type="submit" className="btn-blue btn-lg btn-big w-100" disabled={loading} style={{ height: "45px"}}>
                       {loading ? ( <span className="dot-loader"></span> ) : ( 'Sign Up' )}
                     </Button>
                   </div>

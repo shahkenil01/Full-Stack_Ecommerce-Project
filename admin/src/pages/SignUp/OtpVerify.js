@@ -126,7 +126,7 @@ const VerifyAccount = () => {
               <OtpBox length={6} onChange={handleOtpChange} />
 
               <div className="form-group mt-3 row">
-                <Button type="submit" className="btn-blue btn-lg w-100 btn-big">
+                <Button type="submit" className="btn-blue btn-lg w-100 btn-big" style={{ height: "45px"}}>
                   {loading ? <span className="dot-loader"></span> : "Verify OTP"}
                 </Button>
               </div>

@@ -139,7 +139,7 @@ const OtpVerify = () => {
             <p className="text-center text-light">OTP sent to <br /><b>{email}</b></p>
             <OtpInput onChange={setOtp} length={6} />
             <div className="d-flex align-items-center mt-3 mb-3">
-              <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue" disabled={loading}>
+              <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue" disabled={loading} style={{ height: "45px"}}>
                 {loading ? <span className="dot-loader"></span> : "Verify OTP"}
               </Button>
             </div>

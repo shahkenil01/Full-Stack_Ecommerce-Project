@@ -15,13 +15,12 @@ const Login = ()=>{
   const [inputIndex, setInputIndex] = useState(null);
   const [isShowPassword, setIsShowPassword] = useState(false);
 
-  const focusInput=(index)=>{
-    setInputIndex(index);
-  }
+  const focusInput=(index)=>{ setInputIndex(index); }
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const context = useContext(MyContext);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -39,6 +38,8 @@ const Login = ()=>{
       enqueueSnackbar(`Please fill: ${missing.join(', ')}`, { variant: 'error' });
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signin`, {
@@ -58,6 +59,8 @@ const Login = ()=>{
       navigate("/", { replace: true });
     } catch (err) {
       enqueueSnackbar(err.message, { variant: 'error' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,7 +106,9 @@ const Login = ()=>{
               </div>
 
               <div className='form-group'>
-                <Button className="btn-blue btn-lg btn-big w-100" type="submit">Sign In</Button>
+                <Button className="btn-blue btn-lg btn-big w-100" type="submit" disabled={loading} style={{ height: "45px"}}>
+                  {loading ? <span className="dot-loader"></span> : "Sign In"}
+                </Button>
               </div>
 
               <div className='form-group text-center mb-0'>

@@ -143,15 +143,15 @@ const OtpVerify = () => {
                 {loading ? <span className="dot-loader"></span> : "Verify OTP"}
               </Button>
             </div>
-          <div className="text-center">
-            {timer > 0 ? (
-              <span className="text-muted">Resend OTP in {timer}s</span>
-            ) : (
-              <Link variant="text" onClick={resendOtp} className="border-effect">
-                Resend OTP
-              </Link>
-            )}
-          </div>
+            <div className="text-center">
+              {timer > 0 ? (
+                <span className="text-muted">Resend OTP in {timer}s</span>
+              ) : (
+                <Link variant="text" onClick={resendOtp} className="border-effect">
+                  Resend OTP
+                </Link>
+              )}
+            </div>
           </form>
         </div>
       </div>

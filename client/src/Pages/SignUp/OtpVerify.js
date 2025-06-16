@@ -19,42 +19,36 @@ const OtpVerify = () => {
 
   useEffect(() => {
     context.setisHeaderFooterShow(false);
-    if (!email || !userData) navigate("/signUp", { replace: true });
+    const email = localStorage.getItem("pendingEmail");
+    const userData = localStorage.getItem("pendingUserData");
+
+    const isVerified = localStorage.getItem("userToken");
+
+    if ((!email || !userData) && !isVerified) {
+      navigate("/signup", { replace: true });
+    }
     return () => context.setisHeaderFooterShow(true);
-  }, [context, email, userData, navigate]);
+  }, [context]);
 
   const handleVerify = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Verify OTP
       const verifyRes = await fetch("http://localhost:4000/api/user/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
       });
+
       const verifyData = await verifyRes.json();
       if (!verifyRes.ok) throw new Error(verifyData.msg || "OTP Verification Failed");
 
       enqueueSnackbar("OTP verified successfully!", { variant: "success" });
 
-      // Parse user data from localStorage
       const parsedUser = JSON.parse(userData || '{}');
-      const missing = [];
+      parsedUser.role = "client";
 
-      if (!parsedUser.name) missing.push("name");
-      if (!parsedUser.email) missing.push("email");
-      if (!parsedUser.phone) missing.push("phone");
-      if (!parsedUser.password) missing.push("password");
-
-      if (missing.length > 0) {
-        enqueueSnackbar(`Please fill: ${missing.join(", ")}`, { variant: "error" });
-        navigate("/signUp", { replace: true });
-        return;
-      }
-
-      // Signup user
       const signupRes = await fetch("http://localhost:4000/api/user/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,13 +59,16 @@ const OtpVerify = () => {
 
       enqueueSnackbar("Account created!", { variant: "success" });
 
-      // Set logged-in state
       localStorage.setItem("userToken", signupData.token);
-      localStorage.setItem("userInfo", JSON.stringify(signupData.user));
+      localStorage.setItem("userInfo", JSON.stringify({
+        name: signupData.user.name,
+        email: signupData.user.email,
+        phone: signupData.user.phone
+      }));
+
       context.setIsLogin(true);
       context.setUser(signupData.user);
 
-      // Clean up
       localStorage.removeItem("pendingEmail");
       localStorage.removeItem("pendingUserData");
 
@@ -88,7 +85,7 @@ const OtpVerify = () => {
     <section className="section signInPage otpPage">
       <div className="shape-bottom">
         <svg fill="#fff" viewBox="0 0 1921 819.8">
-          <path className="st0" d="M1921,413.1v406.7H0V0.5h0.4l228.1..."></path>
+          <path className="st0" d="M1921,413.1v406.7H0V0.5h0.4l228.1,598.3c30,74.4,80.8,130.6,152.5,168.6c107.6,57,212.1,40.7,245.7,34.4 c22.4-4.2,54.9-13.1,97.5-26.6L1921,400.5V413.1z"></path>
         </svg>
       </div>
       <div className="container">

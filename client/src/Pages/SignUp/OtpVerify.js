@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../App";
 import OtpInput from "../../Components/OtpBox";
 import Button from '@mui/material/Button';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import images from '../../assets/images';
 
@@ -13,6 +13,8 @@ const OtpVerify = () => {
 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [resending, setResending] = useState(false);
 
   const email = localStorage.getItem("pendingEmail");
   const userData = localStorage.getItem("pendingUserData");
@@ -29,6 +31,22 @@ const OtpVerify = () => {
     }
     return () => context.setisHeaderFooterShow(true);
   }, [context]);
+
+  useEffect(() => {
+    if (timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const handleVerify = async (e) => {
     e.preventDefault();
@@ -81,6 +99,29 @@ const OtpVerify = () => {
     }
   };
 
+  const resendOtp = async () => {
+    try {
+      setResending(true);
+      setTimer(30);
+
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Failed to resend OTP");
+
+      enqueueSnackbar("OTP resent to your email!", { variant: "success" });
+
+    } catch (err) {
+      enqueueSnackbar(err.message, { variant: "error" });
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <section className="section signInPage otpPage">
       <div className="shape-bottom">
@@ -102,6 +143,15 @@ const OtpVerify = () => {
                 {loading ? <span className="dot-loader"></span> : "Verify OTP"}
               </Button>
             </div>
+          <div className="text-center">
+            {timer > 0 ? (
+              <span className="text-muted">Resend OTP in {timer}s</span>
+            ) : (
+              <Link variant="text" onClick={resendOtp} className="border-effect">
+                Resend OTP
+              </Link>
+            )}
+          </div>
           </form>
         </div>
       </div>

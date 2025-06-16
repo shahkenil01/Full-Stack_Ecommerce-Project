@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import images from '../../assets/images.js';
+import { postData } from "../../utils/api";
 
 const SignIn = () => {
   const context = useContext(MyContext);
@@ -31,14 +32,8 @@ const SignIn = () => {
     }
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Login failed");
+      const data = await postData("/api/user/signin", { email, password });
+      if (!data?.token) throw new Error(data.message || "Login failed");
 
       enqueueSnackbar("Login successful!", { variant: "success" });
 

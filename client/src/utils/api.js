@@ -1,12 +1,32 @@
 import axios from "axios";
+import { enqueueSnackbar } from "notistack";
 
-const BASE_URL = process.env.NODE_ENV === "development"
-    ? process.env.REACT_APP_BACKEND_URL
-    : "https://full-stack-ecommerce-project-u0om.onrender.com";// https://full-stack-ecommerce-project-u0om.onrender.com, full-stack-best-production.up.railway.app, https://savory-jumpy-gym.glitch.me
+const BASE_URL = process.env.REACT_APP_BACKEND_URL ||
+  (window.location.hostname === "localhost"
+    ? "http://localhost:4000"
+    : "https://full-stack-ecommerce-project-u0om.onrender.com"); // https://full-stack-ecommerce-project-u0om.onrender.com, full-stackecommerce-project-production.up.railway.app, https://savory-jumpy-gym.glitch.me
+
+const axiosInstance = axios.create({ baseURL: BASE_URL });
+
+axiosInstance.interceptors.response.use(
+  res => res,
+  err => {
+    const msg = err?.response?.data?.msg || err?.response?.data?.message || "Something went wrong";
+    enqueueSnackbar(msg, { variant: "error" });
+
+    if (err?.response?.status === 401) {
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userInfo");
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(err);
+  }
+);
 
 export const fetchDataFromApi = async (url) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}${url}`);
+    const { data } = await axios.get(url);
     return data;
   } catch (error) {
     console.error("GET error:", error);
@@ -14,28 +34,28 @@ export const fetchDataFromApi = async (url) => {
   }
 };
 
-export const postData = async (url, formData) => {
+export const postData = async (url, formData, token) => {
   try {
-    const { data } = await axios.post(`${BASE_URL}${url}`, formData);
+    const { data } = await axiosInstance.post(url, formData, token ? {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    } : {});
     return data;
-  } catch (error) {
-    console.error("POST error:", error);
-    return {
-      success: false,
-      message: error?.response?.data?.message || "Something went wrong",
-    };
+  } catch {
+    return { success: false };
   }
 };
 
-export const putData = async (url, formData) => {
+export const putData = async (url, formData, token) => {
   try {
-    const { data } = await axios.put(`${BASE_URL}${url}`, formData);
+    const { data } = await axiosInstance.put(url, formData, token ? {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    } : {});
     return data;
-  } catch (error) {
-    console.error("PUT error:", error);
-    return {
-      success: false,
-      message: error?.response?.data?.message || "Something went wrong",
-    };
+  } catch {
+    return { success: false };
   }
 };

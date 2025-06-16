@@ -47,7 +47,7 @@ const VerifyAccount = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/api/user/verify-otp", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -61,7 +61,7 @@ const VerifyAccount = () => {
       const userData = JSON.parse(localStorage.getItem("pendingUserData"));
       if (!userData) throw new Error("Missing user data for signup");
 
-      const signupRes = await fetch("http://localhost:4000/api/user/signup", {
+      const signupRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -93,7 +93,7 @@ const VerifyAccount = () => {
     try {
       setResending(true);
       setTimer(30);
-      const res = await fetch("http://localhost:4000/api/user/request-otp", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

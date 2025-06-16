@@ -53,7 +53,7 @@ const OtpVerify = () => {
     setLoading(true);
 
     try {
-      const verifyRes = await fetch("http://localhost:4000/api/user/verify-otp", {
+      const verifyRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -67,7 +67,7 @@ const OtpVerify = () => {
       const parsedUser = JSON.parse(userData || '{}');
       parsedUser.role = "client";
 
-      const signupRes = await fetch("http://localhost:4000/api/user/signup", {
+      const signupRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsedUser),

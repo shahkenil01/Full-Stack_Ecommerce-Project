@@ -1,13 +1,15 @@
-import ProductZoom from "../../Components/ProductZoom"
-import Rating from '@mui/material/Rating';
-import QuantityBox from "../../Components/QuantityBox";
-import { Button } from "@mui/material";
-import { BsCartFill } from "react-icons/bs";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { FaRegHeart } from "react-icons/fa";
+import { Button } from "@mui/material";
+import Rating from '@mui/material/Rating';
 import Tooltip from '@mui/material/Tooltip';
+import { BsCartFill } from "react-icons/bs";
+import { FaRegHeart } from "react-icons/fa";
+import { useSnackbar } from "notistack";
 import RelatedProducts from "./RelatedProducts";
+import { MyContext } from "../../App";
+import QuantityBox from "../../Components/QuantityBox";
+import ProductZoom from "../../Components/ProductZoom"
 import { fetchDataFromApi } from "../../utils/api";
 
 const ProductDetails = () =>{
@@ -22,6 +24,9 @@ const ProductDetails = () =>{
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { addToCart } = useContext(MyContext);
+    const [adding, setAdding] = useState(false);
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         fetchDataFromApi(`/api/products/${id}`).then(res => {
@@ -29,6 +34,16 @@ const ProductDetails = () =>{
             setLoading(false);
         });
     }, [id]);
+
+    const handleAddToCart = () => {
+    setAdding(true);
+
+    setTimeout(() => {
+        addToCart(product, 1);
+        setAdding(false);
+        enqueueSnackbar("Item is added in the cart", { variant: "success" });
+        }, 500);
+    };
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -110,7 +125,9 @@ const ProductDetails = () =>{
                             )}
                             <div className="d-flex align-items-center mt-4">
                                 <QuantityBox/>
-                                <Button className='btn-blue btn-lg btn-big btn-round bg-red ml-1'><BsCartFill/>&nbsp;Add to Cart</Button>
+                                <Button className='btn-blue btn-lg btn-big btn-round bg-red ml-1' onClick={handleAddToCart}>
+                                    <BsCartFill/>&nbsp;{adding ? "Adding..." : "Add to Cart"}
+                                </Button>
                                 <Tooltip title="Add to Wishlist" placement="top"><Button className='btn-blue btn-lg btn-big btn-circle ml-4'><FaRegHeart/></Button></Tooltip>
                             </div>
                         </div>

@@ -1,18 +1,29 @@
-import Rating from '@mui/material/Rating';
+import { useContext } from "react";
 import { Link } from 'react-router-dom';
-import QuantityBox from '../../Components/QuantityBox';
 import { IoIosClose } from 'react-icons/io';
-import Button from '@mui/material/Button';
 import { IoBagCheckOutline } from "react-icons/io5";
+import Button from '@mui/material/Button';
+import Rating from '@mui/material/Rating';
+import { MyContext } from "../../App";
+import QuantityBox from '../../Components/QuantityBox';
 
 const Cart = () => {
+  const { cartItems, removeFromCart } = useContext(MyContext);
+
+  const truncateText = (text, limit = 30) => {
+    if (!text) return "";
+    return text.length > limit ? text.slice(0, limit) + "..." : text;
+  };
+
+  const getTotal = () =>
+    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   return (
     <>
       <section className="section cartPage">
         <div className="container">
           <h2 className="hd mb-1">Your Cart</h2>
           <p>
-            There are <b className="text-red">3</b> products in your cart
+            There are <b className="text-red">{cartItems.length}</b> products in your cart
           </p>
           <div className="row">
             <div className="col-md-9 pr-5">
@@ -28,111 +39,32 @@ const Cart = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                    {cartItems.map((item) => (
+                    <tr key={item._id}>
                       <td width="35%">
-                        <Link to="/product/1">
+                        <Link to={`/product/${item._id}`}>
                           <div className="d-flex align-items-center cartItemimgWrapper">
                             <div className="imgWrapper">
-                              <img
-                                src="https://wp.alithemes.com/html/nest/demo/assets/imgs/shop/product-1-1.jpg"
-                                className="w-100"
-                              />
+                              <img src={item.images?.[0]} className="w-100" />
                             </div>
 
                             <div className="info px-3">
-                              <h6>Field Roast Chao Cheese Creamy Original</h6>
-                              <Rating
-                                name="read-only"
-                                value={4.5}
-                                readOnly
-                                precision={0.5}
-                                size="small"
-                              />
+                              <h6>{truncateText(item.name)}</h6>
+                              <Rating name="read-only" value={item.rating || 0} readOnly size="small" />
                             </div>
                           </div>
                         </Link>
                       </td>
-                      <td width="20%">Rs 500</td>
-                      <td width="20%">
-                        <QuantityBox />
-                      </td>
-                      <td width="15%">Rs 500</td>
+                      <td width="20%">Rs {item.price}</td>
+                      <td width="20%"> <QuantityBox item={item}/> </td>
+                      <td width="15%">Rs {item.price * item.quantity}</td>
                       <td width="10%">
-                        <span className="remove">
+                        <span className="remove" onClick={() => removeFromCart(item._id)}>
                           <IoIosClose />
                         </span>
                       </td>
                     </tr>
-                    <tr>
-                      <td width="35%">
-                        <Link to="/product/1">
-                          <div className="d-flex align-items-center cartItemimgWrapper">
-                            <div className="imgWrapper">
-                              <img
-                                src="https://wp.alithemes.com/html/nest/demo/assets/imgs/shop/product-1-1.jpg"
-                                className="w-100"
-                              />
-                            </div>
-
-                            <div className="info px-3">
-                              <h6>Field Roast Chao Cheese Creamy Original</h6>
-                              <Rating
-                                name="read-only"
-                                value={4.5}
-                                readOnly
-                                precision={0.5}
-                                size="small"
-                              />
-                            </div>
-                          </div>
-                        </Link>
-                      </td>
-                      <td width="20%">Rs 500</td>
-                      <td width="20%">
-                        <QuantityBox />
-                      </td>
-                      <td width="15%">Rs 500</td>
-                      <td width="10%">
-                        <span className="remove">
-                          <IoIosClose />
-                        </span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td width="35%">
-                        <Link to="/product/1">
-                          <div className="d-flex align-items-center cartItemimgWrapper">
-                            <div className="imgWrapper">
-                              <img
-                                src="https://wp.alithemes.com/html/nest/demo/assets/imgs/shop/product-1-1.jpg"
-                                className="w-100"
-                              />
-                            </div>
-
-                            <div className="info px-3">
-                              <h6>Field Roast Chao Cheese Creamy Original</h6>
-                              <Rating
-                                name="read-only"
-                                value={4.5}
-                                readOnly
-                                precision={0.5}
-                                size="small"
-                              />
-                            </div>
-                          </div>
-                        </Link>
-                      </td>
-                      <td width="20%">Rs 500</td>
-                      <td width="20%">
-                        <QuantityBox />
-                      </td>
-                      <td width="15%">Rs 500</td>
-                      <td width="10%">
-                        <span className="remove">
-                          <IoIosClose />
-                        </span>
-                      </td>
-                    </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -144,7 +76,7 @@ const Cart = () => {
 
                 <div className='d-flex align-items-center mb-3'>
                   <span>Subtotal</span>
-                  <span className="ml-auto text-red font-weight-bold">₹1500.00</span>
+                  <span className="ml-auto text-red font-weight-bold">₹{getTotal()}</span>
                 </div>
                 <div className='d-flex align-items-center mb-3'>
                   <span>Shipping</span>
@@ -156,9 +88,9 @@ const Cart = () => {
                 </div>
                 <div className='d-flex align-items-center mb-4'>
                   <span>Total</span>
-                  <span className="ml-auto text-red font-weight-bold">₹1500.00</span>
+                  <span className="ml-auto text-red font-weight-bold">₹{getTotal()}</span>
                 </div>
-                <Button className='btn-blue btn-lg btn-big bg-red'><IoBagCheckOutline/>&nbsp;Checkout</Button>
+                <Button className='btn-blue btn-lg btn-big bg-red'><IoBagCheckOutline/>&nbsp; Checkout</Button>
 
               </div>
             </div>

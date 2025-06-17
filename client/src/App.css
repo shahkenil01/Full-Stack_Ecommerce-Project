@@ -993,8 +993,8 @@ footer .copyright p{
   text-transform: capitalize !important;
   font-weight: 600 !important;
   padding: 5px 25px !important;}
-  .btn-blue svg {
-    font-size: 18px;}
+.btn-blue svg {
+  font-size: 22px;}
 .btn-blue:hover{
   background: #53348c !important;}
 .btn-big{
@@ -1327,14 +1327,16 @@ a:hover{
   text-decoration: none;}
 
 .cartItemimgWrapper{
-  width: 384px;}
+  width: 280px;}
 .cartItemimgWrapper .imgWrapper{
-  height: 75px;
+  height: 80px;
   overflow: hidden;
   width: 20%;
   user-select: none;}
 .cartItemimgWrapper .info a:hover{
   text-decoration: none;}
+.cartItemimgWrapper .info {
+  width: 80%;}
 .cartItemimgWrapper .info h6{
   color: #343434;
   font-weight: bold;}
@@ -1357,6 +1359,10 @@ a:hover{
   border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;}
 .cartPage table tbody tr:hover{
   background: #fafafa;}
+.cartPage .col-md-3{
+  margin-left: 0px;}
+.cartPage ,.btn-big{
+  padding: 8px 10px !important;}
 
 .cartDetails{
   border-radius: 7px !important;

@@ -26,6 +26,7 @@ function App() {
   const [isHeaderFooterShow, setisHeaderFooterShow] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     getCountry('https://countriesnow.space/api/v0.1/countries/');
@@ -45,6 +46,25 @@ function App() {
     }
   }, []);
 
+  const addToCart = (product, quantity = 1) => {
+    setCartItems((prev) => {
+      const existing = prev.find(item => item._id === product._id);
+      if (existing) {
+        return prev.map(item =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      } else {
+        return [...prev, { ...product, quantity }];
+      }
+    });
+  };
+
+  const removeFromCart = (id) => {
+    setCartItems(prev => prev.filter(item => item._id !== id));
+  };
+
   const values = {
     countryList,
     setselectedCountry,
@@ -59,6 +79,9 @@ function App() {
     setIsLogin,
     user,
     setUser,
+    cartItems,
+    addToCart,
+    removeFromCart,
   };
 
   return (

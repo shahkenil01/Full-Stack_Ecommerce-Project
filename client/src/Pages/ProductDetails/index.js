@@ -35,14 +35,44 @@ const ProductDetails = () =>{
         });
     }, [id]);
 
-    const handleAddToCart = () => {
-    setAdding(true);
+    const handleAddToCart = async () => {
+        setAdding(true);
 
-    setTimeout(() => {
-        addToCart(product, 1);
-        setAdding(false);
-        enqueueSnackbar("Item is added in the cart", { variant: "success" });
-        }, 500);
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        const userEmail = userInfo?.email;
+
+        const cartData = {
+            productTitle: product.name,
+            image: product.images?.[0] || '',
+            rating: product.rating || "0",
+            price: product.price,
+            quantity: 1,
+            subTotal: product.price * 1,
+            productId: product._id,
+            userEmail: userEmail,
+        };
+
+        try {
+            const response = await fetch("http://localhost:4000/api/cart/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(cartData),
+        });
+
+        const savedItem = await response.json();
+
+        if (!response.ok) {
+            throw new Error(savedItem.error || "Failed to save in DB");
+        }
+
+        addToCart({ ...product, quantity: 1, _id: savedItem._id });
+
+        enqueueSnackbar("✅ Item added to cart", { variant: "success" });
+        } catch (error) {
+            enqueueSnackbar("❌ DB error: " + error.message, { variant: "error" });
+        } finally {
+            setAdding(false);
+        } 
     };
 
     useEffect(() => {
@@ -332,7 +362,5 @@ const ProductDetails = () =>{
         </>
     )
 }
-
-
 
 export default ProductDetails

@@ -17,6 +17,25 @@ const Cart = () => {
 
   const getTotal = () =>
     cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  const removeFromCartAndDB = async (item) => {
+    removeFromCart(item._id);
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/cart/${item._id}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to delete from DB");
+      }
+    } catch (err) {
+      console.error("❌ Failed to delete from DB:", err.message);
+    }
+  };
+
   return (
     <>
       <section className="section cartPage">
@@ -59,7 +78,7 @@ const Cart = () => {
                       <td width="20%"> <QuantityBox item={item}/> </td>
                       <td width="15%">Rs {item.price * item.quantity}</td>
                       <td width="10%">
-                        <span className="remove" onClick={() => removeFromCart(item._id)}>
+                        <span className="remove" onClick={() => removeFromCartAndDB(item)}>
                           <IoIosClose />
                         </span>
                       </td>

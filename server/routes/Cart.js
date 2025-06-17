@@ -1,9 +1,8 @@
 const Cart = require('../models/Cart');
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/auth');
 
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
 
   try{
     const cartList = await Cart.find(req.query);
@@ -19,45 +18,40 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/add', verifyToken, async (req, res) => {
-  let cartList = new Cart({
-    productTitle: req.body.productTitle,
-    image: req.body.image,
-    rating: req.body.rating,
-    price: req.body.price,
-    quantity: req.body.quantity,
-    subTotal: req.body.subTotal,
-    productId: req.body.productId,
-    userId: req.body.userId,
-  });
-
-  if (!cartList) {
-    return res.status(500).json({
-      error: err,
-      success: false
-    });
-  }
-
-  cartList = await cartList.save();
-
-  res.status(201).json(cartList);
-});
-
-router.delete('/:id', verifyToken, async (req, res) => {
+router.post('/add', async (req, res) => {
   try {
-    const cartItem = await Cart.findById(req.params.id);
+    const { productTitle, image, rating, price, quantity, subTotal, productId, userEmail } = req.body;
 
-    if (!cartItem) {
-      res.status(404).json({
-        message: 'The cart item given id is not found!',
-        success: false
-      });
+    if (!userEmail) {
+      return res.status(400).json({ success: false, error: "User email required" });
     }
 
+    const newCartItem = new Cart({
+      productTitle,
+      image,
+      rating: String(rating),
+      price: String(price),
+      quantity,
+      subTotal,
+      productId,
+      userEmail,
+    });
+
+    const saved = await newCartItem.save();
+    res.status(201).json(saved);
+
+  } catch (err) {
+    console.error("Cart DB Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
     const deletedItem = await Cart.findByIdAndDelete(req.params.id);
 
     if (!deletedItem) {
-      res.status(404).json({
+      return res.status(404).json({
         message: 'Cart item not found!',
         success: false
       });
@@ -65,7 +59,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Category Item deleted!'
+      message: 'Cart item deleted!'
     });
   } catch (error) {
     return res.status(500).json({
@@ -75,7 +69,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
-router.put('/:id', verifyToken, async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const cartList = await Cart.findByIdAndUpdate(
       req.params.id, {

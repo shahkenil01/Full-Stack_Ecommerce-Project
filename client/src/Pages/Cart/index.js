@@ -32,7 +32,7 @@ const Cart = () => {
         throw new Error(result.message || "Failed to delete from DB");
       }
     } catch (err) {
-      console.error("❌ Failed to delete from DB:", err.message);
+      console.error("Failed to delete from DB:", err.message);
     }
   };
 
@@ -61,14 +61,14 @@ const Cart = () => {
                     {cartItems.map((item) => (
                     <tr key={item._id}>
                       <td width="35%">
-                        <Link to={`/product/${item._id}`}>
+                        <Link to={`/product/${item.productId}`}>
                           <div className="d-flex align-items-center cartItemimgWrapper">
                             <div className="imgWrapper">
-                              <img src={item.images?.[0]} className="w-100" />
+                              <img src={item.images?.[0] || item.image} className="w-100" />
                             </div>
 
                             <div className="info px-3">
-                              <h6>{truncateText(item.name)}</h6>
+                              <h6>{truncateText(item.name || item.productTitle)}</h6>
                               <Rating name="read-only" value={item.rating || 0} readOnly size="small" />
                             </div>
                           </div>

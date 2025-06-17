@@ -67,9 +67,9 @@ const ProductDetails = () =>{
 
         addToCart({ ...product, quantity: 1, _id: savedItem._id });
 
-        enqueueSnackbar("✅ Item added to cart", { variant: "success" });
+        enqueueSnackbar("Item added to cart", { variant: "success" });
         } catch (error) {
-            enqueueSnackbar("❌ DB error: " + error.message, { variant: "error" });
+            enqueueSnackbar("DB error: " + error.message, { variant: "error" });
         } finally {
             setAdding(false);
         } 

@@ -7,8 +7,8 @@ const SnackbarCloseButton = ({ snackbarKey }) => {
   const { closeSnackbar } = useSnackbar();
 
   return (
-    <IconButton onClick={() => closeSnackbar(snackbarKey)} color="inherit">
-      <CloseIcon />
+    <IconButton className='closeicon' onClick={() => closeSnackbar(snackbarKey)} color="inherit">
+      <CloseIcon className='closeicon'/>
     </IconButton>
   );
 };

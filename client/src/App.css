@@ -1499,3 +1499,11 @@ a:hover{
 @keyframes spin {
   to {
     transform: rotate(360deg); }}
+
+.go3963613292, .go1888806478 {
+  min-width: auto !important;}
+.go703367398{
+  padding-left: 10px !important;}
+.closeicon {
+  padding: 1px !important;
+  font-size: 20px !important;}

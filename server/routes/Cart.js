@@ -43,7 +43,7 @@ router.post('/add', verifyToken, async (req, res) => {
   res.status(201).json(cartList);
 });
 
-router.delete('/remove', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const cartItem = await Cart.findById(req.params.id);
 
@@ -54,20 +54,18 @@ router.delete('/remove', verifyToken, async (req, res) => {
       });
     }
 
-    if (category.images && category.images.length > 0) {
-      for (const url of category.images) {
-        const parts = url.split('/');
-        const publicIdWithExtension = parts[parts.length - 1];
-        const publicId = publicIdWithExtension.split('.')[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-    }
+    const deletedItem = await Cart.findByIdAndDelete(req.params.id);
 
-    await Category.findByIdAndDelete(req.params.id);
+    if (!deletedItem) {
+      res.status(404).json({
+        message: 'Cart item not found!',
+        success: false
+      });
+    }
 
     return res.status(200).json({
       success: true,
-      message: 'Category and its images deleted!'
+      message: 'Category Item deleted!'
     });
   } catch (error) {
     return res.status(500).json({
@@ -77,17 +75,32 @@ router.delete('/remove', verifyToken, async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const cartList = await Cart.findByIdAndUpdate(
+      req.params.id, {
+        productTitle: req.body.productTitle,
+        image: req.body.image,
+        rating: req.body.rating,
+        price: req.body.price,
+        quantity: req.body.quantity,
+        subTotal: req.body.subTotal,
+        productId: req.body.productId,
+        userId: req.body.userId,
+      }, { new: true }
+    )
 
-    if (!category) {
-      return res.status(404).json({ message: 'The category with the given ID was not found.' });
+    if (!cartList) {
+      return res.status(500).json({
+        message: 'Cart item cannot be updated!',
+        success: false
+      });
     }
 
-    return res.status(200).send(category);
+    res.send(cartList);
+    
   } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error: error.message });
+    return res.status(500).json({ success: false, message: error.message || "Something went wrong" });
   }
 });
 

@@ -26,11 +26,13 @@ const cartSchema = new mongoose.Schema({
     required: true
   },
   productId: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
     required: true
   },
   userId: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   }
 });

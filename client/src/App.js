@@ -26,7 +26,10 @@ function App() {
   const [isHeaderFooterShow, setisHeaderFooterShow] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    const stored = localStorage.getItem("cartItems");
+    return stored ? JSON.parse(stored) : [];
+  });
 
   useEffect(() => {
     getCountry('https://countriesnow.space/api/v0.1/countries/');
@@ -40,29 +43,42 @@ function App() {
 
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
+    const storedCart = localStorage.getItem("cartItems");
     if (userInfo) {
       setUser(JSON.parse(userInfo));
       setIsLogin(true);
+      
+        if (storedCart) {
+        try {
+          const parsed = JSON.parse(storedCart);
+          if (Array.isArray(parsed)) {
+            setCartItems(parsed);
+          }
+        } catch (err) {
+          console.error("Failed to parse stored cart:", err);
+        }
+      }
     }
   }, []);
 
   const addToCart = (product, quantity = 1) => {
-    setCartItems((prev) => {
-      const existing = prev.find(item => item._id === product._id);
-      if (existing) {
-        return prev.map(item =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find(item => item._id === product._id);
+      if (existingItem) {
+        return prevItems.map(item =>
+          item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item
         );
       } else {
-        return [...prev, { ...product, quantity }];
+        return [...prevItems, { ...product, quantity }];
       }
     });
   };
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
-  const removeFromCart = (id) => {
-    setCartItems(prev => prev.filter(item => item._id !== id));
+  const removeFromCart = (productId) => {
+    setCartItems(prev => prev.filter(item => item._id !== productId));
   };
 
   const values = {
@@ -80,6 +96,7 @@ function App() {
     user,
     setUser,
     cartItems,
+    setCartItems,
     addToCart,
     removeFromCart,
   };

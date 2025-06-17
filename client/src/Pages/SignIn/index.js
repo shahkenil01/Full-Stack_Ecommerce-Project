@@ -50,6 +50,11 @@ const SignIn = () => {
       context.setUser(data.user);
       context.setIsLogin(true);
 
+      if (data.cart && Array.isArray(data.cart)) {
+        localStorage.setItem("cartItems", JSON.stringify(data.cart));
+        context.setCartItems(data.cart);
+      }
+
       navigate("/", { replace: true });
     } catch (err) {
       enqueueSnackbar(err.message, { variant: "error" });

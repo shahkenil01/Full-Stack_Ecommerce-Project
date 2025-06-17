@@ -26,9 +26,11 @@ const UserMenu = () => {
   const handleLogout = () => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userInfo');
-    context.setIsLogin(false);
+    localStorage.removeItem(`cartItems_${user.email}`);
     context.setUser(null);
-    navigate('/');
+    context.setIsLogin(false);
+    context.setCartItems([]);
+    navigate('/signIn');
   };
 
   const user = context.user || JSON.parse(localStorage.getItem('userInfo')) || {};

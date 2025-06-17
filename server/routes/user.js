@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Cart = require('../models/Cart');
 const verifyToken = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 const sendOTPEmail = require('../utils/sendOTP');
@@ -95,10 +96,13 @@ router.post('/signin', async (req, res) => {
       return res.status(400).json({ msg: "Incorrect password" });
     }
 
+    const userCart = await Cart.find({ userId: existingUser._id });
+
     const token = jwt.sign({ email:existingUser.email, id: existingUser._id, role: existingUser.role }, process.env.JSON_WEB_TOKEN_SECRECT_KEY, { expiresIn: '1h' });
 
     res.status(200).json({
       user:existingUser,
+      cart: userCart,
       token:token,
       msg:"user Authenticated"
     })

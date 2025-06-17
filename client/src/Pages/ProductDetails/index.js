@@ -26,6 +26,7 @@ const ProductDetails = () =>{
     const [loading, setLoading] = useState(true);
     const { addToCart } = useContext(MyContext);
     const [adding, setAdding] = useState(false);
+    const [buttonLabel, setButtonLabel] = useState("Add to Cart");
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
@@ -36,6 +37,7 @@ const ProductDetails = () =>{
     }, [id]);
 
     const handleAddToCart = async () => {
+        setButtonLabel("Adding...");
         setAdding(true);
 
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -65,13 +67,13 @@ const ProductDetails = () =>{
             throw new Error(savedItem.error || "Failed to save in DB");
         }
 
-        addToCart({ ...product, quantity: 1, _id: savedItem._id });
-
-        enqueueSnackbar("Item added to cart", { variant: "success" });
+          addToCart({ ...product, quantity: 1, _id: savedItem._id });
+          enqueueSnackbar("Item added to cart", { variant: "success" });
         } catch (error) {
-            enqueueSnackbar("DB error: " + error.message, { variant: "error" });
+          enqueueSnackbar("DB error: " + error.message, { variant: "error" });
         } finally {
-            setAdding(false);
+          setButtonLabel("Add to Cart");
+          setAdding(false);
         } 
     };
 
@@ -156,7 +158,7 @@ const ProductDetails = () =>{
                             <div className="d-flex align-items-center mt-4">
                                 <QuantityBox/>
                                 <Button className='btn-blue btn-lg btn-big btn-round bg-red ml-1' onClick={handleAddToCart}>
-                                    <BsCartFill/>&nbsp;{adding ? "Adding..." : "Add to Cart"}
+                                    <BsCartFill/>&nbsp;{buttonLabel}
                                 </Button>
                                 <Tooltip title="Add to Wishlist" placement="top"><Button className='btn-blue btn-lg btn-big btn-circle ml-4'><FaRegHeart/></Button></Tooltip>
                             </div>

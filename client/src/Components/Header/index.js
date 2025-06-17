@@ -13,6 +13,13 @@ import UserMenu from '../Header/UserMenu';
 const Header= ()=>{
 
     const context = useContext(MyContext);
+    const getTotalPrice = () => {
+        return context.cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    };
+
+    const getTotalCount = () => {
+        return context.cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    };
 
     return(
         <>
@@ -44,10 +51,10 @@ const Header= ()=>{
                                         <UserMenu/>
                                     }
                                     <div className='ml-auto cartTab d-flex align-items-center'>
-                                        {context.isLogin && <span className='price'>₹0.00</span>}
+                                        {context.isLogin && ( <span className='price'> ₹{getTotalPrice().toFixed(2)} </span> )}
                                         <div className='position-relative ml-2'>
                                             <Link to="/Cart"><Button className='cart'><IoBagOutline/></Button></Link>
-                                            <span className='count d-flex align-items-center justify-content-center'>0</span>
+                                            <span className='count d-flex align-items-center justify-content-center'>{getTotalCount()}</span>
                                         </div>
                                     </div>
                                 </div>

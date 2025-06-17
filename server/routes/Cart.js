@@ -98,7 +98,6 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 
     res.send(cartList);
-    
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message || "Something went wrong" });
   }

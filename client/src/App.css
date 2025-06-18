@@ -1222,6 +1222,8 @@ footer .copyright p{
 .productSize ul li a.active{
   background: #6d4aae !important;
   color: #fff !important;}
+.productSize ul.error li a {
+  border: 1px solid red !important;}
 /*product_Details_Page-Revew Sectiom Start*/
 .detailsPageTabs{
   border-radius: 25px !important;

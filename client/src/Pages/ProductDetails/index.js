@@ -23,6 +23,7 @@ const ProductDetails = () =>{
 
     const { id } = useParams();
     const [product, setProduct] = useState(null);
+    const [showSelectionError, setShowSelectionError] = useState(false);
     const [loading, setLoading] = useState(true);
     const { addToCart, cartItems } = useContext(MyContext);
     const [adding, setAdding] = useState(false);
@@ -38,6 +39,12 @@ const ProductDetails = () =>{
     }, [id]);
 
     const handleAddToCart = async () => {
+        if ((product.productRAMS?.length > 0 || product.productSIZE?.length > 0 || product.productWEIGHT?.length > 0) && activeSize === null) {
+            setShowSelectionError(true);
+            return;
+        }
+
+        setShowSelectionError(false);
         setButtonLabel("Adding...");
         setAdding(true);
 
@@ -151,7 +158,7 @@ const ProductDetails = () =>{
                                         {product.productSIZE?.length > 0 && "Size:"}
                                         {product.productWEIGHT?.length > 0 && "Weight:"}
                                     </span>
-                                    <ul className="list list-inline mb-0 pl-4">
+                                    <ul className={`list list-inline mb-0 pl-4 ${showSelectionError && activeSize === null ? 'error' : ''}`}>
                                         {product.productRAMS?.map((ram, idx) => (
                                             <li className='list-inline-item' key={`ram-${idx}`}>
                                                 <a className={`tag ${activeSize === idx ? 'active' : ''}`} onClick={() => isActive(idx)}>

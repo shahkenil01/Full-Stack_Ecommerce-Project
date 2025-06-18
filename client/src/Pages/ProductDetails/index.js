@@ -323,24 +323,24 @@ const ProductDetails = () =>{
                                             <textarea className="form-control shadow" placeholder="Write a Review" name="review"></textarea>
                                         </div>
 
-                                            <div className='row'>
-                                                <div className='col-md-6'>
-                                                    <div className='form-group'>
-                                                        <input type='text' className='form-control' placeholder='Name' name='userName' />
-                                                    </div>
-                                                </div>
-
-                                                <div className='col-md-6'>
-                                                    <div className='form-group'>
-                                                        <Rating name='rating' value={4.5} precision={0.5} />
-                                                    </div>
+                                        <div className='row'>
+                                            <div className='col-md-6'>
+                                                <div className='form-group'>
+                                                    <input type='text' className='form-control' placeholder='Name' name='userName' />
                                                 </div>
                                             </div>
 
-                                            <br/>
-                                            <div className='form-group'>
-                                                <Button type='submit' className='btn-blue btn-lg btn-big btn-round'>Submit Review</Button>
+                                            <div className='col-md-6'>
+                                                <div className='form-group'>
+                                                    <Rating name='rating' value={4.5} precision={0.5} />
+                                                </div>
                                             </div>
+                                        </div>
+
+                                        <br/>
+                                        <div className='form-group'>
+                                            <Button type='submit' className='btn-blue btn-lg btn-big btn-round'>Submit Review</Button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>

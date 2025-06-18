@@ -22,7 +22,7 @@ const Cart = () => {
     removeFromCart(item._id);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item._id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item.cartId}`, {
         method: "DELETE",
       });
 

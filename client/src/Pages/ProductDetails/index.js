@@ -67,7 +67,7 @@ const ProductDetails = () =>{
             throw new Error(savedItem.error || "Failed to save in DB");
         }
 
-          addToCart({ ...product, quantity: 1, _id: savedItem._id });
+          addToCart({ ...product, quantity: 1,cartId: savedItem._id, productId: product._id });
           enqueueSnackbar("Item added to cart", { variant: "success" });
         } catch (error) {
           enqueueSnackbar("DB error: " + error.message, { variant: "error" });

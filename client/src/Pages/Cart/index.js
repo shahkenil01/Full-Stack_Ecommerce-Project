@@ -9,6 +9,7 @@ import QuantityBox from '../../Components/QuantityBox';
 
 const Cart = () => {
   const { cartItems, removeFromCart } = useContext(MyContext);
+  const { updateCartQuantity } = useContext(MyContext);
 
   const truncateText = (text, limit = 30) => {
     if (!text) return "";
@@ -20,7 +21,6 @@ const Cart = () => {
 
   const removeFromCartAndDB = async (item) => {
     removeFromCart(item._id);
-
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item.cartId}`, {
         method: "DELETE",
@@ -34,6 +34,19 @@ const Cart = () => {
     } catch (err) {
       console.error("Failed to delete from DB:", err.message);
     }
+  };
+
+  const updateQuantityInCart = (item, newQty) => {
+    updateCartQuantity(item._id, newQty);
+
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item.cartId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        quantity: newQty,
+        subTotal: item.price * newQty,
+      }),
+    }).catch(err => console.error("Failed to update cart DB", err));
   };
 
   return (
@@ -75,7 +88,7 @@ const Cart = () => {
                         </Link>
                       </td>
                       <td width="20%">Rs {item.price}</td>
-                      <td width="20%"> <QuantityBox item={item}/> </td>
+                      <td width="20%"> <QuantityBox quantity={item.quantity} setQuantity={(newQty) => updateQuantityInCart(item, newQty)}/> </td>
                       <td width="15%">Rs {item.price * item.quantity}</td>
                       <td width="10%">
                         <span className="remove" onClick={() => removeFromCartAndDB(item)}>

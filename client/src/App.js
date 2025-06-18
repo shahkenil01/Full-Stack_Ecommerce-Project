@@ -63,15 +63,28 @@ function App() {
 
   const addToCart = (product, quantity = 1) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find(item => item._id === product._id);
+      const existingItem = prevItems.find(item =>
+        item.productId === product._id || item._id === product._id
+      );
       if (existingItem) {
         return prevItems.map(item =>
-          item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item
+          (item.productId === product._id || item._id === product._id)
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
         );
       } else {
         return [...prevItems, { ...product, quantity }];
       }
     });
+  };
+  const updateCartQuantity = (productId, newQty) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        (item.productId === productId || item._id === productId)
+          ? { ...item, quantity: newQty }
+          : item
+      )
+    );
   };
   
   useEffect(() => {
@@ -100,6 +113,7 @@ function App() {
     setCartItems,
     addToCart,
     removeFromCart,
+    updateCartQuantity,
   };
 
   return (

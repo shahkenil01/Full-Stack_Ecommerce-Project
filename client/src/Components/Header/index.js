@@ -20,6 +20,9 @@ const Header= ()=>{
     const getTotalCount = () => {
         return context.cartItems.reduce((acc, item) => acc + item.quantity, 0);
     };
+    const getUniqueItemCount = () => {
+        return context.cartItems.length;
+    };
 
     return(
         <>
@@ -54,7 +57,7 @@ const Header= ()=>{
                                         {context.isLogin && ( <span className='price'> ₹{getTotalPrice().toFixed(2)} </span> )}
                                         <div className='position-relative ml-2'>
                                             <Link to="/Cart"><Button className='cart'><IoBagOutline/></Button></Link>
-                                            <span className='count d-flex align-items-center justify-content-center'>{getTotalCount()}</span>
+                                            <span className='count d-flex align-items-center justify-content-center'>{getUniqueItemCount()}</span>
                                         </div>
                                     </div>
                                 </div>

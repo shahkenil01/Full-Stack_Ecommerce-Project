@@ -24,9 +24,10 @@ const ProductDetails = () =>{
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { addToCart } = useContext(MyContext);
+    const { addToCart, cartItems } = useContext(MyContext);
     const [adding, setAdding] = useState(false);
     const [buttonLabel, setButtonLabel] = useState("Add to Cart");
+    const [quantity, setQuantity] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
@@ -48,27 +49,47 @@ const ProductDetails = () =>{
             image: product.images?.[0] || '',
             rating: product.rating || "0",
             price: product.price,
-            quantity: 1,
-            subTotal: product.price * 1,
+            quantity: quantity,
+            subTotal: product.price * quantity,
             productId: product._id,
             userEmail: userEmail,
         };
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/add`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(cartData),
-        });
+            const existingItem = cartItems.find(
+                item => item.productId === product._id || item._id === product._id
+            );
 
-        const savedItem = await response.json();
+            if (existingItem) {
+                const updatedQty = existingItem.quantity + quantity;
 
-        if (!response.ok) {
-            throw new Error(savedItem.error || "Failed to save in DB");
-        }
+                await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${existingItem.cartId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        quantity: updatedQty,
+                        subTotal: updatedQty * product.price,
+                    }),
+                });
 
-          addToCart({ ...product, quantity: 1,cartId: savedItem._id, productId: product._id });
-          enqueueSnackbar("Item added to cart", { variant: "success" });
+                addToCart({ ...product, cartId: existingItem.cartId, productId: product._id }, quantity);
+                enqueueSnackbar("Quantity updated in cart", { variant: "success" });
+            } else {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/add`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(cartData),
+                });
+
+                const savedItem = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(savedItem.error || "Failed to save in DB");
+                }
+
+                addToCart({ ...product, quantity, cartId: savedItem._id, productId: product._id }, quantity);
+                enqueueSnackbar("Item added to cart", { variant: "success" });
+            }
         } catch (error) {
           enqueueSnackbar("DB error: " + error.message, { variant: "error" });
         } finally {
@@ -156,7 +177,7 @@ const ProductDetails = () =>{
                                 </div>
                             )}
                             <div className="d-flex align-items-center mt-4">
-                                <QuantityBox/>
+                                <QuantityBox quantity={quantity} setQuantity={setQuantity}/>
                                 <Button className='btn-blue btn-lg btn-big btn-round bg-red ml-1' onClick={handleAddToCart}>
                                     <BsCartFill/>&nbsp;{buttonLabel}
                                 </Button>

@@ -346,7 +346,7 @@ const ProductDetails = () =>{
                         {
                             activeTabs === 2 &&
                             <div className='row'>
-                                <div className='col-md-8'>
+                                <div className='col-md-7'>
                                     <h3>Customer questions & answer</h3>
                                     <br/>
 
@@ -357,7 +357,7 @@ const ProductDetails = () =>{
                                             <div className='card p-4 reviewsCard flex-row mb-3' key={index}>
                                                 <div className='image'>
                                                     <div className="rounded-circle">
-                                                        <img src='https://wp.alithemes.com/html/nest/demo/assets/imgs/blog/author-2.png' alt="user" />
+                                                        <img src={`https://ui-avatars.com/api/?name=${review.userName?.charAt(0)}&background=random&color=fff&bold=true`} alt={review.userName} />
                                                     </div>
                                                     <span className='text-g d-block text-center font-weight-bold'>{review.userName}</span>
                                                 </div>

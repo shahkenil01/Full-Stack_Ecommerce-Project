@@ -29,12 +29,27 @@ const ProductDetails = () =>{
     const [adding, setAdding] = useState(false);
     const [buttonLabel, setButtonLabel] = useState("Add to Cart");
     const [quantity, setQuantity] = useState(1);
+    const [reviews, setReviews] = useState([]);
+    const [reviewText, setReviewText] = useState("");
+    const [userName, setUserName] = useState("");
+    const [rating, setRating] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         fetchDataFromApi(`/api/products/${id}`).then(res => {
             setProduct(res);
             setLoading(false);
+        });
+    }, [id]);
+
+    useEffect(() => {
+        fetchDataFromApi(`/api/products/${id}`).then(res => {
+            setProduct(res);
+            setLoading(false);
+        });
+
+            fetchDataFromApi(`/api/reviews/product/${id}`).then(res => {
+            setReviews(res);
         });
     }, [id]);
 
@@ -103,6 +118,38 @@ const ProductDetails = () =>{
           setButtonLabel("Add to Cart");
           setAdding(false);
         } 
+    };
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        const userName = userInfo?.name;
+        if (!userName) {
+            enqueueSnackbar("Login required to post a review", { variant: "error" });
+            return;
+        }
+        try {
+            const payload = {
+                productId: id,
+                userName,
+                reviewText: reviewText,
+                rating,
+            };
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/reviews/add`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) throw new Error("Failed to submit review");
+
+            const newReview = await response.json();
+            setReviews(prev => [newReview, ...prev]); 
+            setReviewText(""); setUserName(""); setRating(0);
+            enqueueSnackbar("Review submitted!", { variant: "success" });
+        } catch (err) {
+            enqueueSnackbar("Error: " + err.message, { variant: "error" });
+        }
     };
 
     useEffect(() => {
@@ -303,43 +350,43 @@ const ProductDetails = () =>{
                                     <h3>Customer questions & answer</h3>
                                     <br/>
 
-                                    <div className='card p-4 reviewsCard flex-row'>
-                                        <div className='image'>
-                                            <div className="rounded-circle">
-                                                <img src='https://wp.alithemes.com/html/nest/demo/assets/imgs/blog/author-2.png'/>
-                                            </div>
-                                            <span className='text-g d-block text-center font-weight-bold'>Vishesh Panchal</span>
-                                        </div>
-                                        <div className='info pl-5'>
-                                            <div className='d-flex align-items-center w-100'>
-                                                <h5 className='text-light'>03/05/2006</h5>
-                                                <div className='ml-auto'>
-                                                    <Rating name="half-rating-read" value={4.5} precision={0.5} readOnly size="small" />
+                                    {reviews.length === 0 ? (
+                                        <p>No reviews yet.</p>
+                                    ) : (
+                                        reviews.map((review, index) => (
+                                            <div className='card p-4 reviewsCard flex-row mb-3' key={index}>
+                                                <div className='image'>
+                                                    <div className="rounded-circle">
+                                                        <img src='https://wp.alithemes.com/html/nest/demo/assets/imgs/blog/author-2.png' alt="user" />
+                                                    </div>
+                                                    <span className='text-g d-block text-center font-weight-bold'>{review.userName}</span>
+                                                </div>
+                                                <div className='info pl-5'>
+                                                    <div className='d-flex align-items-center w-100'>
+                                                        <h5 className='text-light'>{new Date(review.createdAt).toLocaleDateString()}</h5>
+                                                        <div className='ml-auto'>
+                                                            <Rating name="read-only" value={review.rating} readOnly precision={0.5} size="small" />
+                                                        </div>
+                                                    </div>
+                                                    <p>{review.reviewText}</p>
                                                 </div>
                                             </div>
-
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-                                        </div>
-                                    </div>
+                                        ))
+                                    )}
 
                                     <br className='res-hide' /><br className='res-hide' />
 
-                                    <form className='reviewForm'>
+                                    <form className='reviewForm' onSubmit={handleReviewSubmit}>
                                         <h4>Add a review</h4>
                                         <div className="form-group">
-                                            <textarea className="form-control shadow" placeholder="Write a Review" name="review"></textarea>
+                                            <textarea className="form-control shadow" placeholder="Write a Review" name="review"  value={reviewText} onChange={(e) => setReviewText(e.target.value)}></textarea>
                                         </div>
 
                                         <div className='row'>
-                                            <div className='col-md-6'>
-                                                <div className='form-group'>
-                                                    <input type='text' className='form-control' placeholder='Name' name='userName' />
-                                                </div>
-                                            </div>
 
                                             <div className='col-md-6'>
                                                 <div className='form-group'>
-                                                    <Rating name='rating' value={4.5} precision={0.5} />
+                                                    <Rating name='rating' value={rating} precision={0.5} onChange={(e, newValue) => setRating(newValue)} size="medium"/>
                                                 </div>
                                             </div>
                                         </div>

@@ -31,6 +31,7 @@ const productSizeRoutes = require('./routes/productSize');
 const uploadRoutes = require('./routes/upload');
 const userRoutes = require('./routes/user');
 const cartRoutes = require('./routes/Cart');
+const reviewRoutes = require('./routes/review');
 
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
@@ -41,6 +42,7 @@ app.use('/api/sizes', productSizeRoutes);
 app.use('/api/cloudinary', uploadRoutes);
 app.use('/api/User', userRoutes);
 app.use('/api/cart', cartRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Database
 mongoose.connect(process.env.CONNECTION_STRING, {

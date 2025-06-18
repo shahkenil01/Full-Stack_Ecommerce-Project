@@ -988,7 +988,7 @@ footer .copyright p{
 .bg-blue{
   background: #6d4aae !important;}
 .btn-blue{
-  background: #6d4aae;
+  background: #6d4aae !important;
   color: #fff !important;
   text-transform: capitalize !important;
   font-weight: 600 !important;

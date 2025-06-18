@@ -186,7 +186,7 @@ const ProductDetails = () =>{
                                 <li className="list-inline-item">
                                     <div className="d-flex align-items-center">
                                         <Rating name="read-only" value={product.rating || 0} precision={0.5} size="small" readOnly />
-                                        <span className="text-light cursor ml-2">1 Review</span>
+                                        <span className="text-light cursor ml-2">{reviews.length} {reviews.length === 1 ? "Review" : "Reviews"}</span>
                                     </div>
                                 </li>
                             </ul>
@@ -262,11 +262,8 @@ const ProductDetails = () =>{
                             <li className="list-inline-item">
                                 <Button
                                     className={`${activeTabs === 2 && 'active'}`}
-                                    onClick={() => {
-                                        setActiveTabs(2);
-                                    }}
-                                >
-                                    Reviews (3)
+                                    onClick={() => { setActiveTabs(2); }}>
+                                    Reviews ({reviews.length})
                                 </Button>
                             </li>
                         </ul>

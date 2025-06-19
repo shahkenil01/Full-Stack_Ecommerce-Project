@@ -232,7 +232,7 @@ const ProductDetails = () =>{
                             )}
                             <div className="d-flex align-items-center mt-4">
                                 <QuantityBox quantity={quantity} setQuantity={setQuantity}/>
-                                <Button className='btn-blue btn-lg btn-big btn-round bg-red ml-1' onClick={handleAddToCart}>
+                                <Button className='btn-best ml-1' onClick={handleAddToCart}>
                                     <BsCartFill/>&nbsp;{buttonLabel}
                                 </Button>
                                 <Tooltip title="Add to Wishlist" placement="top"><Button className='btn-blue btn-lg btn-big btn-circle ml-4'><FaRegHeart/></Button></Tooltip>

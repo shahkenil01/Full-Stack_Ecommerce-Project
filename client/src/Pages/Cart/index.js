@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Link } from 'react-router-dom';
 import { IoIosClose } from 'react-icons/io';
-import { IoBagCheckOutline } from "react-icons/io5";
+import { IoBagCheckOutline, IoHome } from "react-icons/io5";
 import Button from '@mui/material/Button';
 import Rating from '@mui/material/Rating';
 import { MyContext } from "../../App";
@@ -57,6 +57,21 @@ const Cart = () => {
           <p>
             There are <b className="text-red">{cartItems.length}</b> products in your cart
           </p>
+          {cartItems.length === 0 ? (
+            <div className="empty d-flex align-items-center justify-content-center flex-column">
+              <img
+                src="https://fullstack-ecommerce.netlify.app/static/media/emptyCart.49efd90ea75b10bede28.png"
+                width="150"
+                alt="empty cart"
+              />
+              <h3>Your Cart is currently empty</h3>
+              <Link to="/">
+                <Button className="btn-best mt-3">
+                  <IoHome /> &nbsp; Continue Shopping
+                </Button>
+              </Link>
+            </div>
+          ) : (
           <div className="row">
             <div className="col-md-9 pr-5">
               <div className="table-responsive">
@@ -127,6 +142,7 @@ const Cart = () => {
               </div>
             </div>
           </div>
+          )}
         </div>
       </section>
     </>

@@ -5,6 +5,7 @@ import { IoBagCheckOutline, IoHome } from "react-icons/io5";
 import Button from '@mui/material/Button';
 import Rating from '@mui/material/Rating';
 import { MyContext } from "../../App";
+import emptyCartImg from "../../assets/images/emptyCart.png";
 import QuantityBox from '../../Components/QuantityBox';
 
 const Cart = () => {
@@ -56,11 +57,7 @@ const Cart = () => {
           </p>
           {cartItems.length === 0 ? (
             <div className="empty d-flex align-items-center justify-content-center flex-column">
-              <img
-                src="https://fullstack-ecommerce.netlify.app/static/media/emptyCart.49efd90ea75b10bede28.png"
-                width="150"
-                alt="empty cart"
-              />
+              <img src={emptyCartImg} width="150" alt="empty cart" />
               <h3>Your Cart is currently empty</h3>
               <Link to="/">
                 <Button className="btn-best mt-3">

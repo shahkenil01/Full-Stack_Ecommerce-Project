@@ -88,8 +88,22 @@ function App() {
   };
   
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      const parsedUser = JSON.parse(userInfo);
+      setUser(parsedUser);
+      setIsLogin(true);
+
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/user/${parsedUser.email}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setCartItems(data);
+          }
+        })
+        .catch(err => console.error("Failed to fetch user cart:", err));
+    }
+  }, []);
 
   const removeFromCart = (productId) => {
     setCartItems(prev => prev.filter(item => item._id !== productId));

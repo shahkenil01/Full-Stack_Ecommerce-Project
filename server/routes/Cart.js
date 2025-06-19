@@ -18,6 +18,17 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get("/user/:email", async (req, res) => {
+  try {
+    const userEmail = req.params.email;
+    const cartItems = await Cart.find({ userEmail });
+    res.status(200).json(cartItems);
+  } catch (error) {
+    console.error("Error fetching cart items:", error.message);
+    res.status(500).json({ message: "Server error while fetching cart items" });
+  }
+});
+
 router.post('/add', async (req, res) => {
   try {
     const { productTitle, image, rating, price, quantity, subTotal, productId, userEmail } = req.body;
@@ -80,7 +91,7 @@ router.put('/:id', async (req, res) => {
         quantity: req.body.quantity,
         subTotal: req.body.subTotal,
         productId: req.body.productId,
-        userId: req.body.userId,
+        userEmail: req.body.userEmail,
       }, { new: true }
     )
 

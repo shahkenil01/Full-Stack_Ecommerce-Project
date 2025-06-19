@@ -22,15 +22,12 @@ const Cart = () => {
   const removeFromCartAndDB = async (item) => {
     removeFromCart(item._id);
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item.cartId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item._id || item.cartId}`, {
         method: "DELETE",
       });
 
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to delete from DB");
-      }
+      if (!response.ok) throw new Error(result.message || "Failed to delete from DB");
     } catch (err) {
       console.error("Failed to delete from DB:", err.message);
     }

@@ -1199,6 +1199,9 @@ footer .copyright p{
   color: #000 !important;
   opacity: 0.8 !important;
   font-size: 18px;}
+.productDetails .btn-circle svg.text-danger {
+  color: #ed174a !important;
+  opacity: 1 !important;}
 .productDetails .btn-circle:hover{
   background: #ccc !important;}
 .productZoom.position-relative {
@@ -1392,6 +1395,20 @@ a:hover{
 .cartDetails button {
   width: 60%;}
 /*Cart Page End*/
+
+.myListTableWrapper {
+  margin: auto;
+  width: 70%;}
+.myListTable .cartItemimgWrapper {
+  width: 500px !important;}
+.myListTable .cartItemimgWrapper .imgWrapper {
+  height: 100px !important;
+  width: 100px !important;}
+.myListTable .cartItemimgWrapper .imgWrapper img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;}
+
 /*signInPage Page Start*/
 .signInPage{
   width: 100%;

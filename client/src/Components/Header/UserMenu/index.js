@@ -83,7 +83,7 @@ const UserMenu = () => {
           <ListItemIcon><ShoppingBagIcon fontSize="small" /></ListItemIcon>
           Orders
         </MenuItem>
-        <MenuItem onClick={() => navigate('/wishlist')}>
+        <MenuItem onClick={() => navigate('/my-list')}>
           <ListItemIcon><FavoriteBorderIcon fontSize="small" /></ListItemIcon>
           My List
         </MenuItem>

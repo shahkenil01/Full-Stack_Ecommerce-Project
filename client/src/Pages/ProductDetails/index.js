@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import Rating from '@mui/material/Rating';
 import Tooltip from '@mui/material/Tooltip';
 import { BsCartFill } from "react-icons/bs";
-import { FaRegHeart } from "react-icons/fa";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useSnackbar } from "notistack";
 import RelatedProducts from "./RelatedProducts";
 import { MyContext } from "../../App";
@@ -28,6 +28,7 @@ const ProductDetails = () =>{
     const { addToCart, cartItems } = useContext(MyContext);
     const [adding, setAdding] = useState(false);
     const [buttonLabel, setButtonLabel] = useState("Add to Cart");
+    const [isFavorite, setIsFavorite] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [reviews, setReviews] = useState([]);
     const [reviewText, setReviewText] = useState("");
@@ -40,18 +41,23 @@ const ProductDetails = () =>{
             setProduct(res);
             setLoading(false);
         });
-    }, [id]);
-
-    useEffect(() => {
-        fetchDataFromApi(`/api/products/${id}`).then(res => {
-            setProduct(res);
-            setLoading(false);
-        });
 
             fetchDataFromApi(`/api/reviews/product/${id}`).then(res => {
             setReviews(res);
         });
     }, [id]);
+
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (userInfo?.email && product?._id) {
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/user/${userInfo.email}`)
+                .then(res => res.json())
+                .then(data => {
+                    const match = data.find(item => item.productId === product._id);
+                    setIsFavorite(!!match);
+                });
+        } 
+    }, [product]);
 
     const handleAddToCart = async () => {
         if ((product.productRAMS?.length > 0 || product.productSIZE?.length > 0 || product.productWEIGHT?.length > 0) && activeSize === null) {
@@ -118,6 +124,44 @@ const ProductDetails = () =>{
           setButtonLabel("Add to Cart");
           setAdding(false);
         } 
+    };
+
+    const handleAddToFavorite = async () => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (!userInfo?.email) {
+            enqueueSnackbar("Please login to use wishlist", { variant: "warning" });
+            return;
+        }
+
+        const favData = {
+            productId: product._id,
+            userEmail: userInfo.email,
+            name: product.name,
+            image: product.images?.[0] || '',
+            rating: product.rating || 0,
+            price: product.price,
+        };
+
+        try {
+            if (isFavorite) {
+                await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/remove`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ productId: product._id, userEmail: userInfo.email }),
+                });
+                enqueueSnackbar("Removed from favorites", { variant: "info" });
+            } else {
+                await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/add`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(favData),
+                });
+                enqueueSnackbar("Added to favorites", { variant: "success" });
+            }
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            enqueueSnackbar("Error updating favorites", { variant: "error" });
+        }
     };
 
     const handleReviewSubmit = async (e) => {
@@ -235,7 +279,11 @@ const ProductDetails = () =>{
                                 <Button className='btn-best ml-1' onClick={handleAddToCart}>
                                     <BsCartFill/>&nbsp;{buttonLabel}
                                 </Button>
-                                <Tooltip title="Add to Wishlist" placement="top"><Button className='btn-blue btn-lg btn-big btn-circle ml-4'><FaRegHeart/></Button></Tooltip>
+                                <Tooltip title={isFavorite ? "Remove from Wishlist" : "Add to Wishlist"} placement="top">
+                                    <Button className="btn-blue btn-lg btn-big btn-circle ml-4" onClick={handleAddToFavorite}>
+                                        {isFavorite ? <FaHeart className="text-danger" /> : <FaRegHeart />}
+                                    </Button>
+                                </Tooltip>
                             </div>
                         </div>
                     </div>)}

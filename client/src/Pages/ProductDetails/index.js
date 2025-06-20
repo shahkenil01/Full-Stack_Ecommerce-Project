@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@mui/material";
 import Rating from '@mui/material/Rating';
@@ -34,7 +34,8 @@ const ProductDetails = () =>{
     const [reviewText, setReviewText] = useState("");
     const [userName, setUserName] = useState("");
     const [rating, setRating] = useState(0);
-    const { enqueueSnackbar } = useSnackbar();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const toastRef = useRef(null);
 
     useEffect(() => {
         fetchDataFromApi(`/api/products/${id}`).then(res => {
@@ -143,21 +144,26 @@ const ProductDetails = () =>{
         };
 
         try {
+            if (toastRef.current) {
+                closeSnackbar(toastRef.current);
+            }
+            let newToastKey = null;
             if (isFavorite) {
                 await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/remove`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ productId: product._id, userEmail: userInfo.email }),
                 });
-                enqueueSnackbar("Removed from favorites", { variant: "info" });
+                newToastKey = enqueueSnackbar("Removed from favorites", { variant: "success" });
             } else {
                 await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/add`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(favData),
                 });
-                enqueueSnackbar("Added to favorites", { variant: "success" });
+                newToastKey = enqueueSnackbar("Added to favorites", { variant: "success" });
             }
+            toastRef.current = newToastKey;
             setIsFavorite(!isFavorite);
         } catch (error) {
             enqueueSnackbar("Error updating favorites", { variant: "error" });

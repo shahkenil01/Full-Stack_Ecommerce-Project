@@ -131,8 +131,7 @@ const Cart = () => {
                   <span>Total</span>
                   <span className="ml-auto text-red font-weight-bold">₹{getTotal()}</span>
                 </div>
-                <Button className='btn-blue btn-lg btn-big bg-red'><IoBagCheckOutline/>&nbsp; Checkout</Button>
-
+                <Link to={'/checkout'}><Button className='btn-blue btn-lg btn-big bg-red'><IoBagCheckOutline/>&nbsp; Checkout</Button></Link>
               </div>
             </div>
           </div>

@@ -16,6 +16,7 @@ import SignUp from './Pages/SignUp';
 import OtpVerify from './Pages/SignUp/OtpVerify';
 import NotFound from './Pages/NotFound';
 import Favorite from './Pages/Favorite';
+import CheckoutForm from './Pages/Checkout';
 
 const MyContext = createContext();
 
@@ -144,6 +145,7 @@ function App() {
           <Route exact={true} path="/product/:id" element={<ProductDetails />} />
           <Route exact={true} path="/cart" element={<Cart />} />
           <Route exact={true} path="/my-list" element={<Favorite />} />
+          <Route exact={true} path="/checkout" element={<CheckoutForm />} />
           <Route exact={true} path="/signIn" element={<SignIn />} />
           <Route exact={true} path="/signUp" element={<SignUp />} />
           <Route exact={true} path="/verifyOTP" element={<OtpVerify />} />

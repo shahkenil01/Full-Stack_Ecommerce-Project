@@ -1395,7 +1395,7 @@ a:hover{
 .cartDetails button {
   width: 60%;}
 /*Cart Page End*/
-
+/*Favorite Page Start*/
 .myListTableWrapper {
   margin: auto;
   width: 70%;}
@@ -1408,7 +1408,15 @@ a:hover{
   height: 100%;
   object-fit: cover;
   width: 100%;}
-
+/*Favorite Page End*/
+/*Checkout Page Start*/
+.orderInfo {
+  background: #fafafa !important;
+  padding: 25px !important;}
+.orderInfo thead {
+  border-bottom: 1px solid #0000001a !important;
+  border-top: 1px solid #0000001a !important;}
+/*Checkout Page End*/
 /*signInPage Page Start*/
 .signInPage{
   width: 100%;

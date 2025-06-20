@@ -1,23 +1,26 @@
-import { useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
-import { MdClose } from "react-icons/md";
+import Tooltip from '@mui/material/Tooltip';
 import Rating from '@mui/material/Rating';
-import QuantityBox from '../QuantityBox';
 import { IoIosHeartEmpty } from "react-icons/io";
-import { MdOutlineCompareArrows } from "react-icons/md";
-import ProductZoom from '../ProductZoom';
+import { FaRegHeart, FaHeart } from "react-icons/fa";
+import { MdClose } from "react-icons/md";
 import { BsCartFill } from "react-icons/bs";
+import QuantityBox from '../QuantityBox';
+import ProductZoom from '../ProductZoom';
 import { MyContext } from '../../App';
 import { useSnackbar } from "notistack";
 
 const ProductModel = ({ isOpen, closeProductModal }) => {
     const { selectedProduct, cartItems, addToCart } = useContext(MyContext);
     const [activeOption, setActiveOption] = useState(null);
+    const [isFavorite, setIsFavorite] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
     const [showSelectionError, setShowSelectionError] = useState(false);
-    const { enqueueSnackbar } = useSnackbar();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const toastRef = useRef(null);
 
     if (!selectedProduct) return null;
 
@@ -93,6 +96,61 @@ const ProductModel = ({ isOpen, closeProductModal }) => {
         }
     };
 
+    const handleAddToFavorite = async () => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (!userInfo?.email) {
+            enqueueSnackbar("Please login to use wishlist", { variant: "warning" });
+            return;
+        }
+
+        const favData = {
+            productId: selectedProduct._id,
+            userEmail: userInfo.email,
+            name: selectedProduct.name,
+            image: selectedProduct.images?.[0] || '',
+            rating: selectedProduct.rating || 0,
+            price: selectedProduct.price,
+        };
+
+        try {
+            if (toastRef.current) {
+                closeSnackbar(toastRef.current);
+            }
+            let newToastKey = null;
+            if (isFavorite) {
+                await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/remove`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ productId: selectedProduct._id, userEmail: userInfo.email }),
+                });
+                newToastKey = enqueueSnackbar("Removed from favorites", { variant: "success" });
+            } else {
+                await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/add`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(favData),
+                });
+                newToastKey = enqueueSnackbar("Added to favorites", { variant: "success" });
+            }
+            toastRef.current = newToastKey;
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            enqueueSnackbar("Error updating favorites", { variant: "error" });
+        }
+    };
+
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (userInfo?.email && selectedProduct?._id) {
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/user/${userInfo.email}`)
+                .then(res => res.json())
+                .then(data => {
+                    const match = data.find(item => item.productId === selectedProduct._id);
+                    setIsFavorite(!!match);
+                });
+        } 
+    }, [selectedProduct]);
+
     return (
         <Dialog open={isOpen} className="productModal" onClose={closeProductModal}>
             <Button className='close_' onClick={closeProductModal}><MdClose /></Button>
@@ -163,16 +221,20 @@ const ProductModel = ({ isOpen, closeProductModal }) => {
                         </>
                     )}
 
-                    <div className='d-flex align-items-center'>
+                    <div className='d-flex align-items-center mt-3'>
                         <QuantityBox quantity={quantity} setQuantity={setQuantity} />
                         <Button className='btn-blue btn-lg btn-big bg-red btn-round ml-3' onClick={handleAddToCart} disabled={adding}>
                             <BsCartFill />&nbsp;{adding ? "Adding..." : "Add to Cart"}
                         </Button>
                     </div>
 
-                    <div className='d-flex align-items-center mt-5 actions'>
-                        <Button className='btn-round btn-sml' variant="outlined"> <IoIosHeartEmpty /> &nbsp; ADD TO WISHLIST</Button>
-                        <Button className='btn-round btn-sml ml-3' variant="outlined"> <MdOutlineCompareArrows /> &nbsp; COMPARE</Button>
+                    <div className='d-flex align-items-center mt-4 actions'>
+                        <Tooltip title={isFavorite ? "Remove from Wishlist" : "Add to Wishlist"} placement="top">
+                            <Button className='btn-round btn-sml' variant="outlined" onClick={handleAddToFavorite}>
+                                {isFavorite ? <FaHeart className="text-danger" /> : <IoIosHeartEmpty />}
+                                &nbsp; {isFavorite ? "REMOVE FROM WISHLIST" : "ADD TO WISHLIST"}
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
             </div>

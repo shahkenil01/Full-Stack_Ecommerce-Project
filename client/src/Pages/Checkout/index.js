@@ -1,11 +1,48 @@
+import { useState, useContext } from "react";
 import { TextField, Button } from "@mui/material";
 import { IoBagCheckOutline } from "react-icons/io5";
+import { MyContext } from "../../App";
 
 const CheckoutForm = () => {
+
+  const { cartItems } = useContext(MyContext);
+
+  const truncateChars = (text, limit = 20) => {
+    if (!text) return "";
+    return text.length > limit ? text.slice(0, limit) + "..." : text;
+  };
+
+  const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  const [formFields, setFormFields] = useState({
+    fullName:"",
+    country:"",
+    streetAddressLine1:"",
+    streetAddressLine2:"",
+    city:"",
+    state:"",
+    zipCode:"",
+    phoneNumber:"",
+    email:""
+  })
+
+  const onChangeInput=(e)=>{
+    setFormFields(()=>({
+      ...formFields,
+      [e.target.name]:e.target.value
+    }))
+  }
+
+  const checkout=(e)=>{
+    e.preventDefault();
+
+    console.log(formFields)
+  }
+
   return (
     <section className="section">
       <div className="container">
-        <form className="checkoutForm">
+        <form className="checkoutForm" onSubmit={checkout}>
           <div className="row">
             <div className="col-md-8">
               <h2 className="hd">BILLING DETAILS</h2>
@@ -13,12 +50,12 @@ const CheckoutForm = () => {
               <div className="row mt-3">
                 <div className="col-md-6">
                   <div className="form-group">
-                    <TextField label="Full Name *" name="fullName" size="small" fullWidth />
+                    <TextField label="Full Name *" variant="outlined" className="w-100" size="small" name="fullName"  onChange={onChangeInput}/>
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="form-group">
-                    <TextField label="Country *" name="country" size="small" fullWidth />
+                    <TextField label="Country *" variant="outlined" className="w-100" size="small" name="country" onChange={onChangeInput} />
                   </div>
                 </div>
               </div>
@@ -27,10 +64,10 @@ const CheckoutForm = () => {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <TextField label="House number and street name" name="streetAddressLine1" size="small" fullWidth />
+                    <TextField label="House number and street name" variant="outlined" className="w-100" size="small" name="streetAddressLine1" onChange={onChangeInput} />
                   </div>
                   <div className="form-group">
-                    <TextField label="Apartment, suite, unit, etc. (optional)" name="streetAddressLine2" size="small" fullWidth />
+                    <TextField label="Apartment, suite, unit, etc. (optional)" variant="outlined" className="w-100" size="small" name="streetAddressLine2" onChange={onChangeInput} />
                   </div>
                 </div>
               </div>
@@ -39,7 +76,7 @@ const CheckoutForm = () => {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <TextField label="City" name="city" size="small" fullWidth />
+                    <TextField label="City" variant="outlined" className="w-100" size="small" name="city" onChange={onChangeInput} />
                   </div>
                 </div>
               </div>
@@ -48,7 +85,7 @@ const CheckoutForm = () => {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <TextField label="State" name="state" size="small" fullWidth />
+                    <TextField label="State" variant="outlined" className="w-100" size="small" name="state" onChange={onChangeInput} />
                   </div>
                 </div>
               </div>
@@ -57,7 +94,7 @@ const CheckoutForm = () => {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <TextField label="ZIP Code" name="zipCode" size="small" fullWidth />
+                    <TextField label="ZIP Code" variant="outlined" className="w-100" size="small" name="zipCode" onChange={onChangeInput} />
                   </div>
                 </div>
               </div>
@@ -65,12 +102,12 @@ const CheckoutForm = () => {
               <div className="row">
                 <div className="col-md-6">
                   <div className="form-group">
-                    <TextField label="Phone Number" name="phoneNumber" size="small" fullWidth />
+                    <TextField label="Phone Number" variant="outlined" className="w-100" size="small" name="phoneNumber" onChange={onChangeInput} />
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="form-group">
-                    <TextField label="Email Address" name="email" size="small" fullWidth />
+                    <TextField label="Email Address" variant="outlined" className="w-100" size="small" name="email" onChange={onChangeInput} />
                   </div>
                 </div>
               </div>
@@ -88,19 +125,23 @@ const CheckoutForm = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>CHUWI Intel Celeron ... <b>× 1</b></td>
-                        <td>₹17,000.00</td>
-                      </tr>
+                      {cartItems.map((item, index) => (
+                        <tr key={index}>
+                          <td>
+                            {truncateChars(item.productTitle || item.name, 20)} <b>× {item.quantity}</b>
+                          </td>
+                          <td>₹ {item.price * item.quantity}</td>
+                        </tr>
+                      ))}
                       <tr>
                         <td>Subtotal</td>
-                        <td>₹17,000.00</td>
+                        <td>₹{totalAmount}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                <Button type="submit" className="btn-blue bg-red btn-lg btn-big" variant="contained" fullWidth startIcon={<IoBagCheckOutline />}>
+                <Button type="submit" className="btn-blue bg-red btn-lg btn-big" variant="contained" startIcon={<IoBagCheckOutline />}>
                   Checkout
                 </Button>
               </div>

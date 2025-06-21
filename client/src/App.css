@@ -1427,6 +1427,38 @@ a:hover{
 .orderTable .img img {
   width: 100%;}
 /*Order Page End*/
+section.section.myAccountPage{
+  padding: 35px 0px;}
+.userImage {
+  border: 2px solid #0858f7;
+  border-radius: 100%;
+  height: 140px;
+  overflow: hidden;
+  position: relative;
+  width: 140px;}
+.myAccBox .form-group .MuiOutlinedInput-input {
+  background: #f1f1f1 !important;}
+.css-1gsv261 {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-top-color: rgba(0, 0, 0, 0.12);
+  border-right-color: rgba(0, 0, 0, 0.12);
+  border-left-color: rgba(0, 0, 0, 0.12);}
+.css-1q2h7u5.Mui-selected {
+  color: rgb(25, 118, 210);}
+.myAccountPage .MuiTab-root {
+  font-weight: 600 !important;}
+.css-19kzrtu {
+  padding: 24px;}
+.userImage .overlay input {
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1000;}
+.css-1blp12k-MuiInputBase-root-MuiOutlinedInput-root{
+  color: rgba(0, 0, 0, 0.87);}
 /*signInPage Page Start*/
 .signInPage{
   width: 100%;

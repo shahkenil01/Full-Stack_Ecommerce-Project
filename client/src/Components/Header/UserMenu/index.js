@@ -75,11 +75,11 @@ const UserMenu = () => {
           </Box>
         </Box>
         <Divider />
-        <MenuItem onClick={() => navigate('/account')}>
+        <MenuItem onClick={() => navigate('/my-account')}>
           <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
           My Account
         </MenuItem>
-        <MenuItem onClick={() => navigate('/orders')}>
+        <MenuItem onClick={() => navigate('/order')}>
           <ListItemIcon><ShoppingBagIcon fontSize="small" /></ListItemIcon>
           Orders
         </MenuItem>

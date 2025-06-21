@@ -1,19 +1,31 @@
-// routes/cashfree.js
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 
 router.post("/create-order", async (req, res) => {
   try {
+    const { email, phoneNumber, amount } = req.body;
+
+    console.log("🔍 Incoming Payment Request:", { email, phoneNumber, amount }); 
+
+    if (!email || !phoneNumber || !amount) {
+      return res.status(400).json({ error: "Missing required fields" }); 
+    }
+
+    const cleanCustomerId = email.replace(/[^a-zA-Z0-9_-]/g, "_");
+
     const payload = {
       customer_details: {
-        customer_id: "12345",
-        customer_email: "test@example.com",
-        customer_phone: "9999999999",
+        customer_id: cleanCustomerId,
+        customer_email: email,
+        customer_phone: phoneNumber,
       },
-      order_amount: req.body.amount,
+      order_amount: amount,
       order_currency: "INR",
-      order_id: "order_" + Date.now()
+      order_id: "order_" + Date.now(),
+      order_meta: {
+        return_url: "http://localhost:3005/order?order_id={order_id}",
+      },
     };
 
     const headers = {
@@ -31,8 +43,9 @@ router.post("/create-order", async (req, res) => {
 
     res.status(200).json(response.data);
   } catch (err) {
+    console.error("🔥 Cashfree order creation error:", err.response?.data || err.message);
     res.status(400).json({ error: err.message });
   }
 });
 
-module.exports = router; // ✅ CommonJS style
+module.exports = router;

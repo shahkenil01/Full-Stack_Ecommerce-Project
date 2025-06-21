@@ -3,10 +3,14 @@ import { TextField, Button } from "@mui/material";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { MyContext } from "../../App";
 import { handlePayment } from "../../utils/handlePayment";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 const CheckoutForm = () => {
 
   const { cartItems } = useContext(MyContext);
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const truncateChars = (text, limit = 20) => {
     if (!text) return "";
@@ -47,10 +51,19 @@ const CheckoutForm = () => {
   });
 
   if (Object.keys(newErrors).length === 0) {
-    console.log("✅ Form is valid. Starting payment...");
-    await handlePayment(totalAmount);  // ✅ Cashfree call yahi kar
+    try {
+      await handlePayment({
+        amount: totalAmount,
+        email: formFields.email,
+        phoneNumber: formFields.phoneNumber,
+        navigate,
+        enqueueSnackbar,
+      });
+    } catch (err) {
+      enqueueSnackbar("❌ Something went wrong during payment", { variant: "error" });
+    }
   } else {
-    alert("❌ Please fill all required fields");
+    enqueueSnackbar("❌ Please fill all required fields", { variant: "error" });
   }
 };
 

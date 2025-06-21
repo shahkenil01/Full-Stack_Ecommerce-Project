@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { TextField, Button } from "@mui/material";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { MyContext } from "../../App";
+import { handlePayment } from "../../utils/handlePayment";
 
 const CheckoutForm = () => {
 
@@ -33,11 +34,25 @@ const CheckoutForm = () => {
     }))
   }
 
-  const checkout=(e)=>{
-    e.preventDefault();
+  const checkout = async (e) => {
+  e.preventDefault();
 
-    console.log(formFields)
+  const requiredFields = ["fullName", "country", "streetAddressLine1", "city", "state", "zipCode", "phoneNumber", "email"];
+  const newErrors = {};
+
+  requiredFields.forEach((field) => {
+    if (!formFields[field].trim()) {
+      newErrors[field] = true;
+    }
+  });
+
+  if (Object.keys(newErrors).length === 0) {
+    console.log("✅ Form is valid. Starting payment...");
+    await handlePayment(totalAmount);  // ✅ Cashfree call yahi kar
+  } else {
+    alert("❌ Please fill all required fields");
   }
+};
 
   return (
     <section className="section">

@@ -13,7 +13,7 @@ app.use(cors({
     'http://localhost:3000', //localhost Admin
     'http://localhost:3005' //localhost Client
   ],
-  credentials: false,
+  credentials: true,
 }));
 
 app.options('*', cors());
@@ -33,6 +33,7 @@ const userRoutes = require('./routes/user');
 const cartRoutes = require('./routes/Cart');
 const favoriteRoutes = require('./routes/favorite');
 const reviewRoutes = require('./routes/review');
+const cashfreeRoute = require('./routes/cashfree');
 
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
@@ -45,6 +46,7 @@ app.use('/api/User', userRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/favorite', favoriteRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use('/api/cashfree', cashfreeRoute);
 
 // Database
 mongoose.connect(process.env.CONNECTION_STRING, {

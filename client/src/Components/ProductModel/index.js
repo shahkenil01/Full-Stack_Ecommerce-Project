@@ -22,6 +22,18 @@ const ProductModel = ({ isOpen, closeProductModal }) => {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const toastRef = useRef(null);
 
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (userInfo?.email && selectedProduct?._id) {
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/user/${userInfo.email}`)
+                .then(res => res.json())
+                .then(data => {
+                    const match = data.find(item => item.productId === selectedProduct._id);
+                    setIsFavorite(!!match);
+                });
+        } 
+    }, [selectedProduct]);
+
     if (!selectedProduct) return null;
 
     const { name, brand, price, oldPrice, images, rating, countInStock, description, _id: productId } = selectedProduct;
@@ -138,18 +150,6 @@ const ProductModel = ({ isOpen, closeProductModal }) => {
             enqueueSnackbar("Error updating favorites", { variant: "error" });
         }
     };
-
-    useEffect(() => {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        if (userInfo?.email && selectedProduct?._id) {
-            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/favorite/user/${userInfo.email}`)
-                .then(res => res.json())
-                .then(data => {
-                    const match = data.find(item => item.productId === selectedProduct._id);
-                    setIsFavorite(!!match);
-                });
-        } 
-    }, [selectedProduct]);
 
     return (
         <Dialog open={isOpen} className="productModal" onClose={closeProductModal}>

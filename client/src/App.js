@@ -17,7 +17,7 @@ import OtpVerify from './Pages/SignUp/OtpVerify';
 import NotFound from './Pages/NotFound';
 import Favorite from './Pages/Favorite';
 import CheckoutForm from './Pages/Checkout';
-import Orders from './Pages/Order';
+import Orders from './Pages/Order/Order';
 import MyAccount from './Pages/MyAccount';
 
 const MyContext = createContext();
@@ -97,6 +97,8 @@ function App() {
       const parsedUser = JSON.parse(userInfo);
       setUser(parsedUser);
       setIsLogin(true);
+
+      localStorage.removeItem("saveOrder");
 
       fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/user/${parsedUser.email}`)
         .then(res => res.json())

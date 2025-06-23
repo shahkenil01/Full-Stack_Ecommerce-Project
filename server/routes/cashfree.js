@@ -4,15 +4,14 @@ const axios = require("axios");
 
 router.post("/create-order", async (req, res) => {
   try {
-    const { email, phoneNumber, amount } = req.body;
-
-    if (!email || !phoneNumber || !amount) {
-      return res.status(400).json({ error: "Missing required fields" });
+    const { email, phoneNumber, amount, token } = req.body;
+    if (!email || !phoneNumber || !amount || !token) {
+      return res.status(400).json({ error: "Missing required fields or payload" });
     }
 
     const cleanCustomerId = email.replace(/[^a-zA-Z0-9_-]/g, "_");
 
-    const payload = {
+    const paymentPayload = {
       customer_details: {
         customer_id: cleanCustomerId,
         customer_email: email,
@@ -22,7 +21,7 @@ router.post("/create-order", async (req, res) => {
       order_currency: "INR",
       order_id: "order_" + Date.now(),
       order_meta: {
-        return_url: "http://localhost:3005/order?order_id={order_id}",
+        return_url: `http://localhost:3005/order?paid=true&token=${token}`
       },
     };
 
@@ -35,14 +34,14 @@ router.post("/create-order", async (req, res) => {
 
     const response = await axios.post(
       "https://sandbox.cashfree.com/pg/orders",
-      payload,
+      paymentPayload,
       { headers }
     );
 
     res.status(200).json(response.data);
   } catch (err) {
     const message =
-      err.response?.data?.message || err.response?.data || err.message;
+    err.response?.data?.message || err.response?.data || err.message;
     res.status(400).json({ error: message });
   }
 });

@@ -39,33 +39,37 @@ const CheckoutForm = () => {
   }
 
   const checkout = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const requiredFields = ["fullName", "country", "streetAddressLine1", "city", "state", "zipCode", "phoneNumber", "email"];
-  const newErrors = {};
+    const requiredFields = ["fullName", "country", "streetAddressLine1", "city", "state", "zipCode", "phoneNumber", "email"];
+    const newErrors = {};
 
-  requiredFields.forEach((field) => {
-    if (!formFields[field].trim()) {
-      newErrors[field] = true;
-    }
-  });
+    requiredFields.forEach((field) => {
+      if (!formFields[field].trim()) {
+        newErrors[field] = true;
+      }
+    });
 
-  if (Object.keys(newErrors).length === 0) {
-    try {
+    if (Object.keys(newErrors).length === 0) {
+      const orderToken = "ot_" + Date.now();
+      try {
+      const orderPayload = { cartItems, formFields };
+      localStorage.setItem(`order_${orderToken}`, JSON.stringify(orderPayload));
+
       await handlePayment({
         amount: totalAmount,
         email: formFields.email,
         phoneNumber: formFields.phoneNumber,
-        navigate,
+        token: orderToken,
         enqueueSnackbar,
       });
     } catch (err) {
-      enqueueSnackbar("❌ Something went wrong during payment", { variant: "error" });
+      enqueueSnackbar("Something went wrong during payment", { variant: "error" });
     }
-  } else {
-    enqueueSnackbar("❌ Please fill all required fields", { variant: "error" });
-  }
-};
+    } else {
+      enqueueSnackbar("Please fill all required fields", { variant: "error" });
+    }
+  };
 
   return (
     <section className="section">

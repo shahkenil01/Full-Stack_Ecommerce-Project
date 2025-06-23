@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const handlePayment = async ({ amount, email, phoneNumber, navigate, enqueueSnackbar }) => {
+export const handlePayment = async ({ amount, email, phoneNumber, token, enqueueSnackbar }) => {
   if (!window.Cashfree) {
     enqueueSnackbar("❌ Cashfree SDK not loaded", { variant: "error" });
     return;
@@ -11,6 +11,7 @@ export const handlePayment = async ({ amount, email, phoneNumber, navigate, enqu
       amount,
       email,
       phoneNumber,
+      token,
     });
 
     const paymentSessionId = res.data.payment_session_id;

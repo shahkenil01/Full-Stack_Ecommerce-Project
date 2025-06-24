@@ -27,6 +27,7 @@ const UserMenu = () => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userInfo');
     localStorage.removeItem("cartItems");
+    localStorage.removeItem('order_last');
     context.setUser(null);
     context.setIsLogin(false);
     context.setCartItems([]);

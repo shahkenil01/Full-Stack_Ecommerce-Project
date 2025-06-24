@@ -89,48 +89,60 @@ const ProductDetails = () =>{
                 item => item.productId === product._id || item._id === product._id
             );
 
-            if (existingItem) {
-                const updatedQty = existingItem.quantity + quantity;
+            if (userEmail) {
+                if (existingItem) {
+                    const updatedQty = existingItem.quantity + quantity;
 
-                await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${existingItem.cartId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        quantity: updatedQty,
-                        subTotal: updatedQty * product.price,
-                    }),
-                });
+                    await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${existingItem.cartId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            quantity: updatedQty,
+                            subTotal: updatedQty * product.price,
+                        }),
+                    });
 
-                addToCart({ ...product, cartId: existingItem.cartId, productId: product._id }, quantity);
-                enqueueSnackbar("Quantity updated in cart", { variant: "success" });
-            } else {
-                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/add`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(cartData),
-                });
+                    addToCart({ ...product, cartId: existingItem.cartId, productId: product._id }, quantity);
+                    enqueueSnackbar("Quantity updated in cart", { variant: "success" });
+                } else {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/add`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(cartData),
+                    });
 
-                const savedItem = await response.json();
+                    const savedItem = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(savedItem.error || "Failed to save in DB");
+                    if (!response.ok) {
+                        throw new Error(savedItem.error || "Failed to save in DB");
+                    }
+
+                    addToCart({ ...product, quantity, cartId: savedItem._id, productId: product._id }, quantity);
+                    enqueueSnackbar("Item added to cart", { variant: "success" });
                 }
 
-                addToCart({ ...product, quantity, cartId: savedItem._id, productId: product._id }, quantity);
-                enqueueSnackbar("Item added to cart", { variant: "success" });
+            } else {
+                if (existingItem) {
+                    addToCart({ ...existingItem }, quantity);
+                    enqueueSnackbar("Quantity updated in cart", { variant: "success" });
+                } else {
+                    addToCart({ ...product, quantity, productId: product._id }, quantity);
+                    enqueueSnackbar("Item added to cart (Please LogIn To Continue)", { variant: "success" });
+                }
             }
+
         } catch (error) {
           enqueueSnackbar("DB error: " + error.message, { variant: "error" });
         } finally {
           setButtonLabel("Add to Cart");
           setAdding(false);
-        } 
+        }
     };
 
     const handleAddToFavorite = async () => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         if (!userInfo?.email) {
-            enqueueSnackbar("Please login to use wishlist", { variant: "warning" });
+            enqueueSnackbar("Please login to use wishlist", { variant: "error" });
             return;
         }
 

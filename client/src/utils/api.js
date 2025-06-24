@@ -31,10 +31,12 @@ export const postData = async (url, formData) => {
     const { data } = await axiosInstance.post(url, formData);
     return data;
   } catch (error) {
-    console.error("POST error:", error);
+    if (process.env.NODE_ENV === "development") {
+      console.error("POST error:", error);
+    }
     return {
       success: false,
-      message: error?.response?.data?.message || "Something went wrong",
+      message: error?.response?.data?.msg || "Something went wrong",
     };
   }
 };

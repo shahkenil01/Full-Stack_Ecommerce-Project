@@ -36,7 +36,7 @@ const SignIn = () => {
 
     try {
       const data = await postData("/api/user/signin", { email, password });
-      if (!data?.token) throw new Error(data.message || "Login failed");
+      if (!data?.token) { throw new Error(data.message); }
 
       enqueueSnackbar("Login successful!", { variant: "success" });
 
@@ -58,7 +58,7 @@ const SignIn = () => {
 
       navigate("/", { replace: true });
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      enqueueSnackbar(err.message || "Please try again.", { variant: "error" });
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,7 @@ export const handlePayment = async ({ amount, email, phoneNumber, token, enqueue
   }
 
   try {
-    const res = await axios.post("http://localhost:4000/api/cashfree/create-order", {
+    const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/cashfree/create-order`, {
       amount,
       email,
       phoneNumber,

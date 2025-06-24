@@ -21,7 +21,7 @@ router.post("/create-order", async (req, res) => {
       order_currency: "INR",
       order_id: "order_" + Date.now(),
       order_meta: {
-        return_url: `http://localhost:3005/order?paid=true&token=${token}`
+        return_url: `${process.env.FRONTEND_URL}/order?paid=true&token=${token}`
       },
     };
 

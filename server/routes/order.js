@@ -21,10 +21,6 @@ router.post("/create", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ msg: "Invalid User ID format" });
-    }
-
     const formatAddress = (line1, line2) => {
       if (line1 && !line2) return line1.slice(0, 15);
       if (line1 && line2) return line1.slice(0, 10) + ", " + line2.slice(0, 5);

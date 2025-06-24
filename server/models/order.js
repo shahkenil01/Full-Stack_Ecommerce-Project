@@ -16,10 +16,8 @@ const orderSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: { type: String, required: true },
   address: { type: String, required: true },
-  pincode: { type: String, required: true },
   totalAmount: { type: Number, required: true },
   email: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   orderStatus: { type: String, default: "pending" },
   date: { type: Date, default: Date.now },
 });

@@ -12,14 +12,12 @@ router.post("/create", async (req, res) => {
       name,
       addressLine1,
       addressLine2,
-      zipCode,
       totalAmount,
       email,
-      userId,
       phone,
     } = req.body;
 
-    if (!orderId || !paymentId || !products || !name || !email || !userId || !totalAmount || !zipCode) {
+    if (!orderId || !paymentId || !products || !name || !email || !totalAmount || !phone) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -41,11 +39,9 @@ router.post("/create", async (req, res) => {
       products,
       name,
       address,
-      pincode: zipCode,
       totalAmount,
       email,
       phone,
-      userId: new mongoose.Types.ObjectId(userId),
     });
 
     const saved = await newOrder.save();
@@ -56,9 +52,9 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.get("/user/:id", async (req, res) => {
+router.get("/user/:email", async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.params.id }).sort({ date: -1 });
+    const orders = await Order.find({ email: req.params.email }).sort({ date: -1 });
     res.status(200).json(orders);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orders" });

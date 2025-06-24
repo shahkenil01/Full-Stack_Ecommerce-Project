@@ -17,7 +17,7 @@ const OrdersTable = () => {
     if (!user?._id) return;
 
     axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user._id}`)
+      .get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`)
       .then((res) => {
         setOrders(res.data);
       })
@@ -40,10 +40,8 @@ const OrdersTable = () => {
                 <th>Name</th>
                 <th>Phone Number</th>
                 <th>Address</th>
-                <th>Pincode</th>
                 <th>Total Amount</th>
                 <th>Email</th>
-                <th>User Id</th>
                 <th>Order Status</th>
                 <th>Date</th>
               </tr>
@@ -68,10 +66,8 @@ const OrdersTable = () => {
                     <td>{order.name}</td>
                     <td>{order.phone}</td>
                     <td>{order.address}</td>
-                    <td>{order.pincode}</td>
                     <td>₹{order.totalAmount}</td>
                     <td>{order.email}</td>
-                    <td>{order.userId}</td>
                     <td>
                       <span className="badge badge-danger">{order.orderStatus}</span>
                     </td>

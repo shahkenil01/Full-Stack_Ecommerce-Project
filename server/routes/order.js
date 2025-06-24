@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Order = require("../models/order");
 
 router.post("/create", async (req, res) => {
@@ -15,10 +16,15 @@ router.post("/create", async (req, res) => {
       totalAmount,
       email,
       userId,
+      phone,
     } = req.body;
 
     if (!orderId || !paymentId || !products || !name || !email || !userId || !totalAmount || !zipCode) {
       return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ msg: "Invalid User ID format" });
     }
 
     const formatAddress = (line1, line2) => {
@@ -38,7 +44,8 @@ router.post("/create", async (req, res) => {
       pincode: zipCode,
       totalAmount,
       email,
-      userId,
+      phone,
+      userId: new mongoose.Types.ObjectId(userId),
     });
 
     const saved = await newOrder.save();

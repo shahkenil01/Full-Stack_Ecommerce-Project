@@ -79,6 +79,7 @@ const OtpVerify = () => {
 
       localStorage.setItem("userToken", signupData.token);
       localStorage.setItem("userInfo", JSON.stringify({
+        _id: signupData.user._id,  
         name: signupData.user.name,
         email: signupData.user.email,
         phone: signupData.user.phone

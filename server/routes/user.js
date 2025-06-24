@@ -60,7 +60,7 @@ router.post('/signup', async (req, res) => {
       role: userRole
     });
 
-    const token = jwt.sign({ email:result.email, id: result._id, role: result.role }, process.env.JSON_WEB_TOKEN_SECRECT_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ email:result.email, id: result._id.toString(), role: result.role }, process.env.JSON_WEB_TOKEN_SECRET_KEY, { expiresIn: '1h' });
 
     res.status(200).json({
       success: true,
@@ -98,7 +98,7 @@ router.post('/signin', async (req, res) => {
 
     const userCart = await Cart.find({ userEmail: existingUser.email });
 
-    const token = jwt.sign({ email:existingUser.email, id: existingUser._id, role: existingUser.role }, process.env.JSON_WEB_TOKEN_SECRECT_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ email:existingUser.email, id: existingUser._id.toString(), role: existingUser.role }, process.env.JSON_WEB_TOKEN_SECRET_KEY, { expiresIn: '1h' });
 
     res.status(200).json({
       user:existingUser,
@@ -109,6 +109,19 @@ router.post('/signin', async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({msg:"somthing went wrong"});
+  }
+});
+
+// Clear user's cart after payment
+router.delete('/clear-cart', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); // ✅ fetch user first
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+
+    const result = await Cart.deleteMany({ userEmail: user.email }); // ✅ now safe to use
+    return res.status(200).json({ msg: "Cart cleared", deleted: result.deletedCount });
+  } catch (error) {
+    return res.status(400).json({ msg: "Failed to clear cart", error: error.message });
   }
 });
 

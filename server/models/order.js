@@ -14,6 +14,7 @@ const orderSchema = new mongoose.Schema({
   paymentId: { type: String, required: true },
   products: [productSchema],
   name: { type: String, required: true },
+  phone: { type: String, required: true },
   address: { type: String, required: true },
   pincode: { type: String, required: true },
   totalAmount: { type: Number, required: true },

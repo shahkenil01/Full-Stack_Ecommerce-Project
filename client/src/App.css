@@ -1421,9 +1421,9 @@ a:hover{
 .orderTable th, .orderTable td {
   white-space: nowrap;}
 .orderTable .img {
-  height: 40px;
+  height: 60px;
   overflow: hidden;
-  width: 70px;}
+  width: 60px;}
 .orderTable .img img {
   width: 100%;}
 /*Order Page End*/

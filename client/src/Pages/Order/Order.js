@@ -10,7 +10,6 @@ const Orders = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
 
-  // ✅ Decode cart & formFields from URL
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
 
@@ -20,10 +19,13 @@ const Orders = () => {
 
   if (token) {
     try {
-      const stored = JSON.parse(localStorage.getItem(`order_${token}`));
-      cart = stored.cartItems || [];
-      formFields = stored.formFields || {};
-      shouldSave = params.get("paid") === "true";
+      const raw = localStorage.getItem(`order_${token}`);
+      if (raw) {
+        const stored = JSON.parse(raw);
+        cart = stored?.cartItems || [];
+        formFields = stored?.formFields || {};
+        shouldSave = params.get("paid") === "true";
+      }
     } catch (e) {
       console.error("❌ Failed to decode order data:", e);
     }
@@ -31,9 +33,6 @@ const Orders = () => {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      console.log("👤 user from context:", user);
-      console.log("📦 shouldSave:", shouldSave);
-      console.log("🛒 cart:", cart);
 
       if (!shouldSave) {
         setLoading(false);
@@ -70,6 +69,7 @@ const Orders = () => {
         name: formFields.fullName,
         addressLine1: formFields.streetAddressLine1,
         addressLine2: formFields.streetAddressLine2,
+        phone: formFields.phoneNumber,
         zipCode: formFields.zipCode,
         totalAmount,
         email: formFields.email,
@@ -79,11 +79,29 @@ const Orders = () => {
       try {
         console.log("📦 Sending order to backend:", payload);
         await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/orders/create`, payload);
-        console.log("✅ Order saved");
+        // 🧹 Clean Razorpay & temp order keys
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith("order_ot_") || key.startsWith("rzp_")) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // ✅ Save minimal order details
+        localStorage.setItem("order_last", JSON.stringify({
+          orderId: payload.orderId,
+          paymentId: payload.paymentId
+        }));
 
         setCartItems([]);
+        localStorage.removeItem(`order_${token}`);
+
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/user/clear-cart`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken") || ""}`,
+          },
+        });
       } catch (err) {
-        console.error("❌ Order save failed:", err.response?.data || err.message);
+        console.error("Order save failed:", err.response?.data || err.message);
       }
 
       setLoading(false);

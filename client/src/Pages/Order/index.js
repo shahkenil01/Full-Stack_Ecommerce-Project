@@ -66,7 +66,7 @@ const OrdersTable = () => {
                       </span>
                     </td>
                     <td>{order.name}</td>
-                    <td>{order.products?.[0]?.quantity}</td>
+                    <td>{order.phone}</td>
                     <td>{order.address}</td>
                     <td>{order.pincode}</td>
                     <td>₹{order.totalAmount}</td>

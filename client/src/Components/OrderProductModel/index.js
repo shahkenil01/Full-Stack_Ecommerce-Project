@@ -34,7 +34,7 @@ const OrdersProductDialog = ({ open, handleClose, products = [] }) => {
                     <span>{product.name}</span>
                   </td>
                   <td>
-                    <div className="img" style={{ width: "60px" }}>
+                    <div className="img">
                       <img
                         src={product.image}
                         alt={product.name}

@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useContext } from 'react';
+import OrdersAddressDialog from '../../Components/OrdersAddressDialog';
 import OrdersProductDialog from '../../Components/OrderProductModel';
 import { MyContext } from '../../App';
 import axios from 'axios';
 
 const OrdersTable = () => {
   const [open, setOpen] = useState(false);
+  const [openAddress, setOpenAddress] = useState(false);
   const [orders, setOrders] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState("");
   const { user } = useContext(MyContext);
 
-  
   const handleOpenDialog = (products) => { setSelectedProducts(products); setOpen(true); };
   const handleCloseDialog = () => setOpen(false);
+
+  const handleAddressOpen = (address) => { setSelectedAddress(address); setOpenAddress(true); };
 
   useEffect(() => {
     if (!user?._id) return;
@@ -58,14 +62,19 @@ const OrdersTable = () => {
                       <span
                         className="text-blue font-weight-bold cursor"
                         onClick={() => handleOpenDialog(order.products)}
-                        style={{ cursor: 'pointer' }}
-                      >
+                        style={{ cursor: 'pointer' }}>
                         View Products
                       </span>
                     </td>
                     <td>{order.name}</td>
                     <td>{order.phone}</td>
-                    <td>{order.address}</td>
+                    <td>
+                      <span 
+                        className="text-blue font-weight-bold cursor" 
+                        onClick={() => handleAddressOpen(order.address)}>
+                        View Address
+                      </span>
+                    </td>
                     <td>₹{order.totalAmount}</td>
                     <td>{order.email}</td>
                     <td>
@@ -81,6 +90,7 @@ const OrdersTable = () => {
       </div>
 
       <OrdersProductDialog open={open} handleClose={handleCloseDialog} products={selectedProducts}/>
+      <OrdersAddressDialog open={openAddress} handleClose={() => setOpenAddress(false)} address={selectedAddress} />
     </section>
   );
 };

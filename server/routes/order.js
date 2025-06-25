@@ -21,13 +21,7 @@ router.post("/create", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const formatAddress = (line1, line2) => {
-      if (line1 && !line2) return line1.slice(0, 15);
-      if (line1 && line2) return line1.slice(0, 10) + ", " + line2.slice(0, 5);
-      return "";
-    };
-
-    const address = formatAddress(addressLine1, addressLine2);
+    const address = `${addressLine1 || ""}${addressLine2 ? ", " + addressLine2 : ""}`;
 
     const newOrder = new Order({
       orderId,

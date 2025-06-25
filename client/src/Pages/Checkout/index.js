@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { TextField, Button } from "@mui/material";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { MyContext } from "../../App";
@@ -9,13 +9,23 @@ import { useSnackbar } from "notistack";
 const CheckoutForm = () => {
 
   const { cartItems } = useContext(MyContext);
-  const navigate = useNavigate();
+  const { user } = useContext(MyContext);
   const { enqueueSnackbar } = useSnackbar();
 
   const truncateChars = (text, limit = 20) => {
     if (!text) return "";
     return text.length > limit ? text.slice(0, limit) + "..." : text;
   };
+
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (userInfo?.email) {
+      setFormFields(prev => ({
+        ...prev,
+        email: userInfo.email
+      }));
+    }
+  }, []);
 
   const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -28,7 +38,7 @@ const CheckoutForm = () => {
     state:"",
     zipCode:"",
     phoneNumber:"",
-    email:""
+    email: user?.email || ""
   })
 
   const onChangeInput=(e)=>{
@@ -139,7 +149,7 @@ const CheckoutForm = () => {
                 </div>
                 <div className="col-md-6">
                   <div className="form-group">
-                    <TextField label="Email Address" variant="outlined" className="w-100" size="small" name="email" onChange={onChangeInput} />
+                    <TextField label="Email Address" variant="outlined" className="w-100" size="small" name="email" value={formFields.email} disabled />
                   </div>
                 </div>
               </div>

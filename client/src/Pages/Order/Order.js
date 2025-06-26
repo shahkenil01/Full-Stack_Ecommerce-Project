@@ -3,15 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { MyContext } from "../../App";
 import axios from "axios";
 import OrdersTable from "./index";
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Alert,
-  Button,
-  Paper,
-  Stack
-} from "@mui/material";
+import { Box, CircularProgress, Typography, Alert, Button, Paper, Stack } from "@mui/material";
 import { CheckCircle, Error, Payment, ShoppingCart } from "@mui/icons-material";
 
 const Orders = () => {
@@ -115,15 +107,7 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh',
-        textAlign: 'center',
-        p: 4
-      }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', p: 4 }}>
         <CircularProgress size={60} thickness={4} sx={{ mb: 3, color: 'primary.main' }} />
         <Typography variant="h5" gutterBottom>
           Processing Your Order
@@ -138,15 +122,7 @@ const Orders = () => {
 
   if (error) {
     return (
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh',
-        textAlign: 'center',
-        p: 4
-      }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', p: 4 }}>
         <Error color="error" sx={{ fontSize: 80, mb: 3 }} />
         <Typography variant="h5" gutterBottom>
           Order Processing Issue
@@ -157,8 +133,7 @@ const Orders = () => {
         <Stack direction="row" spacing={2}>
           <Button 
             variant="contained" 
-            onClick={() => navigate('/contact')}
-          >
+            onClick={() => navigate('/contact')} >
             Contact Support
           </Button>
           <Button 
@@ -191,22 +166,13 @@ const Orders = () => {
           Your order has been confirmed and is being processed. You'll receive a confirmation email shortly.
         </Typography>
         <Paper elevation={0} sx={{ 
-          p: 3, 
-          mb: 4,
-          border: '1px solid',
-          borderColor: 'success.light',
-          backgroundColor: 'success.lightest'
+          p: 3,  mb: 4, border: '1px solid', borderColor: 'success.light', backgroundColor: 'success.lightest'
         }}>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
             Order Reference: {token?.slice(0, 8)}...{token?.slice(-4)}
           </Typography>
         </Paper>
-        <Button 
-          variant="contained" 
-          size="large"
-          startIcon={<ShoppingCart />}
-          onClick={() => navigate('/order')}
-        >
+        <Button variant="contained" size="large"startIcon={<ShoppingCart />}onClick={() => navigate('/order')} >
           View Your Orders
         </Button>
       </Box>
@@ -233,7 +199,7 @@ const Orders = () => {
         </Alert>
         <Button 
           variant="outlined" 
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate('/order')}
         >
           Check Order Status
         </Button>

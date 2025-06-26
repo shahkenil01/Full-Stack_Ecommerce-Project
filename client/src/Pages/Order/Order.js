@@ -8,11 +8,10 @@ const Orders = () => {
   const { user, setCartItems } = useContext(MyContext);
   const hasSavedRef = useRef(false);
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
-
+  const paid = params.get("paid") === "true";
   let cart = [];
   let formFields = {};
   let shouldSave = false;
@@ -24,9 +23,8 @@ const Orders = () => {
         const stored = JSON.parse(raw);
         cart = stored?.cartItems || [];
         formFields = stored?.formFields || {};
-        shouldSave = params.get("paid") === "true";
+        shouldSave = paid;
 
-        // ✅ Also save this data to backend-readable folder
         fetch(`${process.env.REACT_APP_BACKEND_URL}/save-temp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -37,6 +35,7 @@ const Orders = () => {
       console.error("❌ Failed to decode order data:", e);
     }
   }
+  const [loading, setLoading] = useState(shouldSave);
 
   useEffect(() => {
   const timer = setTimeout(() => {
@@ -72,14 +71,35 @@ const Orders = () => {
       localStorage.removeItem(`cf_order_${token}`);
       setCartItems([]);
       setLoading(false);
-    }, 500); // poll interval
+    }, 500);
     return () => clearInterval(interval);
-  }, 3000); // ✅ 3 second delay before polling starts
+  }, 3000);
 
   return () => clearTimeout(timer);
 }, [user]);
 
-  if (loading) return <div style={{ padding: "2rem", textAlign: "center" }}>⏳ Waiting for payment confirmation...</div>;
+  if (loading)
+  return (
+    <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f9f9f9", flexDirection: "column", textAlign: "center", }}>
+      <div style={{ fontSize: "3rem", animation: "pulse 1.5s infinite" }}>
+        🧾
+      </div>
+      <h2 style={{ margin: "1rem 0 0.5rem" }}>Processing Your Order</h2>
+      <p style={{ color: "#555" }}>
+        Please wait while we confirm your payment and finalize your order.
+      </p>
+
+      <style>
+        {`
+          @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+          }
+        `}
+      </style>
+    </div>
+  );
 
   return <OrdersTable />;
 };

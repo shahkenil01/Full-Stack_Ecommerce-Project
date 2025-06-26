@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { MyContext } from "../../App";
 import axios from "axios";
-import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button,
-} from "@mui/material";
+import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button,} from "@mui/material";
+import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
+import { Box, Paper } from '@mui/material';
 import { MdInfo } from "react-icons/md";
 
 const truncate = (str = "", len = 20) => {
@@ -27,9 +28,17 @@ const OrdersTable = () => {
   if (orders.length === 0) {
     return (
       <section className="section">
-        <div className="container text-center">
-          <h2 className="hd">Orders</h2>
-          <p>No orders found</p>
+        <div className="container">
+          <h2 className="hd text-center mb-4">Orders</h2>
+          <Paper elevation={3} sx={{ textAlign: 'center', padding: 4, borderRadius: 3 }} >
+            <SentimentDissatisfiedIcon sx={{ fontSize: 64, color: '#FBC02D' }} />
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              No orders found
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+              You haven’t placed any orders yet. Go ahead and treat yourself!
+            </Typography>
+          </Paper>
         </div>
       </section>
     );

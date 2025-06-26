@@ -68,14 +68,11 @@ router.post("/create-order", async (req, res) => {
 
 // ✅ Webhook Handler Route
 router.post("/webhook", async (req, res) => {
-  console.log("🔥 Webhook triggered! 🔥");
-  console.log("📦 Full Webhook Body:", JSON.stringify(req.body, null, 2));
   try {
     const event = req.body?.type;
     const data = req.body?.data;
 
     if (event !== "PAYMENT_SUCCESS_WEBHOOK" || !data?.payment) {
-      console.log("📛 Ignored non-success webhook");
       return res.status(200).send("ignored");
     }
 
@@ -88,19 +85,12 @@ router.post("/webhook", async (req, res) => {
     const payment_amount = payment.payment_amount;
     const token = order?.order_tags?.token;
 
-    console.log("🧩 Token received:", token);
-    console.log("💳 Payment ID:", payment_id);
-    console.log("📦 Order ID:", order_id);
-
     if (!token) {
-      console.log("❌ No token found, skipping...");
       return res.status(200).send("no token, skip");
     }
 
     const raw = await findTempOrderWithRetry(token);
-    console.log("🔍 DB Token Query Result:", raw);
     if (!raw) {
-      console.log("⚠️ Temp order not found in DB for token:", token);
       return res.status(200).send("no order data, skip");
     }
 
@@ -138,14 +128,10 @@ router.post("/webhook", async (req, res) => {
       totalAmount: payment_amount || 0,
     });
 
-    console.log("📝 Order to be saved:", newOrder.toObject());
-    console.log("💳 Payment method used:", method);
-
     await newOrder.save();
-    console.log("✅ Order saved to DB for:", newOrder.email);
     res.status(200).send("Order saved via webhook");
   } catch (err) {
-    console.error("🔥 Webhook Save Failed FULL:", err);
+    console.error("🔥 Webhook Save Failed:", err);
     res.status(500).send("error ignored");
   }
 });

@@ -1,96 +1,112 @@
-import React, { useState, useEffect, useContext } from 'react';
-import OrdersAddressDialog from '../../Components/OrdersAddressDialog';
-import OrdersProductDialog from '../../Components/OrderProductModel';
-import { MyContext } from '../../App';
-import axios from 'axios';
+import React, { useState, useEffect, useContext } from "react";
+import { MyContext } from "../../App";
+import axios from "axios";
+import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button,
+} from "@mui/material";
+import { MdInfo } from "react-icons/md";
+
+const truncate = (str = "", len = 20) => {
+  return str.length > len ? str.slice(0, len) + "..." : str;
+};
 
 const OrdersTable = () => {
-  const [open, setOpen] = useState(false);
-  const [openAddress, setOpenAddress] = useState(false);
   const [orders, setOrders] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState("");
   const { user } = useContext(MyContext);
 
-  const handleOpenDialog = (products) => { setSelectedProducts(products); setOpen(true); };
-  const handleCloseDialog = () => setOpen(false);
-
-  const handleAddressOpen = (address) => { setSelectedAddress(address); setOpenAddress(true); };
-
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?.email) return;
 
     axios
       .get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`)
-      .then((res) => {
-        setOrders(res.data);
-      })
-      .catch((err) => {
-        console.error("❌ Failed to fetch orders:", err.message);
-      });
+      .then((res) => setOrders(res.data))
+      .catch((err) =>
+        console.error("❌ Failed to fetch orders:", err.message)
+      );
   }, [user]);
+
+  if (orders.length === 0) {
+    return (
+      <section className="section">
+        <div className="container text-center">
+          <h2 className="hd">Orders</h2>
+          <p>No orders found</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section">
       <div className="container">
         <h2 className="hd">Orders</h2>
-        <div className="table-responsive orderTable">
-          <table className="table table-striped table-bordered">
-            <thead className="thead-light">
-              <tr>
-                <th>Order Id</th>
-                <th>Payment Id</th>
-                <th>Products</th>
-                <th>Name</th>
-                <th>Phone Number</th>
-                <th>Address</th>
-                <th>Total Amount</th>
-                <th>Email</th>
-                <th>Order Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length === 0 ? (
-                <tr><td colSpan="12">No orders found</td></tr>
-              ) : (
-                orders.map((order) => (
-                  <tr key={order._id}>
-                    <td><span className="text-blue font-weight-bold">{order.orderId}</span></td>
-                    <td><span className="text-blue font-weight-bold">{order.paymentId}</span></td>
-                    <td>
-                      <span
-                        className="text-blue font-weight-bold cursor"
-                        onClick={() => handleOpenDialog(order.products)}
-                        style={{ cursor: 'pointer' }}>
-                        View Products
-                      </span>
-                    </td>
-                    <td>{order.name}</td>
-                    <td>{order.phone}</td>
-                    <td>
-                      <span 
-                        className="text-blue font-weight-bold cursor" 
-                        onClick={() => handleAddressOpen(order.address)}>
-                        View Address
-                      </span>
-                    </td>
-                    <td>₹{order.totalAmount}</td>
-                    <td>{order.email}</td>
-                    <td>
-                      <span className="badge badge-danger">{order.orderStatus}</span>
-                    </td>
-                    <td>{new Date(order.date).toLocaleDateString()}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        {orders.map((order) => (
+          <Card key={order._id} className="mb-4 shadow-sm">
+            <CardHeader
+              title={`Order on ${new Date(order.date).toLocaleDateString()}`}
+              subheader={`Payment Mode: ${order.paymentMethod || "N/A"}`}
+              action={
+                <Chip
+                  label={order.orderStatus}
+                  color="error"
+                  variant="filled"
+                  size="small"
+                />
+              }
+            />
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Products
+              </Typography>
+              <Divider className="mb-2" />
+              {order.products.map((prod, index) => (
+                <div
+                  key={index}
+                  className="d-flex align-items-center mb-3"
+                  style={{ gap: "15px" }}
+                >
+                  <Avatar
+                    src={prod.image}
+                    alt={prod.name}
+                    variant="rounded"
+                    sx={{ width: 56, height: 56 }}
+                  />
+                  <div>
+                    <div>
+                      <strong>{truncate(prod.name, 20)}</strong>
+                    </div>
+                    <small>
+                      Qty: {prod.quantity} | ₹{prod.price} × {prod.quantity} = ₹
+                      {prod.subtotal}
+                    </small>
+                  </div>
+                </div>
+              ))}
 
-      <OrdersProductDialog open={open} handleClose={handleCloseDialog} products={selectedProducts}/>
-      <OrdersAddressDialog open={openAddress} handleClose={() => setOpenAddress(false)} address={selectedAddress} />
+              <Divider className="mt-3 mb-2" />
+              <Typography variant="h6">User Info</Typography>
+              <div className="pl-1 mt-1">
+                <div><strong>Name:</strong> {order.name}</div>
+                <div><strong>Email:</strong> {order.email}</div>
+                <div><strong>Phone:</strong> {order.phone}</div>
+                <div><strong>Address:</strong> {order.address}, {order.city}, {order.state}, {order.country}, {order.zipCode}</div>
+              </div>
+
+              <Divider className="mt-3 mb-2" />
+              <div className="d-flex justify-content-between align-items-center">
+                <Typography><strong>Total:</strong> ₹{order.totalAmount}</Typography>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  size="small"
+                  startIcon={<MdInfo />}
+                >
+                  {order.paymentId}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </section>
   );
 };

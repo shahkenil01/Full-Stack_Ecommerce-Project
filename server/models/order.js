@@ -10,14 +10,19 @@ const productSchema = new mongoose.Schema({
 });
 
 const orderSchema = new mongoose.Schema({
-  orderId: { type: String, required: true, unique: true },
-  paymentId: { type: String, required: true },
+  paymentId: { type: String, required: true, unique: true },
+  orderId: { type: String, required: true },
+  paymentMethod: { type: String },
   products: [productSchema],
   name: { type: String, required: true },
   phone: { type: String, required: true },
-  address: { type: String, required: true },
-  totalAmount: { type: Number, required: true },
   email: { type: String, required: true },
+  address: { type: String, required: true },
+  country: String,
+  city: String,
+  state: String,
+  zipCode: String,
+  totalAmount: { type: Number, required: true },
   orderStatus: { type: String, default: "pending" },
   date: { type: Date, default: Date.now },
 });

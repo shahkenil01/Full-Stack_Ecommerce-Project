@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const Order = require("../models/order");
 
+// Create Order
 router.post("/create-order", async (req, res) => {
   try {
     const { email, phoneNumber, amount, token } = req.body;
@@ -10,19 +12,24 @@ router.post("/create-order", async (req, res) => {
     }
 
     const cleanCustomerId = email.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const orderId = "order_" + Date.now();
 
     const paymentPayload = {
       customer_details: {
         customer_id: cleanCustomerId,
         customer_email: email,
         customer_phone: phoneNumber,
+        customer_name: "Guest User"
       },
       order_amount: amount,
       order_currency: "INR",
-      order_id: "order_" + Date.now(),
+      order_id: orderId,
       order_meta: {
         return_url: `${process.env.FRONTEND_URL}/order?paid=true&token=${token}`
       },
+      order_tags: {
+        token: token
+      }
     };
 
     const headers = {
@@ -38,11 +45,76 @@ router.post("/create-order", async (req, res) => {
       { headers }
     );
 
-    res.status(200).json(response.data);
+    res.status(200).json({ ...response.data, order_id: orderId });
   } catch (err) {
     const message =
-    err.response?.data?.message || err.response?.data || err.message;
+      err.response?.data?.message || err.response?.data || err.message;
     res.status(400).json({ error: message });
+  }
+});
+
+// Webhook Handler
+router.post("/webhook", async (req, res) => {
+  try {
+    const event = req.body?.type;
+    const data = req.body?.data;
+
+    if (event !== "PAYMENT_SUCCESS_WEBHOOK" || !data?.payment) {
+      return res.status(200).send("ignored");
+    }
+
+    const payment = data.payment;
+    const order = data.order;
+
+    const payment_id = payment.cf_payment_id;
+    const order_id = order.order_id;
+    const payment_method = payment.payment_method;
+    const payment_amount = payment.payment_amount;
+    const token = order?.order_tags?.token;
+
+    if (!token) return res.status(200).send("no token, skip");
+
+    const raw = global.tempOrders[token];
+    if (!raw) return res.status(200).send("no order data, skip");
+
+    delete global.tempOrders[token];
+
+    const method =
+      payment_method?.card?.type ||
+      payment_method?.upi?.type ||
+      payment_method?.app?.provider ||
+      payment_method?.netbanking?.channel ||
+      "UNKNOWN";
+
+    const formattedProducts = raw.cartItems.map((item) => ({
+      productId: item._id || item.productId,
+      name: item.name || item.productTitle,
+      image: item.images?.[0] || item.image,
+      quantity: item.quantity,
+      price: item.price,
+      subtotal: item.price * item.quantity,
+    }));
+
+    const newOrder = new Order({
+      paymentId: payment_id,
+      paymentMethod: method,
+      orderId: order_id,
+      products: formattedProducts,
+      name: raw.formFields.fullName || "Guest",
+      phone: raw.formFields.phoneNumber || "0000000000",
+      email: raw.formFields.email || "noemail@dummy.com",
+      address: `${raw.formFields.streetAddressLine1 || ""}, ${raw.formFields.streetAddressLine2 || ""}`,
+      city: raw.formFields.city || "",
+      state: raw.formFields.state || "",
+      zipCode: raw.formFields.zipCode || "",
+      country: raw.formFields.country || "",
+      totalAmount: payment_amount || 0,
+    });
+
+    await newOrder.save();
+    res.status(200).send("Order saved via webhook");
+  } catch (err) {
+    res.status(500).send("error ignored");
   }
 });
 

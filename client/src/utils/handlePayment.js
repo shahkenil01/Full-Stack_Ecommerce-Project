@@ -15,6 +15,9 @@ export const handlePayment = async ({ amount, email, phoneNumber, token, enqueue
     });
 
     const paymentSessionId = res.data.payment_session_id;
+    const cashfreeOrderId = res.data.order_id;
+
+    localStorage.setItem(`cf_order_${token}`, cashfreeOrderId);
 
     const cashfree = new window.Cashfree({ mode: "sandbox" });
 

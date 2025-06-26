@@ -4,6 +4,19 @@ const axios = require("axios");
 const Order = require("../models/order");
 const TempOrder = require("../models/tempOrder");
 
+// Helper delay function
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Retry logic to find temp order
+async function findTempOrderWithRetry(token, retries = 5, delayMs = 500) {
+  for (let i = 0; i < retries; i++) {
+    const found = await TempOrder.findOne({ token });
+    if (found) return found;
+    await wait(delayMs);
+  }
+  return null;
+}
+
 router.post("/create-order", async (req, res) => {
   try {
     const { email, phoneNumber, amount, token } = req.body;
@@ -84,7 +97,7 @@ router.post("/webhook", async (req, res) => {
       return res.status(200).send("no token, skip");
     }
 
-    const raw = await TempOrder.findOne({ token });
+    const raw = await findTempOrderWithRetry(token);
     console.log("🔍 DB Token Query Result:", raw);
     if (!raw) {
       console.log("⚠️ Temp order not found in DB for token:", token);
@@ -129,7 +142,6 @@ router.post("/webhook", async (req, res) => {
     console.log("💳 Payment method used:", method);
 
     await newOrder.save();
-
     console.log("✅ Order saved to DB for:", newOrder.email);
     res.status(200).send("Order saved via webhook");
   } catch (err) {

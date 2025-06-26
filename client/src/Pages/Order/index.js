@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import { MyContext } from "../../App";
 import axios from "axios";
 import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Grid, IconButton, Tooltip } from "@mui/material";
@@ -44,14 +45,12 @@ const OrdersTable = () => {
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             You haven't placed any orders yet. Start shopping to see your orders here!
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Link to="/"><Button variant="contained" color="primary" 
             sx={{ mt: 3 }}
             startIcon={<MdShoppingBasket />}
           >
             Browse Products
-          </Button>
+          </Button></Link>
         </Paper>
       </Box>
     );

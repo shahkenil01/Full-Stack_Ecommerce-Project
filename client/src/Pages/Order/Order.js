@@ -14,6 +14,7 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [showOrders, setShowOrders] = useState(false);
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
@@ -105,6 +106,16 @@ const Orders = () => {
     processPayment();
   }, [user, shouldSave, token, setCartItems]);
 
+  const handleViewOrders = () => {
+    setPaymentStatus(null);
+    setShowOrders(true);
+    navigate('/order', { replace: true });
+  };
+
+  if (showOrders || (!loading && !error && !paymentStatus)) {
+    return <OrdersTable />;
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', p: 4 }}>
@@ -172,7 +183,7 @@ const Orders = () => {
             Order Reference: {token?.slice(0, 8)}...{token?.slice(-4)}
           </Typography>
         </Paper>
-        <Button variant="contained" size="large"startIcon={<ShoppingCart />}onClick={() => navigate('/order')} >
+        <Button  variant="contained"  size="large" startIcon={<ShoppingCart />} onClick={handleViewOrders} >
           View Your Orders
         </Button>
       </Box>
@@ -199,7 +210,7 @@ const Orders = () => {
         </Alert>
         <Button 
           variant="outlined" 
-          onClick={() => navigate('/order')}
+          onClick={handleViewOrders}
         >
           Check Order Status
         </Button>

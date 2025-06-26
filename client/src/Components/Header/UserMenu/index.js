@@ -80,7 +80,7 @@ const UserMenu = () => {
           <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
           My Account
         </MenuItem>
-        <MenuItem onClick={() => navigate('/order')}>
+        <MenuItem onClick={() => navigate('/orders')}>
           <ListItemIcon><ShoppingBagIcon fontSize="small" /></ListItemIcon>
           Orders
         </MenuItem>

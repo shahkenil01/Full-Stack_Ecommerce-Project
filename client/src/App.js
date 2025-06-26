@@ -17,7 +17,7 @@ import OtpVerify from './Pages/SignUp/OtpVerify';
 import NotFound from './Pages/NotFound';
 import Favorite from './Pages/Favorite';
 import CheckoutForm from './Pages/Checkout';
-import Orders from './Pages/Order/Order';
+import OrderStatus from './Pages/Order/OrderStatus';
 import AllOrders from './Pages/Order/AllOrders';
 import MyAccount from './Pages/MyAccount';
 
@@ -152,7 +152,7 @@ function App() {
           <Route exact={true} path="/my-list" element={<Favorite />} />
           <Route exact={true} path="/checkout" element={<CheckoutForm />} />
           <Route exact={true} path="/my-account" element={<MyAccount />} />
-          <Route exact={true} path="/order" element={<Orders />} />
+          <Route exact={true} path="/order" element={<OrderStatus />} />
           <Route exact={true} path="/orders" element={<AllOrders />} />
           <Route exact={true} path="/signIn" element={<SignIn />} />
           <Route exact={true} path="/signUp" element={<SignUp />} />

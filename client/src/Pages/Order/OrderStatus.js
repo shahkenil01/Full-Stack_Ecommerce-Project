@@ -2,11 +2,10 @@ import { useEffect, useContext, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MyContext } from "../../App";
 import axios from "axios";
-import OrdersTable from "./index";
 import { Box, CircularProgress, Typography, Alert, Button, Paper, Stack } from "@mui/material";
 import { CheckCircle, Error, Payment, ShoppingCart } from "@mui/icons-material";
 
-const Orders = () => {
+const OrderStatus = () => {
   const { user, setCartItems } = useContext(MyContext);
   const hasSavedRef = useRef(false);
   const location = useLocation();
@@ -14,7 +13,6 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [showOrders, setShowOrders] = useState(false);
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
@@ -49,8 +47,14 @@ const Orders = () => {
   }
 
   useEffect(() => {
+    // Redirect if not from payment flow
+    if (!token || paymentResult !== "true") {
+      navigate('/orders');
+      return;
+    }
+
     const saveAndProcessOrder = async () => {
-      if (!token || !user?._id || hasSavedRef.current || paymentResult !== "true") return;
+      if (!token || !user?._id || hasSavedRef.current) return;
 
       hasSavedRef.current = true;
 
@@ -103,17 +107,11 @@ const Orders = () => {
     };
 
     saveAndProcessOrder();
-  }, [token, user]);
+  }, [token, user, navigate, paymentResult]);
 
   const handleViewOrders = () => {
-    setPaymentStatus(null);
-    setShowOrders(true);
-    navigate('/order', { replace: true });
+    navigate('/orders', { replace: true });
   };
-
-  if (showOrders || (!loading && !error && !paymentStatus)) {
-    return <OrdersTable />;
-  }
 
   if (loading) {
     return (
@@ -182,7 +180,7 @@ const Orders = () => {
             Order Reference: {token?.slice(0, 8)}...{token?.slice(-4)}
           </Typography>
         </Paper>
-        <Button  variant="contained"  size="large" startIcon={<ShoppingCart />} onClick={handleViewOrders} >
+        <Button variant="contained" size="large" startIcon={<ShoppingCart />} onClick={handleViewOrders}>
           View Your Orders
         </Button>
       </Box>
@@ -217,7 +215,17 @@ const Orders = () => {
     );
   }
 
-  return <OrdersTable />;
+  // Default case - shouldn't happen
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', p: 4 }}>
+      <Typography variant="h5" gutterBottom>
+        Order Processing Complete
+      </Typography>
+      <Button variant="contained" onClick={handleViewOrders}>
+        View Your Orders
+      </Button>
+    </Box>
+  );
 };
 
-export default Orders;
+export default OrderStatus;

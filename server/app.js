@@ -4,7 +4,6 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-global.tempOrders = {};
 const PORT = process.env.PORT || 4000;
 
 app.use(cors({
@@ -21,21 +20,6 @@ app.options('*', cors());
 
 //middleware
 app.use(bodyParser.json());
-
-app.post("/save-temp", (req, res) => {
-  try {
-    const { token, cartItems, formFields } = req.body;
-    if (!token || !cartItems || !formFields) {
-      return res.status(400).json({ error: "Missing token/cart/form" });
-    }
-
-    global.tempOrders[token] = { cartItems, formFields };
-
-    res.status(200).json({ msg: "saved in memory" });
-  } catch (e) {
-    res.status(500).json({ error: "failed to save temp" });
-  }
-});
 
 //Routes
 const categoryRoutes = require('./routes/categories');

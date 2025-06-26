@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const Order = require("../models/order");
+const TempOrder = require("../models/tempOrder");
 
 // Create Order
 router.post("/create-order", async (req, res) => {
@@ -74,10 +75,10 @@ router.post("/webhook", async (req, res) => {
 
     if (!token) return res.status(200).send("no token, skip");
 
-    const raw = global.tempOrders[token];
+    const raw = await TempOrder.findOne({ token });
     if (!raw) return res.status(200).send("no order data, skip");
 
-    delete global.tempOrders[token];
+    await TempOrder.deleteOne({ token });
 
     const method =
       payment_method?.card?.type ||

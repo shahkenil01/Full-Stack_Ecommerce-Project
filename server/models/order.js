@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
   paymentId: { type: String, required: true, unique: true },
   orderId: { type: String, required: true },
-  paymentMethod: { type: String },
+  paymentMethod: { type: String, enum: [ 'Credit/Debit Card', 'UPI', 'NetBanking', 'Wallet', 'Cashfree Payment' ], default: 'Cashfree Payment' },
   products: [productSchema],
   name: { type: String, required: true },
   phone: { type: String, required: true },

@@ -49,62 +49,61 @@ const Orders = () => {
   }
 
   useEffect(() => {
-    const processPayment = async () => {
-      if (!shouldSave || !user?._id) {
-        setLoading(false);
-        return;
-      }
+    const saveAndProcessOrder = async () => {
+      if (!token || !user?._id || hasSavedRef.current || paymentResult !== "true") return;
 
-      if (hasSavedRef.current) return;
       hasSavedRef.current = true;
 
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      let orderConfirmed = false;
-      let attempts = 0;
-
       try {
-        // Initial delay before polling starts
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        const raw = localStorage.getItem(`order_${token}`);
+        if (raw) {
+          const stored = JSON.parse(raw);
+          const cart = stored?.cartItems || [];
+          const formFields = stored?.formFields || {};
 
-        while (attempts < 10 && !orderConfirmed) {
-          try {
+          await axios.post(`${process.env.REACT_APP_BACKEND_URL}/save-temp`, {
+            token,
+            cartItems: cart,
+            formFields
+          });
+
+          await new Promise(resolve => setTimeout(resolve, 3000));
+
+          let attempts = 0;
+          while (attempts < 10) {
             const res = await axios.get(
-              `${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${userInfo?.email}`
+              `${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`
             );
-            
+
             if (Array.isArray(res.data) && res.data.length > 0) {
-              orderConfirmed = true;
               setPaymentStatus("success");
               break;
             }
-          } catch (e) {
-            console.warn("Polling failed:", e.message);
+
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            attempts++;
           }
 
-          attempts++;
-          await new Promise(resolve => setTimeout(resolve, 1500));
-        }
+          if (attempts === 10) {
+            setPaymentStatus("pending");
+            setError("Payment confirmation is taking longer than expected. Your order may still process.");
+          }
 
-        if (!orderConfirmed) {
-          setPaymentStatus("pending");
-          setError("Payment confirmation is taking longer than expected. Your order may still process.");
+          localStorage.removeItem(`order_${token}`);
+          localStorage.removeItem(`cf_order_${token}`);
+          setCartItems([]);
         }
-
-        // Cleanup
-        localStorage.removeItem(`order_${token}`);
-        localStorage.removeItem(`cf_order_${token}`);
-        setCartItems([]);
-      } catch (error) {
-        console.error("Order processing error:", error);
+      } catch (err) {
+        console.error("❌ Order processing failed:", err.message);
         setPaymentStatus("error");
-        setError("Failed to confirm your payment. Please check your order history or contact support.");
+        setError("Something went wrong while confirming your order.");
       } finally {
         setLoading(false);
       }
     };
 
-    processPayment();
-  }, [user, shouldSave, token, setCartItems]);
+    saveAndProcessOrder();
+  }, [token, user]);
 
   const handleViewOrders = () => {
     setPaymentStatus(null);

@@ -24,7 +24,7 @@ const OrdersTable = () => {
 
   if (orders.length === 0) {
     return (
-      <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
+      <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, mb: 5 }}>
         <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 600 }}>
           Your Orders
         </Typography>

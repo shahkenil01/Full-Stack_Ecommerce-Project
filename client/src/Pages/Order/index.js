@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { MyContext } from "../../App";
 import axios from "axios";
-import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button,} from "@mui/material";
+import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Grid, IconButton, Tooltip } from "@mui/material";
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
-import { Box, Paper } from '@mui/material';
-import { MdInfo } from "react-icons/md";
-
-const truncate = (str = "", len = 20) => {
-  return str.length > len ? str.slice(0, len) + "..." : str;
-};
+import { MdInfo, MdShoppingBasket } from "react-icons/md";
+import { LocalShipping, Payment, Home, Person, Email, Phone } from '@mui/icons-material';
 
 const OrdersTable = () => {
   const [orders, setOrders] = useState([]);
@@ -27,96 +23,222 @@ const OrdersTable = () => {
 
   if (orders.length === 0) {
     return (
-      <section className="section">
-        <div className="container">
-          <h2 className="hd text-center mb-4">Orders</h2>
-          <Paper elevation={3} sx={{ textAlign: 'center', padding: 4, borderRadius: 3 }} >
-            <SentimentDissatisfiedIcon sx={{ fontSize: 64, color: '#FBC02D' }} />
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              No orders found
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
-              You haven’t placed any orders yet. Go ahead and treat yourself!
-            </Typography>
-          </Paper>
-        </div>
-      </section>
+      <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 600 }}>
+          Your Orders
+        </Typography>
+        <Paper elevation={3} sx={{ 
+          textAlign: 'center', 
+          p: 4, 
+          borderRadius: 2,
+          backgroundColor: 'background.paper'
+        }}>
+          <SentimentDissatisfiedIcon sx={{ 
+            fontSize: 64, 
+            color: 'warning.main',
+            mb: 2
+          }} />
+          <Typography variant="h5" sx={{ mb: 1 }}>
+            No orders found
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+            You haven't placed any orders yet. Start shopping to see your orders here!
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            sx={{ mt: 3 }}
+            startIcon={<MdShoppingBasket />}
+          >
+            Browse Products
+          </Button>
+        </Paper>
+      </Box>
     );
   }
 
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'completed': return 'success';
+      case 'processing': return 'info';
+      case 'shipped': return 'secondary';
+      case 'cancelled': return 'error';
+      default: return 'warning';
+    }
+  };
+
   return (
-    <section className="section">
-      <div className="container">
-        <h2 className="hd">Orders</h2>
-        {orders.map((order) => (
-          <Card key={order._id} className="mb-4 shadow-sm">
-            <CardHeader
-              title={`Order on ${new Date(order.date).toLocaleDateString()}`}
-              subheader={`Payment Mode: ${order.paymentMethod || "N/A"}`}
-              action={
+    <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 1, md: 3 } }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+        Your Orders
+      </Typography>
+      
+      {orders.map((order) => (
+        <Card key={order._id} sx={{ mb: 4, boxShadow: 3 }}>
+          <CardHeader
+            title={
+              <Typography variant="h6" component="div">
+                Order #{order._id.slice(-6).toUpperCase()}
+              </Typography>
+            }
+            subheader={
+              <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+                  Placed on {new Date(order.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </Typography>
                 <Chip
+                  icon={<LocalShipping fontSize="small" />}
                   label={order.orderStatus}
-                  color="error"
-                  variant="filled"
+                  color={getStatusColor(order.orderStatus)}
+                  variant="outlined"
                   size="small"
                 />
-              }
-            />
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Products
-              </Typography>
-              <Divider className="mb-2" />
-              {order.products.map((prod, index) => (
-                <div
-                  key={index}
-                  className="d-flex align-items-center mb-3"
-                  style={{ gap: "15px" }}
-                >
-                  <Avatar
-                    src={prod.image}
-                    alt={prod.name}
-                    variant="rounded"
-                    sx={{ width: 56, height: 56 }}
-                  />
-                  <div>
-                    <div>
-                      <strong>{truncate(prod.name, 20)}</strong>
-                    </div>
-                    <small>
-                      Qty: {prod.quantity} | ₹{prod.price} × {prod.quantity} = ₹
-                      {prod.subtotal}
-                    </small>
-                  </div>
-                </div>
-              ))}
-
-              <Divider className="mt-3 mb-2" />
-              <Typography variant="h6">User Info</Typography>
-              <div className="pl-1 mt-1">
-                <div><strong>Name:</strong> {order.name}</div>
-                <div><strong>Email:</strong> {order.email}</div>
-                <div><strong>Phone:</strong> {order.phone}</div>
-                <div><strong>Address:</strong> {order.address}, {order.city}, {order.state}, {order.country}, {order.zipCode}</div>
-              </div>
-
-              <Divider className="mt-3 mb-2" />
-              <div className="d-flex justify-content-between align-items-center">
-                <Typography><strong>Total:</strong> ₹{order.totalAmount}</Typography>
-                <Button
+              </Box>
+            }
+            action={
+              <Tooltip title="Payment details">
+                <Chip
+                  icon={<Payment fontSize="small" />}
+                  label={order.paymentMethod || "N/A"}
+                  color="primary"
                   variant="outlined"
-                  color="secondary"
                   size="small"
-                  startIcon={<MdInfo />}
-                >
-                  {order.paymentId}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+                />
+              </Tooltip>
+            }
+            sx={{
+              backgroundColor: 'primary.light',
+              color: 'primary.contrastText',
+              '& .MuiCardHeader-subheader': {
+                color: 'primary.contrastText'
+              }
+            }}
+          />
+          
+          <CardContent>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+              Ordered Items
+            </Typography>
+            
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: 'grey.100' }}>
+                    <TableCell>Product</TableCell>
+                    <TableCell align="right">Price</TableCell>
+                    <TableCell align="center">Quantity</TableCell>
+                    <TableCell align="right">Subtotal</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {order.products.map((prod, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Avatar
+                            src={prod.image}
+                            alt={prod.name}
+                            variant="rounded"
+                            sx={{ width: 56, height: 56, mr: 2 }}
+                          />
+                          <Typography variant="body2">
+                            {prod.name}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        ₹{prod.price.toFixed(2)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {prod.quantity}
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography fontWeight="medium">
+                          ₹{(prod.price * prod.quantity).toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Divider sx={{ my: 3 }} />
+            
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                  <Person fontSize="small" sx={{ verticalAlign: 'middle', mr: 1 }} />
+                  Shipping Information
+                </Typography>
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="body2" paragraph>
+                    <strong>{order.name}</strong>
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    <Email fontSize="small" sx={{ verticalAlign: 'middle', mr: 1 }} />
+                    {order.email}
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    <Phone fontSize="small" sx={{ verticalAlign: 'middle', mr: 1 }} />
+                    {order.phone}
+                  </Typography>
+                  <Typography variant="body2">
+                    <Home fontSize="small" sx={{ verticalAlign: 'middle', mr: 1 }} />
+                    {order.address}, {order.city}, {order.state}, {order.country} - {order.zipCode}
+                  </Typography>
+                </Paper>
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                  Order Summary
+                </Typography>
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2">Subtotal:</Typography>
+                    <Typography variant="body2">₹{order.totalAmount.toFixed(2)}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2">Shipping:</Typography>
+                    <Typography variant="body2">Free</Typography>
+                  </Box>
+                  <Divider sx={{ my: 1 }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body1" fontWeight="medium">Total:</Typography>
+                    <Typography variant="body1" fontWeight="medium">₹{order.totalAmount.toFixed(2)}</Typography>
+                  </Box>
+                  
+                  {order.paymentId && (
+                    <>
+                      <Divider sx={{ my: 1 }} />
+                      <Tooltip title={order.paymentId}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          color="info"
+                          size="small"
+                          startIcon={<MdInfo />}
+                          sx={{ mt: 1 }}
+                        >
+                          Payment ID: {order.paymentId.slice(0, 8)}...
+                        </Button>
+                      </Tooltip>
+                    </>
+                  )}
+                </Paper>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
   );
 };
 

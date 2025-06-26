@@ -7,4 +7,4 @@ const tempOrderSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now, expires: 600 } // auto-delete after 10 mins
 });
 
-module.exports = mongoose.model("TempOrder", tempOrderSchema);
+module.exports = mongoose.models.TempOrder || mongoose.model("TempOrder", tempOrderSchema);

@@ -85,6 +85,7 @@ router.post("/webhook", async (req, res) => {
     }
 
     const raw = await TempOrder.findOne({ token });
+    console.log("🔍 DB Token Query Result:", raw);
     if (!raw) {
       console.log("⚠️ Temp order not found in DB for token:", token);
       return res.status(200).send("no order data, skip");

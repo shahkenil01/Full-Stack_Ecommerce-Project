@@ -13,12 +13,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function findTempOrderWithRetry(token, retries = 8, delayMs = 1000) {
   for (let i = 1; i <= retries; i++) {
     const found = await TempOrder.findOne({ token });
-    if (found) {
-      console.log(`✅ Found temp order on attempt #${i}`);
-      return found;
-    }
-    
-    console.log(`⏳ Temp order not found (attempt ${i}/${retries}), retrying in ${delayMs}ms...`);
+    if (found) return found;
     await wait(delayMs);
   }
   return null;
@@ -76,24 +71,18 @@ router.post("/create-order", async (req, res) => {
 
     res.status(200).json({ ...response.data, order_id: orderId });
   } catch (err) {
-    const message =
-      err.response?.data?.message || err.response?.data || err.message;
+    const message = err.response?.data?.message || err.response?.data || err.message;
     res.status(400).json({ error: message });
   }
 });
 
 // ✅ Webhook Handler Route
 router.post('/webhook', async (req, res) => {
-  console.log('ℹ️ Webhook received (TEST MODE)');
-  console.log('Headers:', req.headers);
-  console.log('Raw Body:', JSON.stringify(req.body, null, 2));
-
   try {
     const { type, data } = req.body;
 
     // 1. Check if this is a payment success event
     if (type !== 'PAYMENT_SUCCESS_WEBHOOK') {
-      console.log('⚠️ Ignoring non-payment event:', type);
       return res.status(200).json({ status: 'ignored', reason: 'Not a payment event' });
     }
 
@@ -104,7 +93,6 @@ router.post('/webhook', async (req, res) => {
     const orderId = order?.order_id;
 
     if (!token || !paymentId || !orderId) {
-      console.error('❌ Missing required fields');
       return res.status(400).json({ 
         error: 'Missing required fields',
         received: { token, paymentId, orderId }
@@ -112,11 +100,9 @@ router.post('/webhook', async (req, res) => {
     }
 
     // 3. Find temporary order (simulating DB lookup)
-    console.log(`🔍 Looking for temp order with token: ${token}`);
     const tempOrder = await findTempOrderWithRetry(token, 8, 1000);
 
     if (!tempOrder) {
-      console.error('❌ Temp order not found');
       return res.status(400).json({ 
         error: 'Order not found',
         token
@@ -159,7 +145,6 @@ router.post('/webhook', async (req, res) => {
     await TempOrder.deleteOne({ token });
     await Cart.deleteMany({ userEmail: tempOrder.formFields?.email });
 
-    console.log(`✅ Order created: ${newOrder._id}`);
     return res.status(200).json({ 
       success: true,
       orderId: newOrder._id,
@@ -167,7 +152,7 @@ router.post('/webhook', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('🔥 Webhook processing failed:', error);
+    console.error('Payment processing failed:', error);
     return res.status(500).json({ 
       error: 'Internal server error',
       details: error.message 

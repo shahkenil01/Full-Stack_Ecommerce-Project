@@ -24,7 +24,6 @@ app.use(bodyParser.json());
 
 // ✅ TEMP SAVE route (important)
 app.post("/save-temp", async (req, res) => {
-  console.log("🔥 Hit /save-temp with:", req.body);
   try {
     const { token, cartItems, formFields } = req.body;
     if (!token || !cartItems || !formFields) {

@@ -35,6 +35,7 @@ const orderRoutes = require("./routes/order");
 const favoriteRoutes = require('./routes/favorite');
 const reviewRoutes = require('./routes/review');
 const cashfreeRoute = require('./routes/cashfree');
+const tempRoutes = require('./routes/temp');
 
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
@@ -49,6 +50,7 @@ app.use("/api/orders", orderRoutes);
 app.use('/api/favorite', favoriteRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use('/api/cashfree', cashfreeRoute);
+app.use('/api/temp', tempRoutes);
 
 // Database
 mongoose.connect(process.env.CONNECTION_STRING, {

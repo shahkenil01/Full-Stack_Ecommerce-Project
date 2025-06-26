@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const Order = require("../models/order");
+const Cart = require("../models/Cart");
 const TempOrder = require("../models/tempOrder");
 
 // Helper delay function
@@ -97,6 +98,7 @@ router.post("/webhook", async (req, res) => {
     await TempOrder.deleteOne({ token });
 
     const method =
+      payment_method?.card?.network ||
       payment_method?.card?.type ||
       payment_method?.upi?.type ||
       payment_method?.app?.provider ||
@@ -129,6 +131,7 @@ router.post("/webhook", async (req, res) => {
     });
 
     await newOrder.save();
+    await Cart.deleteMany({ userEmail: { $regex: new RegExp(`^${raw.formFields.email}$`, "i") } });
     res.status(200).send("Order saved via webhook");
   } catch (err) {
     console.error("🔥 Webhook Save Failed:", err);

@@ -98,22 +98,64 @@ router.post("/webhook", async (req, res) => {
     await TempOrder.deleteOne({ token });
 
     let method = "UNKNOWN";
-
-    if (payment_method?.card) {
-      const card = payment_method.card;
-      const type = card.card_type?.replace("_", " ") || "";
-      const network = card.card_network || "";
-      method = `${type} (${network})`.trim();
-    } else if (payment_method?.upi) {
-      method = payment_method.upi.type || "UPI";
-    } else if (payment_method?.app) {
-      method = payment_method.app.provider || "Wallet";
-    } else if (payment_method?.netbanking) {
-      method = payment_method.netbanking.channel || "NetBanking";
-    } else if (payment_method?.emi) {
-      method = "EMI";
-    } else if (payment_method?.paypal) {
-      method = "PayPal";
+    
+    if (payment_method) {
+      // Card Payments
+      if (payment_method.card) {
+        const card = payment_method.card;
+        const type = card.card_type?.replace(/_/g, " ") || "";
+        const network = card.card_network || "";
+        method = `${type} ${network}`.trim() || "Credit/Debit Card";
+      }
+      // UPI Payments
+      else if (payment_method.upi) {
+        const upiType = payment_method.upi.type || "";
+        method = `UPI${upiType ? ` (${upiType})` : ''}`;
+      }
+      // Netbanking
+      else if (payment_method.netbanking) {
+        method = `NetBanking (${payment_method.netbanking.bank_name || payment_method.netbanking.channel || ''})`;
+      }
+      // Wallets
+      else if (payment_method.wallet) {
+        method = `Wallet (${payment_method.wallet.provider || ''})`;
+      }
+      // PayLater
+      else if (payment_method.paylater) {
+        method = `PayLater (${payment_method.paylater.provider || ''})`;
+      }
+      // EMI
+      else if (payment_method.emi) {
+        method = `EMI (${payment_method.emi.provider || ''})`;
+      }
+      // Prepaid Cards
+      else if (payment_method.prepaid_card) {
+        method = `Prepaid Card (${payment_method.prepaid_card.provider || ''})`;
+      }
+      // Direct Debit
+      else if (payment_method.debit_emi) {
+        method = `Debit EMI (${payment_method.debit_emi.provider || ''})`;
+      }
+      // Amazon Pay
+      else if (payment_method.amazonpay) {
+        method = "Amazon Pay";
+      }
+      // Paypal
+      else if (payment_method.paypal) {
+        method = "PayPal";
+      }
+      // Cashfree Token
+      else if (payment_method.token) {
+        method = "Saved Card/Token";
+      }
+      // NEFT/RTGS/IMPS
+      else if (payment_method.banktransfer) {
+        method = `Bank Transfer (${payment_method.banktransfer.channel || ''})`;
+      }
+      // Default case for any other method
+      else {
+        method = payment_method.channel || payment_method.provider || "Cashfree Payment";
+      }
     }
 
     const formattedProducts = raw.cartItems.map((item) => ({

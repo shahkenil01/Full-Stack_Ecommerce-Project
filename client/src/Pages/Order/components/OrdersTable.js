@@ -117,13 +117,7 @@ const OrdersTable = () => {
             }
             action={
               <Tooltip title="Payment details">
-                <Chip
-                  icon={<Payment fontSize="small" />}
-                  label={order.paymentMethod || "N/A"}
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                />
+                <Chip icon={<Payment fontSize="small" />} label={order.paymentMethod || "N/A"} color="primary" variant="outlined" size="small" />
               </Tooltip>
             }
             sx={{
@@ -155,12 +149,7 @@ const OrdersTable = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Avatar
-                            src={prod.image}
-                            alt={prod.name}
-                            variant="rounded"
-                            sx={{ width: 56, height: 56, mr: 2 }}
-                          />
+                          <Avatar src={prod.image} alt={prod.name} variant="rounded" sx={{ width: 56, height: 56, mr: 2 }} />
                           <Typography variant="body2">
                             {prod.name}
                           </Typography>
@@ -233,15 +222,8 @@ const OrdersTable = () => {
                     <>
                       <Divider sx={{ my: 1 }} />
                       <Tooltip title={order.paymentId}>
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          color="info"
-                          size="small"
-                          startIcon={<MdInfo />}
-                          sx={{ mt: 1 }}
-                        >
-                          Payment ID: {order.paymentId.slice(0, 8)}...
+                        <Button fullWidth variant="outlined" color="info" size="small" startIcon={<MdInfo />} sx={{ mt: 1 }} >
+                          Payment ID: {order.paymentId}
                         </Button>
                       </Tooltip>
                     </>

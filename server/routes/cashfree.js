@@ -97,13 +97,24 @@ router.post("/webhook", async (req, res) => {
 
     await TempOrder.deleteOne({ token });
 
-    const method =
-      payment_method?.card?.network ||
-      payment_method?.card?.type ||
-      payment_method?.upi?.type ||
-      payment_method?.app?.provider ||
-      payment_method?.netbanking?.channel ||
-      "UNKNOWN";
+    let method = "UNKNOWN";
+
+if (payment_method?.card) {
+  const card = payment_method.card;
+  const type = card.card_type?.replace("_", " ") || "";     // "debit_card" → "debit card"
+  const network = card.card_network || "";                  // "mastercard"
+  method = `${type} (${network})`.trim();                   // → "debit card (mastercard)"
+} else if (payment_method?.upi) {
+  method = payment_method.upi.type || "UPI";
+} else if (payment_method?.app) {
+  method = payment_method.app.provider || "Wallet";
+} else if (payment_method?.netbanking) {
+  method = payment_method.netbanking.channel || "NetBanking";
+} else if (payment_method?.emi) {
+  method = "EMI";
+} else if (payment_method?.paypal) {
+  method = "PayPal";
+}
 
     const formattedProducts = raw.cartItems.map((item) => ({
       productId: item._id || item.productId,

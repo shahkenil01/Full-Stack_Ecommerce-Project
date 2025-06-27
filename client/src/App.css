@@ -49,7 +49,7 @@ body{
   box-shadow: 0 1px 3px #0000000f, 0 1px 2px #0000001f;
   top: -80px;}
 .headerWrapperFixed+div {
-  margin-top: 160px !important;}
+  margin-top: 155px !important;}
 .headerWrapperFixed+section {
   margin-top: 130px !important;}
 
@@ -1080,7 +1080,7 @@ footer .copyright p{
   flex: 0 0 20%;}
 .product_Listing_Page .productListing .sidebar .sticky{
   position: sticky;
-  top: 30px;}
+  top: 80px;}
 
 .product_Listing_Page .productListing .sidebar .filterBox{
   margin-bottom: 35px;}

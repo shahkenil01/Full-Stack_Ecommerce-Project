@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
 import { IoIosMenu } from "react-icons/io";
 import { FaAngleDown } from "react-icons/fa6";
@@ -6,14 +6,14 @@ import { Link } from 'react-router-dom';
 import images from '../../../assets/images';
 import { fetchDataFromApi } from '../../../utils/api';
 
-const Navigation = () => {
+const Navigation = ({ isScrolled }) => {
     const [isopenSidebarVal, setisopenSidebarVal] = useState(false);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-const getSubCats = (categoryId) =>
-  subCategories.filter(sub => sub.category && sub.category._id === categoryId);
+    const getSubCats = (categoryId) =>
+      subCategories.filter(sub => sub.category && sub.category._id === categoryId);
 
     const customOrder = [ "Fashion", "Electronics", "Bags", "Footwear", "Groceries", "Beauty", "Wellness", "Jewellery" ];
 
@@ -45,8 +45,9 @@ const getSubCats = (categoryId) =>
     }
 
     return(
-      <nav>
-        <div className='container'>
+      <>
+      <nav className={`navigation ${isScrolled ? 'fixed' : ''}`}>
+        <div className='container mt-2'>
           <div className='row'>
             <div className='col-sm-2 navPart1'>
               <div className='catWrapper'>
@@ -117,6 +118,8 @@ const getSubCats = (categoryId) =>
           </div>
         </div>
       </nav>
+      {isScrolled && <div style={{ height: '60px' }}></div>}
+      </>
     )
 }
 

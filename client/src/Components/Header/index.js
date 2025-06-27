@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useLayoutEffect  } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { IoBagOutline } from "react-icons/io5";
@@ -11,14 +11,23 @@ import { MyContext } from '../../App';
 
 const Header= ()=>{
     const context = useContext(MyContext);
-    const [isScrolled, setIsScrolled] = useState(false);
 
-    useEffect(() => {
+    const getTotalPrice = () => {
+        return context.cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    };
+
+    const getUniqueItemCount = () => {
+        return context.cartItems.length;
+    };
+
+    useLayoutEffect(() => {
+        const el = document.querySelector('.headerWrapperFixed');
+
         const handleScroll = () => {
-            if (window.scrollY > 60) {
-                setIsScrolled(true);
+            if (window.scrollY > 50) {
+                el.classList.add('fixed');
             } else {
-                setIsScrolled(false);
+                el.classList.remove('fixed');
             }
         };
 
@@ -26,26 +35,16 @@ const Header= ()=>{
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const getTotalPrice = () => {
-        return context.cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    };
-
-    const getTotalCount = () => {
-        return context.cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    };
-    const getUniqueItemCount = () => {
-        return context.cartItems.length;
-    };
-
     return(
         <>
-            <div className={`headerWrapper ${isScrolled ? 'scrolled' : ''}`}>
+        <div className='headerWrapperFixed'>
+        <div className='headerWrapper'>
             {/*<div className="top-strip bg-blue">
                 <div className="container">
                     <p className="mb-0 mt-0 text-center">Due to high order Might be dealy.</p>
                 </div>
             </div>*/}
-                 <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
+                 <header className='header'>
                     <div className="container">
                         <div className="row">
                             <div className="logoWrapper col-sm-2 d-flex align-items-center ">
@@ -79,9 +78,9 @@ const Header= ()=>{
                     </div>
                 </header>
 
-                <Navigation isScrolled={isScrolled} />
+                <Navigation />
 
-            </div>
+            </div></div>
         </>
     )
 }

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import images from '../../../assets/images';
 import { fetchDataFromApi } from '../../../utils/api';
 
-const Navigation = ({ isScrolled }) => {
+const Navigation = () => {
     const [isopenSidebarVal, setisopenSidebarVal] = useState(false);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -46,7 +46,7 @@ const Navigation = ({ isScrolled }) => {
 
     return(
       <>
-      <nav className={`navigation ${isScrolled ? 'fixed' : ''}`}>
+      <nav className='navigation'>
         <div className='container mt-2'>
           <div className='row'>
             <div className='col-sm-2 navPart1'>
@@ -118,7 +118,6 @@ const Navigation = ({ isScrolled }) => {
           </div>
         </div>
       </nav>
-      {isScrolled && <div style={{ height: '60px' }}></div>}
       </>
     )
 }

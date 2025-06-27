@@ -51,7 +51,7 @@ body{
 .headerWrapperFixed+div {
   margin-top: 155px !important;}
 .headerWrapperFixed+section {
-  margin-top: 130px !important;}
+  margin-top: 120px !important;}
 
 .header{
   width: 100%;
@@ -1080,7 +1080,7 @@ footer .copyright p{
   flex: 0 0 20%;}
 .product_Listing_Page .productListing .sidebar .sticky{
   position: sticky;
-  top: 80px;}
+  top: 75px;}
 
 .product_Listing_Page .productListing .sidebar .filterBox{
   margin-bottom: 35px;}

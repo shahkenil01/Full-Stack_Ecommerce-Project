@@ -77,7 +77,7 @@ const Listing = () => {
 
                             <div className="content_right">
 
-                                <div className="showBy mt-3 mb-3 d-flex align-items-center">
+                                <div className="showBy mb-3 d-flex align-items-center">
                                     <div className="d-flex align-items-center btnWrapper">
                                         <Button className={productView==='one' && 'act'} onClick={()=>setProductView('one')}><IoIosMenu/></Button>
                                         <Button className={productView==='three' && 'act'} onClick={()=>setProductView('three')}><CgMenuGridR/></Button>

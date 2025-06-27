@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './Pages/Home';
@@ -45,6 +46,12 @@ function App() {
       setCountryList(res.data.data);
     });
   };
+
+  const theme = createTheme({
+    typography: {
+      fontFamily: 'Roboto, sans-serif',
+    },
+  });
 
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
@@ -138,6 +145,7 @@ function App() {
   };
 
   return (
+    <ThemeProvider theme={theme}> <CssBaseline />
     <BrowserRouter>
       <ScrollToTop />
       <MyContext.Provider value={values}>
@@ -170,6 +178,7 @@ function App() {
         )}
       </MyContext.Provider>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { Button, Dialog, Breadcrumbs, Typography, Link as MuiLink, TablePagination } from "@mui/material";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdDelete } from "react-icons/md";
 import { IoMdHome } from "react-icons/io";
+import { useSnackbar } from "notistack";
 import { fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
 import CustomDropdown from "../../components/CustomDropdown";
@@ -15,6 +16,8 @@ const Orders = () => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+  const { enqueueSnackbar } = useSnackbar();
+  const token = localStorage.getItem("userToken");
 
   const showProducts = (id) => {
     const foundOrder = orders.find((order) => order._id === id);
@@ -31,27 +34,52 @@ const Orders = () => {
 
   const handleStatusChange = async (value, orderId) => {
     try {
-      const updated = orders.map((order) =>
-        order._id === orderId ? { ...order, orderStatus: value } : order
-      );
-      setOrders(updated);
-
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/orders/${orderId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ orderStatus: value })
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to update status");
+        throw new Error(data?.msg || "Failed to update status");
       }
 
-      console.log("✅ Order status updated:", data);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === orderId ? { ...order, orderStatus: value } : order
+        )
+      );
+
+      enqueueSnackbar("Order status updated successfully", { variant: "success" });
     } catch (err) {
+      enqueueSnackbar(err.message, { variant: "error" });
       console.error("❌ Error updating status:", err.message);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to delete this order?")) return;
+
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/orders/${orderId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.msg || "Failed to delete order");
+      }
+
+      setOrders((prev) => prev.filter((order) => order._id !== orderId));
+      enqueueSnackbar("Order deleted successfully", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar(err.message, { variant: "error" });
+      console.error("❌ Error deleting order:", err.message);
     }
   };
 
@@ -88,6 +116,7 @@ const Orders = () => {
                 <th>Amount</th>
                 <th>Status</th>
                 <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -121,6 +150,13 @@ const Orders = () => {
                     />
                   </td>
                   <td>{order.date.split("T")[0]}</td>
+                  <td>
+                    <div className="actions d-flex align-items-center">
+                      <Button className='error' color="error" onClick={() => handleDeleteOrder(order._id)}>
+                        <MdDelete />
+                      </Button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Order = require("../models/order");
+const verifyToken = require("../middleware/auth");
+const isAdmin = require("../middleware/isAdmin");
 
 router.get("/all", async (req, res) => {
   try {
@@ -21,12 +23,10 @@ router.get("/user/:email", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { orderStatus } = req.body;
-    if (!orderStatus) {
-      return res.status(400).json({ error: "orderStatus is required" });
-    }
+    if (!orderStatus) return res.status(400).json({ msg: "orderStatus is required" });
 
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
@@ -34,14 +34,12 @@ router.put("/:id", async (req, res) => {
       { new: true }
     );
 
-    if (!updatedOrder) {
-      return res.status(404).json({ error: "Order not found" });
-    }
+    if (!updatedOrder) return res.status(404).json({ msg: "Order not found" });
 
-    res.json({ message: "Order status updated", order: updatedOrder });
+    res.json({ msg: "Order status updated", order: updatedOrder });
   } catch (error) {
     console.error("Failed to update order status:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ msg: "Internal Server Error" });
   }
 });
 
@@ -55,6 +53,18 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch order:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.delete("/:id", verifyToken, isAdmin, async (req, res) => {
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(req.params.id);
+    if (!deletedOrder) return res.status(404).json({ msg: "Order not found" });
+
+    res.json({ msg: "Order deleted successfully" });
+  } catch (error) {
+    console.error("Failed to delete order:", error);
+    res.status(500).json({ msg: "Internal Server Error" });
   }
 });
 

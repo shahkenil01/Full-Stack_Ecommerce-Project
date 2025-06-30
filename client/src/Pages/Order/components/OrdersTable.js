@@ -10,6 +10,7 @@ import { TrackingModal } from "./TrackingModal";
 
 const OrdersTable = () => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
 
@@ -18,10 +19,12 @@ const OrdersTable = () => {
   const fetchOrders = () => {
     if (!user?.email) return;
 
+    setLoading(true);
     axios
       .get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`)
       .then((res) => setOrders(res.data.sort((a, b) => new Date(b.date) - new Date(a.date))))
-      .catch((err) => console.error("❌ Failed to fetch orders:", err.message));
+      .catch((err) => console.error("❌ Failed to fetch orders:", err.message))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -39,7 +42,7 @@ const OrdersTable = () => {
     fetchOrders();
   };
 
-  if (orders.length === 0) {
+  if (!loading && orders.length === 0) {
     return (
       <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, mb: 5 }}>
         <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 600 }}>

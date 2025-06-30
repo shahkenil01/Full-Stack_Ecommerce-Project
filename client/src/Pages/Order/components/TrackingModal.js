@@ -4,7 +4,6 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Stepper, Step, StepL
 import { styled } from '@mui/material/styles';
 import { MdCheckCircle, MdCancel } from "react-icons/md";
 import { FaBoxOpen, FaShippingFast, FaTruckLoading } from "react-icons/fa";
-import { motion } from "framer-motion";
 
 const ColorConnector = styled(StepConnector)(({ theme }) => ({
   '&.MuiStepConnector-root': {  top: 20 },

@@ -9,16 +9,22 @@ import emptyCartImg from "../../assets/images/emptyCart.png";
 import QuantityBox from '../../Components/QuantityBox';
 
 const Cart = () => {
-  const { cartItems, removeFromCart } = useContext(MyContext);
-  const { updateCartQuantity } = useContext(MyContext);
+  const { cartItems, removeFromCart, updateCartQuantity } = useContext(MyContext);
+  if (cartItems === null) return null;
+
+  const getTotal = () =>
+    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  const total = getTotal();
+  const gstRate = total >= 1000 ? 0.12 : 0.12;
+  const gstAmount = parseFloat((total * gstRate).toFixed(2));
+  const deliveryCharge = total >= 1000 ? 0 : 45;
+  const grandTotal = total + gstAmount + deliveryCharge;
 
   const truncateText = (text, limit = 30) => {
     if (!text) return "";
     return text.length > limit ? text.slice(0, limit) + "..." : text;
   };
-
-  const getTotal = () =>
-    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const removeFromCartAndDB = async (item) => {
     removeFromCart(item._id);
@@ -37,7 +43,7 @@ const Cart = () => {
   const updateQuantityInCart = (item, newQty) => {
     updateCartQuantity(item._id, newQty);
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item.cartId}`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/${item._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -115,21 +121,21 @@ const Cart = () => {
               <div className="card border p-3 cartDetails">
                 <h4>CART TOTALS</h4>
 
-                <div className='d-flex align-items-center mb-3'>
+                <div className='d-flex align-items-center mb-2'>
                   <span>Subtotal</span>
                   <span className="ml-auto text-red font-weight-bold">₹{getTotal()}</span>
                 </div>
-                <div className='d-flex align-items-center mb-3'>
-                  <span>Shipping</span>
-                  <span className="ml-auto"><b>Free</b></span>
+                <div className='d-flex align-items-center mb-2'>
+                  <span>GST ({gstRate * 100}%)</span>
+                  <span className="ml-auto text-red font-weight-bold">₹{gstAmount}</span>
                 </div>
-                <div className='d-flex align-items-center mb-3'>
-                  <span>Estimate for</span>
-                  <span className="ml-auto"><b>India</b></span>
+                <div className='d-flex align-items-center mb-2'>
+                  <span>Delivery Charge</span>
+                  <span className="ml-auto">{deliveryCharge > 0 ? `₹${deliveryCharge}` : "Free"}</span>
                 </div>
                 <div className='d-flex align-items-center mb-4'>
                   <span>Total</span>
-                  <span className="ml-auto text-red font-weight-bold">₹{getTotal()}</span>
+                  <span className="ml-auto text-red font-weight-bold">₹{grandTotal}</span>
                 </div>
                 <Link to={'/checkout'}><Button className='btn-blue btn-lg btn-big bg-red'><IoBagCheckOutline/>&nbsp; Checkout</Button></Link>
               </div>

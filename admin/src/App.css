@@ -714,8 +714,6 @@ body.dark .dropdown-item:focus {
 .table.fullWidthTable td {
   white-space: nowrap;
   vertical-align: middle;}
-.table-responsive.order {
-  overflow: visible !important;}
 
 .table .thead-dark th{
   background-color: #1866ee;

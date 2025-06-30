@@ -28,7 +28,10 @@ const Orders = () => {
   };
   useEffect(() => {
     fetchDataFromApi(`/api/orders/all`).then((data) => {
-      if (Array.isArray(data)) setOrders(data);
+      if (Array.isArray(data)) {
+        const sorted = data.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+        setOrders(sorted);
+      }
     });
   }, []);
 

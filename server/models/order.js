@@ -25,6 +25,6 @@ const orderSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   orderStatus: { type: String, default: "pending" },
   date: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Order", orderSchema);

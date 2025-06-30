@@ -3,6 +3,7 @@ import { createContext, useEffect, useState } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css';
 import './assets/css/responsive.css';
+import { jwtDecode } from 'jwt-decode';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import TopLoadingBar from './components/TopLoadingBar';
@@ -55,6 +56,41 @@ function AppWrapper() {
       setUser(JSON.parse(userData));
     }
     setIsAuthLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const expiry = decoded.exp * 1000;
+        const now = Date.now();
+
+        if (expiry <= now) {
+          localStorage.removeItem("userToken");
+          localStorage.removeItem("userInfo");
+          setIsLogin(false);
+          setUser(null);
+        } else {
+          const timeout = setTimeout(() => {
+            localStorage.removeItem("userToken");
+            localStorage.removeItem("userInfo");
+            setIsLogin(false);
+            setUser(null);
+            window.location.href = "/login";
+          }, expiry - now);
+
+          return () => clearTimeout(timeout);
+        }
+      } catch (err) {
+        console.error("❌ Invalid token:", err.message);
+        localStorage.removeItem("userToken");
+        localStorage.removeItem("userInfo");
+        setIsLogin(false);
+        setUser(null);
+      }
+    }
   }, []);
 
   useEffect(()=>{

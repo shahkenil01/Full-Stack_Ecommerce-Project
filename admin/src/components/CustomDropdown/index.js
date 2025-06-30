@@ -46,7 +46,8 @@ const CustomDropdown = ({ value, onChange, options = [], placeholder = "Select",
         .map((v) => options.find((o) => o.value === v)?.label || v)
         .join(', ');
     } else {
-      return value ? options.find(o => o.value === value)?.label : <em>{placeholder}</em>;
+      const matched = options.find(o => o.value === value);
+      return matched ? matched.label : <em>{placeholder}</em>;
     }
   };
 

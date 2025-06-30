@@ -27,6 +27,7 @@ import ProductEdit from './pages/Products/ProductEdit';
 import ProductsRam from './pages/Products/ProductsRam';
 import ProductsWeight from './pages/Products/ProductsWeight';
 import ProductsSize from './pages/Products/ProductsSize';
+import Orders from './pages/Order';
 
 const MyContext = createContext();
 
@@ -100,6 +101,7 @@ function AppWrapper() {
     { path: '/product/edit/:id' },
     { path: '/productWEIGHT/add' },
     { path: '/productSIZE/add' },
+    { path: '/orders' },
   ];
 
   const skipLoaderRoutes = [
@@ -157,6 +159,7 @@ function AppWrapper() {
               <Route path="/productRAMS/add" element={<ProductsRam />} />
               <Route path="/productWEIGHT/add" element={<ProductsWeight />} />
               <Route path="/productSIZE/add" element={<ProductsSize />} />
+              <Route path="/orders" element={<Orders />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

@@ -5,37 +5,33 @@ import axios from "axios";
 import { Card, CardHeader, CardContent, Typography, Divider, Chip, Avatar, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Grid, Tooltip } from "@mui/material";
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
 import { MdInfo, MdShoppingBasket } from "react-icons/md";
-import { LocalShipping, Payment, Home, Person, Email, Phone } from '@mui/icons-material';
+import { LocalShipping, Payment, Home, Person, Email, Phone, TrackChanges } from '@mui/icons-material';
+import { TrackingModal } from "./TrackingModal";
 
 const OrdersTable = () => {
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isTrackingOpen, setIsTrackingOpen] = useState(false);
+
   const { user } = useContext(MyContext);
 
-  useEffect(() => {
+  const fetchOrders = () => {
     if (!user?.email) return;
 
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`
-        );
-        setOrders(res.data);
-      } catch (err) {
-        console.error("❌ Failed to fetch orders:", err.message);
-      }
-    };
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`)
+      .then((res) => setOrders(res.data.sort((a, b) => new Date(b.date) - new Date(a.date))))
+      .catch((err) => console.error("❌ Failed to fetch orders:", err.message));
+  };
 
+  useEffect(() => {
     fetchOrders();
   }, [user]);
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'completed': return 'success';
-      case 'processing': return 'info';
-      case 'shipped': return 'secondary';
-      case 'cancelled': return 'error';
-      default: return 'warning';
-    }
+  const handleModalClose = () => {
+    setIsTrackingOpen(false);
+    setSelectedOrder(null);
+    fetchOrders();
   };
 
   if (orders.length === 0) {
@@ -44,27 +40,15 @@ const OrdersTable = () => {
         <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 600 }}>
           Your Orders
         </Typography>
-        <Paper elevation={3} sx={{ 
-          textAlign: 'center', 
-          p: 4, 
-          borderRadius: 2,
-          backgroundColor: 'background.paper'
-        }}>
-          <SentimentDissatisfiedIcon sx={{ 
-            fontSize: 64, 
-            color: 'warning.main',
-            mb: 2
-          }} />
+        <Paper elevation={3} sx={{ textAlign: 'center', p: 4, borderRadius: 2, backgroundColor: 'background.paper' }}>
+          <SentimentDissatisfiedIcon sx={{ fontSize: 64, color: 'warning.main', mb: 2 }} />
           <Typography variant="h5" sx={{ mb: 1 }}>
             No orders found
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             You haven't placed any orders yet. Start shopping to see your orders here!
           </Typography>
-          <Link to="/"><Button variant="contained" color="primary" 
-            sx={{ mt: 3 }}
-            startIcon={<MdShoppingBasket />}
-          >
+          <Link to="/"><Button variant="contained" color="primary" sx={{ mt: 3 }} startIcon={<MdShoppingBasket />}>
             Browse Products
           </Button></Link>
         </Paper>
@@ -72,21 +56,22 @@ const OrdersTable = () => {
     );
   }
 
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'completed': return 'success';
+      case 'processing': return 'default';
+      case 'shipped': return 'secondary';
+      case 'cancelled': return 'error';
+      default: return 'warning';
+    }
+  };
+
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 1, md: 3 } }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          Your Orders
-        </Typography>
-        <Button 
-          variant="outlined" 
-          onClick={() => window.location.reload()}
-          sx={{ ml: 2 }}
-        >
-          Refresh Orders
-        </Button>
-      </Box>
-      
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+        Your Orders
+      </Typography>
+
       {orders.map((order) => (
         <Card key={order._id} sx={{ mb: 4, boxShadow: 3 }}>
           <CardHeader
@@ -112,12 +97,27 @@ const OrdersTable = () => {
                   color={getStatusColor(order.orderStatus)}
                   variant="outlined"
                   size="small"
+                  sx={ order.orderStatus.toLowerCase() === 'processing'
+                      ? {
+                          color: '#000',
+                          borderColor: 'transparent',
+                          backgroundColor: '#fff3e0',
+                          fontWeight: 600,
+                        }
+                      : {}
+                  }
                 />
               </Box>
             }
             action={
               <Tooltip title="Payment details">
-                <Chip icon={<Payment fontSize="small" />} label={order.paymentMethod || "N/A"} color="primary" variant="outlined" size="small" />
+                <Chip
+                  icon={<Payment fontSize="small" />}
+                  label={order.paymentMethod || "N/A"}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                />
               </Tooltip>
             }
             sx={{
@@ -128,12 +128,12 @@ const OrdersTable = () => {
               }
             }}
           />
-          
+
           <CardContent>
             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
               Ordered Items
             </Typography>
-            
+
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
                 <TableHead>
@@ -149,18 +149,19 @@ const OrdersTable = () => {
                     <TableRow key={index}>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Avatar src={prod.image} alt={prod.name} variant="rounded" sx={{ width: 56, height: 56, mr: 2 }} />
+                          <Avatar
+                            src={prod.image}
+                            alt={prod.name}
+                            variant="rounded"
+                            sx={{ width: 56, height: 56, mr: 2 }}
+                          />
                           <Typography variant="body2">
                             {prod.name}
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell align="right">
-                        ₹{prod.price.toFixed(2)}
-                      </TableCell>
-                      <TableCell align="center">
-                        {prod.quantity}
-                      </TableCell>
+                      <TableCell align="right">₹{prod.price.toFixed(2)}</TableCell>
+                      <TableCell align="center">{prod.quantity}</TableCell>
                       <TableCell align="right">
                         <Typography fontWeight="medium">
                           ₹{(prod.price * prod.quantity).toFixed(2)}
@@ -173,7 +174,7 @@ const OrdersTable = () => {
             </TableContainer>
 
             <Divider sx={{ my: 3 }} />
-            
+
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
@@ -198,7 +199,7 @@ const OrdersTable = () => {
                   </Typography>
                 </Paper>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
                   Order Summary
@@ -217,23 +218,32 @@ const OrdersTable = () => {
                     <Typography variant="body1" fontWeight="medium">Total:</Typography>
                     <Typography variant="body1" fontWeight="medium">₹{order.totalAmount.toFixed(2)}</Typography>
                   </Box>
-                  
+
                   {order.paymentId && (
                     <>
                       <Divider sx={{ my: 1 }} />
                       <Tooltip title={order.paymentId}>
-                        <Button fullWidth variant="outlined" color="info" size="small" startIcon={<MdInfo />} sx={{ mt: 1 }} >
+                        <Button fullWidth variant="outlined" color="info" size="small" startIcon={<MdInfo />} sx={{ mt: 1 }}>
                           Payment ID: {order.paymentId}
                         </Button>
                       </Tooltip>
                     </>
                   )}
+
+                  <Button fullWidth variant="contained" color="secondary" size="small" startIcon={<TrackChanges />}
+                    onClick={() => { setSelectedOrder(order); setIsTrackingOpen(true); }} sx={{ mt: 2 }} >
+                    Track Order
+                  </Button>
                 </Paper>
               </Grid>
             </Grid>
           </CardContent>
         </Card>
       ))}
+
+      {selectedOrder && (
+        <TrackingModal open={isTrackingOpen} onClose={handleModalClose} order={selectedOrder} orderDate={selectedOrder.date} />
+      )}
     </Box>
   );
 };

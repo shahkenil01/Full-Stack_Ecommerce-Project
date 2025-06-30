@@ -137,7 +137,6 @@ router.post('/webhook', async (req, res) => {
       zipCode: tempOrder.formFields?.zipCode || '',
       country: tempOrder.formFields?.country || '',
       totalAmount: payment.payment_amount || order.order_amount || 0,
-      orderStatus: 'processing'
     });
 
     // 6. Save order and clean up

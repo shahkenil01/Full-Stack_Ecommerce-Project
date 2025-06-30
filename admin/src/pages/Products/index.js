@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaUserCircle, FaEye, FaPencilAlt } from "react-icons/fa";
 import { IoMdCart, IoMdHome } from "react-icons/io";
@@ -8,8 +8,10 @@ import DashboardBox from '../Dashboard/components/dashboardBox';
 import { fetchDataFromApi, deleteData } from '../../utils/api';
 import CustomDropdown from '../../components/CustomDropdown';
 import { useSnackbar } from 'notistack';
+import { MyContext } from "../../App";
 
 const Products = () => {
+  const context = useContext(MyContext);
   const [categoryBy, setCategoryBy] = useState('');
   const [subcategories, setSubcategories] = useState([]);
   const [productList, setProductList] = useState([]);
@@ -123,17 +125,17 @@ const Products = () => {
         </div>
 
         <div className="table-responsive fixedheight mt-3">
-          <table className="table table-bordered v-align">
+          <table className={`table table-bordered v-align ${context.isToggleSidebar ? 'fullWidthTable' : ''}`}>
             <thead className="thead-dark">
               <tr>
-                <th style={{ width: "50px" }}>NO.</th>
-                <th>PRODUCT</th>
-                <th style={{ width: "100px" }}>CATEGORY</th>
-                <th style={{ width: "150px" }}>SUB CATEGORY</th>
-                <th style={{ width: "130px" }}>BRAND</th>
-                <th style={{ width: "50px" }}>PRICE</th>
-                <th style={{ width: "100px" }}>RATING</th>
-                <th style={{ width: "120px" }}>ACTIONS</th>
+                <th >NO.</th>
+                <th >PRODUCT</th>
+                <th >CATEGORY</th>
+                <th >SUB CATEGORY</th>
+                <th >BRAND</th>
+                <th >PRICE</th>
+                <th >RATING</th>
+                <th >ACTIONS</th>
               </tr>
             </thead>
             <tbody>

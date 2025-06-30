@@ -25,6 +25,7 @@ const Sidebar = () => {
     '/subCategory': 2,
     '/products': 3,
     '/product': 3,
+    '/orders': 4,
   };
 
   useEffect(() => {

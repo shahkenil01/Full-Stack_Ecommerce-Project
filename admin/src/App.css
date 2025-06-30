@@ -590,7 +590,6 @@ main .sidebarWrapper .sidebar ul .submenuWrapper{
   position: relative;
   width: 100%;
   height: 40px;
-  margin-top: 5px;
   font-family: 'Roboto', sans-serif;
   user-select: none;}
 .dropdown-select {
@@ -709,6 +708,14 @@ body.dark .dropdown-item:focus {
   position: sticky;
   top: -0.5px;
   z-index: 1;}
+.table.fullWidthTable {
+  min-width: 1265px !important; }
+.table.fullWidthTable th,
+.table.fullWidthTable td {
+  white-space: nowrap;
+  vertical-align: middle;}
+.table-responsive.order {
+  overflow: visible !important;}
 
 .table .thead-dark th{
   background-color: #1866ee;
@@ -1311,3 +1318,23 @@ textarea {
   outline: none !important;}
 .otpBox input:focus{
   border: 1px solid rgba(0,0,0,0.7) !important;}
+
+.close_, .close_ svg {
+  color: #000 !important;}
+.productModal .MuiPaper-elevation {
+  max-width: 900px !important;
+  padding: 25px;
+  position: relative;
+  width: 900px !important;}
+.close_ svg {
+  font-size: 22px;
+  opacity: .7;}
+.close_ {
+  background: #f1f1f1 !important;
+  border-radius: 50% !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  position: absolute !important;
+  right: 10px;
+  top: 10px;
+  width: 40px !important;}

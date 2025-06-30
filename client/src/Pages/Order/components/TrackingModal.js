@@ -1,44 +1,42 @@
-import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Stepper, Step, StepLabel, Typography, Button, Box, StepConnector,
-  Zoom,
-} from '@mui/material';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Stepper, Step, StepLabel, Typography, Button, Box, StepConnector, Zoom, } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { MdCheckCircle, MdCancel } from "react-icons/md";
 import { FaBoxOpen, FaShippingFast, FaTruckLoading } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const ColorConnector = styled(StepConnector)(({ theme }) => ({
-  '&.MuiStepConnector-root': {
-    top: 20,
-  },
+  '&.MuiStepConnector-root': {  top: 20 },
   '& .MuiStepConnector-line': {
     borderTopStyle: 'dotted',
     borderTopWidth: 3,
     transition: 'all 0.3s ease',
   },
-  '&.Mui-active .MuiStepConnector-line': {
-    borderColor: 'green',
-  },
-  '&.Mui-completed .MuiStepConnector-line': {
-    borderColor: 'green',
-  },
-  '&:not(.Mui-completed):not(.Mui-active) .MuiStepConnector-line': {
-    borderColor: '#d1d5db',
-  }
+  '&.Mui-active .MuiStepConnector-line': { borderColor: 'green' },
+  '&.Mui-completed .MuiStepConnector-line': { borderColor: 'green' },
+  '&:not(.Mui-completed):not(.Mui-active) .MuiStepConnector-line': { borderColor: '#d1d5db' }
 }));
 
-const FadeMotion = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4 }}
-  >
-    {children}
-  </motion.div>
-);
+export const TrackingModal = ({ open, onClose, orderId, orderDate }) => {
+  const [order, setOrder] = useState(null);
+  const fetchOrder = () => {
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/${orderId}`)
+      .then((res) => setOrder(res.data))
+      .catch(err => console.error("❌ Error fetching order:", err.message));
+  };
 
-export const TrackingModal = ({ open, onClose, order, orderDate }) => {
+  useEffect(() => {
+    if (!open || !orderId) return;
+
+    fetchOrder();
+    const interval = setInterval(fetchOrder, 1000);
+
+    return () => clearInterval(interval);
+  }, [orderId, open]);
+
+  if (!order) return null;
+
   const rawStatus = (order?.orderStatus || "pending").trim().toLowerCase();
   const currentStatus = rawStatus === "cancelled" ? "cancelled" : rawStatus;
 
@@ -96,11 +94,7 @@ export const TrackingModal = ({ open, onClose, order, orderDate }) => {
       </DialogTitle>
 
       <DialogContent dividers>
-        <Stepper
-          activeStep={activeStep}
-          alternativeLabel
-          connector={<ColorConnector />}
-        >
+        <Stepper activeStep={activeStep} alternativeLabel connector={<ColorConnector />} >
           {steps.map((step, index) => {
             const IconComponent = step.icon;
             const isCompleted = index < activeStep;
@@ -108,34 +102,21 @@ export const TrackingModal = ({ open, onClose, order, orderDate }) => {
 
             return (
               <Step key={step.label} completed={isCompleted}>
-                <StepLabel
-                  icon={
+                <StepLabel icon={
                     <Zoom in>
                       <Box sx={{ p: 1, borderRadius: '50%' }}>
-                        <IconComponent
-                          size={24}
-                          color={
-                            step.label.toLowerCase() === 'cancelled'
-                              ? 'red'
-                              : isCompleted || isActive
-                              ? 'green'
-                              : 'gray'
-                          }
-                        />
+                        <IconComponent size={24} color={
+                          step.label.toLowerCase() === 'cancelled'
+                            ? 'red'
+                            : isCompleted || isActive
+                            ? 'green'
+                            : 'gray'
+                          } />
                       </Box>
                     </Zoom>
                   }
-                  sx={{
-                    '& .MuiStepLabel-label': {
-                      fontWeight: 600,
-                      color:
-                        step.label.toLowerCase() === 'cancelled'
-                          ? 'error.main'
-                          : '#1a1a1a',
-                      px: 2,
-                      py: 1,
-                      borderRadius: '12px',
-                    },
+                  sx={{ '& .MuiStepLabel-label': { fontWeight: 600, color: step.label.toLowerCase() === 'cancelled' ? 'error.main' : '#1a1a1a',
+                      px: 2, py: 1, borderRadius: '12px' },
                   }}
                 >
                   <Box>
@@ -154,14 +135,7 @@ export const TrackingModal = ({ open, onClose, order, orderDate }) => {
       </DialogContent>
 
       <DialogActions>
-        <Button
-          onClick={onClose}
-          variant="contained"
-          sx={{
-            backgroundColor: '#6d4aae',
-            '&:hover': { backgroundColor: '#53348c' }
-          }}
-        >
+        <Button onClick={onClose} variant="contained" sx={{ backgroundColor: '#6d4aae', '&:hover': { backgroundColor: '#53348c' } }} >
           Close
         </Button>
       </DialogActions>

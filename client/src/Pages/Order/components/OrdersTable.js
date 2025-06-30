@@ -25,7 +25,12 @@ const OrdersTable = () => {
   };
 
   useEffect(() => {
+    if (!user?.email) return;
     fetchOrders();
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 1000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const handleModalClose = () => {
@@ -242,7 +247,7 @@ const OrdersTable = () => {
       ))}
 
       {selectedOrder && (
-        <TrackingModal open={isTrackingOpen} onClose={handleModalClose} order={selectedOrder} orderDate={selectedOrder.date} />
+        <TrackingModal open={isTrackingOpen} onClose={handleModalClose} orderId={selectedOrder._id} orderDate={selectedOrder.date} />
       )}
     </Box>
   );

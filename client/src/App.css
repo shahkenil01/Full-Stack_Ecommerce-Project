@@ -1443,6 +1443,17 @@ section.section.myAccountPage{
   overflow: hidden;
   position: relative;
   width: 140px;}
+.userImage .overlay svg {
+  color: #fff;
+  font-size: 40px;}
+.userImage .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.4);}
 .myAccBox .form-group .MuiOutlinedInput-input {
   background: #f1f1f1 !important;}
 .css-1gsv261 {

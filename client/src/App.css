@@ -1442,7 +1442,8 @@ section.section.myAccountPage{
   height: 140px;
   overflow: hidden;
   position: relative;
-  width: 140px;}
+  width: 140px;
+  left: 40px;}
 .userImage .overlay svg {
   color: #fff;
   font-size: 40px;}

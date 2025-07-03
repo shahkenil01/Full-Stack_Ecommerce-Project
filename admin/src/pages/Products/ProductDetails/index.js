@@ -279,7 +279,7 @@ const ProductDetails = () => {
                   { icon: <BiSolidCategoryAlt />, label: "Category", value: product.category?.name },
                   { icon: <FaTag />, label: "Price", value: `₹${product.price || "0"}` },
                   { icon: <FaShoppingCart />, label: "Stock", value: `(${product.countInStock || 0}) piece` },
-                  { icon: <FaStar />, label: "Review", value: `(${product.numReviews || 0}) Review` },
+                  { icon: <FaStar />, label: "Review", value: `(${reviews.length}) Review` },
                   createdDate && { icon: <FaShieldAlt />, label: "Published", value: createdDate }
                 ].filter(Boolean).map((item, idx) => (
                   <div className="row" key={idx}>
@@ -310,7 +310,7 @@ const ProductDetails = () => {
                         <span className="name">{labelMap[key]}</span>
                       </div>
                       <div className="col-sm-9">
-                        <ul className="list list-inline tags sml">
+                        <ul className="list list-inline tags sml ml-3">
                           {product[key].map((val, i) => (
                             <li className="list-inline-item" key={i}><span>{val}</span></li>
                           ))}
@@ -380,7 +380,6 @@ const ProductDetails = () => {
                       </div>
                     </div>
 
-                    {/* Replies */}
                     {rev.replies?.map((rep, j) => (
                       <div className="reviewsRow reply" key={j}>
                         <div className="row"></div>
@@ -425,7 +424,6 @@ const ProductDetails = () => {
                       </div>
                     ))}
 
-                    {/* Reply Form */}
                     {activeReplyId === rev._id && (
                       <div className="reviewsRow reply">
                         <form className="reviewForm w-100">
@@ -451,7 +449,7 @@ const ProductDetails = () => {
               onChange={(e) => setNewReview({ ...newReview, reviewText: e.target.value }) }
             />
             <div className="mt-3 mb-3">
-              <Rating name="new-review-rating" value={newReview.rating}
+              <Rating name="new-review-rating" value={newReview.rating} precision={0.5}
                 onChange={(e, newVal) => setNewReview({ ...newReview, rating: newVal }) }
               />
             </div>

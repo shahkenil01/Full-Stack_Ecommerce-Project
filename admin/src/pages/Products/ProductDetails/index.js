@@ -78,8 +78,9 @@ const ProductDetails = () => {
 
       const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
       reviewRes?.forEach((r) => {
-        const rounded = Math.round(r.rating);
-        if (breakdown[rounded] !== undefined) {
+        const rating = Number(r.rating);
+        const rounded = Math.round(rating);
+        if (breakdown.hasOwnProperty(rounded)) {
           breakdown[rounded]++;
         }
       });
@@ -144,8 +145,19 @@ const ProductDetails = () => {
 
       const data = await res.json();
       if (res.ok) {
-        setReviews([data, ...reviews]);
-        setNewReview({ userName: "Anonymous", rating: 5, reviewText: "" });
+        const updatedReviews = [data, ...reviews];
+          setReviews(updatedReviews);
+          setNewReview({ userName: "Anonymous", rating: 5, reviewText: "" });
+
+        const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        updatedReviews.forEach((r) => {
+          const rating = Number(r.rating);
+          const rounded = Math.round(rating);
+          if (breakdown.hasOwnProperty(rounded)) {
+            breakdown[rounded]++;
+          }
+        });
+        setRatingBreakdown(breakdown);
         enqueueSnackbar("Review added successfully", { variant: "success" });
       } else {
         enqueueSnackbar(data.message || "Failed to post review", { variant: "error" });
@@ -166,7 +178,18 @@ const ProductDetails = () => {
         const data = await res.json();
 
         if (res.ok) {
-          setReviews((prev) => prev.filter((r) => r._id !== reviewId));
+          const updatedReviews = reviews.filter((r) => r._id !== reviewId);
+          setReviews(updatedReviews);
+
+          const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+          updatedReviews.forEach((r) => {
+            const rating = Number(r.rating);
+            const rounded = Math.round(rating);
+            if (breakdown.hasOwnProperty(rounded)) {
+              breakdown[rounded]++;
+            }
+          });
+          setRatingBreakdown(breakdown);
           enqueueSnackbar("Review deleted successfully", { variant: "success" });
         } else {
           enqueueSnackbar(data.message || "Failed to delete review", { variant: "error" });

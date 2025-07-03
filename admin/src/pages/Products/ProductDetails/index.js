@@ -369,25 +369,25 @@ const ProductDetails = () => {
           <p>{product.description}</p>
 
           <h6 className="mt-4 mb-4">Rating Analytics</h6>
-<div className="ratingSection">
-  {[5, 4, 3, 2, 1].map((star) => {
-    const count = ratingBreakdown[star] || 0;
-    const total = reviews.length || 1; // to prevent divide by zero
-    const percent = Math.round((count / total) * 100);
+          <div className="ratingSection">
+            {[5, 4, 3, 2, 1].map((star) => {
+              const count = ratingBreakdown[star] || 0;
+              const total = reviews.length || 1; // to prevent divide by zero
+              const percent = Math.round((count / total) * 100);
 
-    return (
-      <div className="ratingrow d-flex align-items-center" key={star}>
-        <span className="col1">{star} Star</span>
-        <div className="col2">
-          <div className="progress">
-            <div className="progress-bar" style={{ width: `${percent}%` }}></div>
+              return (
+                <div className="ratingrow d-flex align-items-center" key={star}>
+                  <span className="col1">{star} Star</span>
+                  <div className="col2">
+                    <div className="progress">
+                      <div className="progress-bar" style={{ width: `${percent}%` }}></div>
+                    </div>
+                  </div>
+                  <span className="col3">({count})</span>
+                </div>
+              );
+            })}
           </div>
-        </div>
-        <span className="col3">({count})</span>
-      </div>
-    );
-  })}
-</div>
 
           {reviews.length > 0 && (
             <>

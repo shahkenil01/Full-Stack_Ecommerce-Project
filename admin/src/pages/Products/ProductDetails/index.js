@@ -24,10 +24,18 @@ const ProductDetails = () => {
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [editingReply, setEditingReply] = useState({ reviewId: null, index: null });
   const [editReplyText, setEditReplyText] = useState("");
+
   const [newReview, setNewReview] = useState({
     userName: "Anonymous",
     rating: 5,
     reviewText: ""
+  });
+  const [ratingBreakdown, setRatingBreakdown] = useState({
+    5: 0,
+    4: 0,
+    3: 0,
+    2: 0,
+    1: 0,
   });
 
   const productSliderOptions = {
@@ -67,6 +75,15 @@ const ProductDetails = () => {
 
       const reviewRes = await fetchDataFromApi(`/api/reviews/product/${id}`);
       setReviews(reviewRes || []);
+
+      const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      reviewRes?.forEach((r) => {
+        const rounded = Math.round(r.rating);
+        if (breakdown[rounded] !== undefined) {
+          breakdown[rounded]++;
+        }
+      });
+      setRatingBreakdown(breakdown);
     })();
   }, [id]);
 
@@ -159,7 +176,7 @@ const ProductDetails = () => {
       }
     };
 
-    const handleReplyEdit = (reviewId, index, text) => {
+  const handleReplyEdit = (reviewId, index, text) => {
     setEditingReply({ reviewId, index });
     setEditReplyText(text);
   };
@@ -329,19 +346,25 @@ const ProductDetails = () => {
           <p>{product.description}</p>
 
           <h6 className="mt-4 mb-4">Rating Analytics</h6>
-          <div className="ratingSection">
-            {[5, 4, 3, 2, 1].map((star) => (
-              <div className="ratingrow d-flex align-items-center" key={star}>
-                <span className="col1">{star} Star</span>
-                <div className="col2">
-                  <div className="progress">
-                    <div className="progress-bar" style={{ width: `${star * 10}%` }}></div>
-                  </div>
-                </div>
-                <span className="col3">(22)</span>
-              </div>
-            ))}
+<div className="ratingSection">
+  {[5, 4, 3, 2, 1].map((star) => {
+    const count = ratingBreakdown[star] || 0;
+    const total = reviews.length || 1; // to prevent divide by zero
+    const percent = Math.round((count / total) * 100);
+
+    return (
+      <div className="ratingrow d-flex align-items-center" key={star}>
+        <span className="col1">{star} Star</span>
+        <div className="col2">
+          <div className="progress">
+            <div className="progress-bar" style={{ width: `${percent}%` }}></div>
           </div>
+        </div>
+        <span className="col3">({count})</span>
+      </div>
+    );
+  })}
+</div>
 
           {reviews.length > 0 && (
             <>

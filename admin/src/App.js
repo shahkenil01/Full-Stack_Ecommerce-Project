@@ -189,7 +189,7 @@ function AppWrapper() {
               <Route path="/subCategory" element={<SubCategory />} />
               <Route path="/subCategory/add" element={<SubCategoryAdd />} />
               <Route path="/products" element={<Products />} />
-              <Route path="/product/details" element={<ProductDetails />} />
+              <Route path="/product/details/:id" element={<ProductDetails />} />
               <Route path="/product/upload" element={<ProductUpload />} />
               <Route path="/product/edit/:id" element={<ProductEdit />} />
               <Route path="/productRAMS/add" element={<ProductsRam />} />

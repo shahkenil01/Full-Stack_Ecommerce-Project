@@ -163,7 +163,7 @@ const Dashboard = () => {
                   </td>
                   <td>
                     <div className="actions d-flex align-items-center">
-                        <Link to="/product/details">
+                        <Link to={`/product/details/${item._id}`}>
                           <Button className='secondary' color="secondary"><FaEye /></Button>
                         </Link>
                         <Link to={`/product/edit/${item._id}`}>

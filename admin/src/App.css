@@ -1085,8 +1085,7 @@ body.light .productDetailsSEction .productInfo .icon svg {
   color: #faaf00 !important;}
 .reviewSection .reviewsRow .btn-big {
   font-size: 15px !important;
-  padding: 7px 20px !important;
-  margin-top: -30px;}
+  padding: 7px 20px !important;}
 .reviewSection .reviewsRow .btn-big svg {
   font-size: 15px !important;}
 .reviewSection .reviewsRow p {
@@ -1094,6 +1093,12 @@ body.light .productDetailsSEction .productInfo .icon svg {
 .reviewSection .reviewsRow.reply {
   margin-left: auto;
   width: 90%;}
+textarea.reviewReplay {
+  height: 65px !important;
+  background: transparent;
+  border: none;
+  color: white;
+  width: 60%;}
 
 .reviewForm {
   width: 100%;}
@@ -1336,3 +1341,28 @@ textarea {
   right: 10px;
   top: 10px;
   width: 40px !important;}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;}
+
+.btn-delete {
+  background-color: #fd3131; /* red */}
+
+.btn-delete:hover {
+  background-color: #ff6565;}
+
+.btn-edit {
+  background-color: #1ff543;}
+
+.btn-edit:hover {
+  background-color: #45e089;}

@@ -1,5 +1,22 @@
 const mongoose = require("mongoose");
 
+// First define replySchema
+const replySchema = new mongoose.Schema({
+  userName: {
+    type: String,
+    required: true
+  },
+  replyText: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+// Then define reviewSchema and use replySchema inside
 const reviewSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,6 +37,7 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  replies: [replySchema],
   createdAt: {
     type: Date,
     default: Date.now

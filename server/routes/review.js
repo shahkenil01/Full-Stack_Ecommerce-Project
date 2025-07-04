@@ -1,10 +1,11 @@
 const express = require('express');
 const Review = require('../models/review');
-
+const verifyToken = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 const router = express.Router();
 
 // Create review
-router.post("/add", async (req, res) => {
+router.post("/add", verifyToken, isAdmin, async (req, res) => {
   try {
     const review = new Review(req.body);
     const saved = await review.save();
@@ -25,7 +26,7 @@ router.get("/product/:productId", async (req, res) => {
 });
 
 // Delete review by ID
-router.delete("/:reviewId", async (req, res) => {
+router.delete("/:reviewId", verifyToken, isAdmin, async (req, res) => {
   try {
     const deleted = await Review.findByIdAndDelete(req.params.reviewId);
     if (!deleted) {
@@ -37,7 +38,7 @@ router.delete("/:reviewId", async (req, res) => {
   }
 });
 
-router.post("/reply/:reviewId", async (req, res) => {
+router.post("/reply/:reviewId", verifyToken, isAdmin, async (req, res) => {
   try {
     const { userName, replyText } = req.body;
 
@@ -57,7 +58,7 @@ router.post("/reply/:reviewId", async (req, res) => {
   }
 });
 
-router.put("/reply/:reviewId/:replyIndex", async (req, res) => {
+router.put("/reply/:reviewId/:replyIndex", verifyToken, isAdmin, async (req, res) => {
   try {
     const { userName, replyText } = req.body;
     const { reviewId, replyIndex } = req.params;
@@ -77,7 +78,7 @@ router.put("/reply/:reviewId/:replyIndex", async (req, res) => {
   }
 });
 
-router.delete("/reply/:reviewId/:replyIndex", async (req, res) => {
+router.delete("/reply/:reviewId/:replyIndex", verifyToken, isAdmin, async (req, res) => {
   try {
     const { reviewId, replyIndex } = req.params;
     const review = await Review.findById(reviewId);

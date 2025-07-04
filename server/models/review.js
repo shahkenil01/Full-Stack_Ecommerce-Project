@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// First define replySchema
 const replySchema = new mongoose.Schema({
   userName: {
     type: String,
@@ -16,7 +15,6 @@ const replySchema = new mongoose.Schema({
   }
 });
 
-// Then define reviewSchema and use replySchema inside
 const reviewSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,

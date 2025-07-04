@@ -104,7 +104,7 @@ const ProductDetails = () => {
     try {
       const res = await fetch(`/api/reviews/reply/${reviewId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${localStorage.getItem('userToken')}` },
         body: JSON.stringify({ userName: "Admin", replyText })
       });
 
@@ -117,7 +117,7 @@ const ProductDetails = () => {
         );
         enqueueSnackbar("Reply added successfully", { variant: "success" }); // ✅ success
       } else {
-        enqueueSnackbar(data.message || "Failed to post reply", { variant: "error" });
+        enqueueSnackbar(data.message || data.msg || "Failed to post reply", { variant: "error" });
       }
     } catch (err) {
       enqueueSnackbar("Reply failed", { variant: "error" });
@@ -134,7 +134,7 @@ const ProductDetails = () => {
     try {
       const res = await fetch(`/api/reviews/add`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${localStorage.getItem('userToken')}` },
         body: JSON.stringify({
           productId: product._id,
           userName: newReview.userName,
@@ -160,7 +160,7 @@ const ProductDetails = () => {
         setRatingBreakdown(breakdown);
         enqueueSnackbar("Review added successfully", { variant: "success" });
       } else {
-        enqueueSnackbar(data.message || "Failed to post review", { variant: "error" });
+        enqueueSnackbar(data.message || data.msg || "Failed to post review", { variant: "error" });
       }
     } catch (err) {
       enqueueSnackbar("Review add error", { variant: "error" });
@@ -173,6 +173,7 @@ const ProductDetails = () => {
       try {
         const res = await fetch(`/api/reviews/${reviewId}`, {
           method: "DELETE",
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('userToken')}`, }
         });
 
         const data = await res.json();
@@ -192,7 +193,7 @@ const ProductDetails = () => {
           setRatingBreakdown(breakdown);
           enqueueSnackbar("Review deleted successfully", { variant: "success" });
         } else {
-          enqueueSnackbar(data.message || "Failed to delete review", { variant: "error" });
+          enqueueSnackbar(data.message || data.msg || "Failed to delete review", { variant: "error" });
         }
       } catch (err) {
         enqueueSnackbar("Delete request failed", { variant: "error" });
@@ -214,7 +215,7 @@ const ProductDetails = () => {
     try {
       const res = await fetch(`/api/reviews/reply/${reviewId}/${index}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${localStorage.getItem('userToken')}` },
         body: JSON.stringify({ userName: "Admin", replyText: editReplyText }),
       });
 
@@ -227,7 +228,7 @@ const ProductDetails = () => {
         setEditReplyText("");
         enqueueSnackbar("Reply updated successfully", { variant: "success" });
       } else {
-        enqueueSnackbar(data.message || "Failed to update reply", { variant: "error" });
+        enqueueSnackbar(data.message || data.msg || "Failed to update reply", { variant: "error" });
       }
     } catch (err) {
       enqueueSnackbar("Reply update failed", { variant: "error" });
@@ -239,7 +240,8 @@ const ProductDetails = () => {
 
     try {
       const res = await fetch(`/api/reviews/reply/${reviewId}/${index}`, {
-        method: "DELETE"
+        method: "DELETE",
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('userToken')}`, }
       });
 
       const data = await res.json();
@@ -249,10 +251,10 @@ const ProductDetails = () => {
         );
         enqueueSnackbar("Reply deleted", { variant: "success" });
       } else {
-        enqueueSnackbar(data.message || "Delete failed", { variant: "error" });
+        enqueueSnackbar(data.message || data.msg || "Delete failed", { variant: "error" });
       }
     } catch (err) {
-      enqueueSnackbar("Delete request error", { variant: "error" });
+      enqueueSnackbar(err.message || "Delete request error", { variant: "error" });
     }
   };
 

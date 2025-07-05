@@ -967,6 +967,8 @@ footer .copyright p{
   top: 20px; 
   left: 20px; 
   z-index: 12;}
+.zoomSlider{
+  padding-top: 30px;}
 .zoomSlider .slick-slide {
   padding-right: 20px !important;}
 .zoomSlider *{

@@ -1,64 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
-import images from '../../assets/images';
+import { fetchDataFromApi } from "../../utils/api";
+import images from "../../assets/images"; // Make sure bannerAlt is exported from there
 
-const homeBanner = ()=>{
-           const NextArrow = (props) => {
-                const { onClick } = props;
-                return <div className="homeBanner-next-btn" onClick={onClick} />;
-            }
-            
-            const PrevArrow = (props) => {
-                const { onClick } = props;
-                return <div className="homeBanner-prev-btn" onClick={onClick} />;
-            };
+const HomeBanner = () => {
+  const [slides, setSlides] = useState([]);
 
-    var settings = {
-        dots: false,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: true,
-        autoplay: true,
-        centerMode: true,
-        centerPadding: '40px',
-        nextArrow: <NextArrow />,
-        prevArrow: <PrevArrow />
-      };
+  useEffect(() => {
+    fetchDataFromApi("/api/homeBanner").then((res) => {
+      if (Array.isArray(res) && res.length > 0) {
+        setSlides(res);
+      }
+    });
+  }, []);
 
-    return (
-        <div className="container mt-3">
-            <div className="homeBannerSection">
-                <Slider {...settings}>
-                <div className="item">
-                    <img src={images.slider1} className="w-100" alt="Slider 1"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider2} className="w-100" alt="Slider 2"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider3} className="w-100" alt="Slider 3"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider4} className="w-100" alt="Slider 4"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider5} className="w-100" alt="Slider 5"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider6} className="w-100" alt="Slider 6"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider7} className="w-100" alt="Slider 7"/>
-                </div>
-                <div className="item">
-                    <img src={images.slider8} className="w-100" alt="Slider 8"/>
-                </div>
-                </Slider>
-            </div>
-        </div>
-    )
-}
+  const NextArrow = ({ onClick }) => <div className="homeBanner-next-btn" onClick={onClick} />;
+  const PrevArrow = ({ onClick }) => <div className="homeBanner-prev-btn" onClick={onClick} />;
 
-export default homeBanner;
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    arrows: slides.length > 1, // ❗️ Show arrows only if more than one slide
+    centerMode: true,
+    centerPadding: "40px",
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+  };
+
+  return (
+    <div className="container mt-3">
+      <div className="homeBannerSection">
+        {slides.length > 0 ? (
+          <Slider {...settings}>
+            {slides.map((slide, index) => (
+              <div className="item" key={index}>
+                <img src={slide.image} className="w-100" alt={`Slide ${index + 1}`} />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <div className="item">
+            <img src={images.bannerAlt} className="w-100" alt="Default Banner" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default HomeBanner;

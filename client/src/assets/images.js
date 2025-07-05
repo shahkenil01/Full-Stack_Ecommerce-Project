@@ -23,6 +23,7 @@ const images = {
     Wellness: require("./images/Wellness.png"),
     Jewellery: require("./images/Jewellery.png"),
     newsletter: require("./images/newsletter.png"),
+    bannerAlt: require("./images/bannerAlt.jpeg"),
     Google_Icons: require("./images/Google_Icons.png")
 };
 

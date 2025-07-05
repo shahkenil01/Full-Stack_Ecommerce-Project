@@ -56,8 +56,8 @@ const Sidebar = () => {
           </Button>
           <div className={`submenuWrapper ${isOpen[1] ? 'colapse' : 'colapsed'}`}>
             <ul className='submenu'>
-              <li><Link to="/homeBannerSlide/add" className={location.pathname === '/homeBannerSlide/add' ? 'active-submenu' : ''}>Add Home Banner Slide</Link></li>
               <li><Link to="/homeBannerSlide/list" className={location.pathname === '/homeBannerSlide/list' ? 'active-submenu' : ''}>Home Banner Slide</Link></li>
+              <li><Link to="/homeBannerSlide/add" className={location.pathname === '/homeBannerSlide/add' ? 'active-submenu' : ''}>Add Home Banner Slide</Link></li>
             </ul>
           </div>
         </li>

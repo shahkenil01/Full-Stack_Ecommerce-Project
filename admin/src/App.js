@@ -14,8 +14,9 @@ import Login from './pages/login';
 import SignUp from './pages/SignUp';
 import OtpVerify from './pages/SignUp/OtpVerify';
 import NotFound from './pages/NotFound';
-import HomeBannerSlide from './pages/HomeBannerSlide';
-import HomeBannerSlideAdd from './pages/HomeBannerSlide/AddHomeBannerSlide';
+import HomeSlidesList from './pages/HomeBanner/homeSlideList';
+import AddHomeSlide from './pages/HomeBanner/addHomeSlide';
+import EditHomeSlide from './pages/HomeBanner/editSlide';
 import Category from './pages/Category';
 import CategoryAdd from './pages/Category/CategoryAdd';
 import CategoryEdit from './pages/Category/CategoryEdit';
@@ -181,8 +182,9 @@ function AppWrapper() {
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/homeBannerSlide/list" element={<HomeBannerSlide />} />
-              <Route path="/homeBannerSlide/add" element={<HomeBannerSlideAdd />} />
+              <Route path="/homeBannerSlide/list" element={<HomeSlidesList />} />
+              <Route path="/homeBannerSlide/add" element={<AddHomeSlide />} />
+              <Route path="/homeBannerSlide/edit/:id" element={<EditHomeSlide />} />
               <Route path="/category" element={<Category />} />
               <Route path="/category/add" element={<CategoryAdd />} />
               <Route path="/category/edit/:id" element={<CategoryEdit />} />

@@ -1366,3 +1366,9 @@ textarea {
 
 .btn-edit:hover {
   background-color: #45e089;}
+
+.imgWrapper.custom-img-fix .img {
+  height: 60px !important;
+  width: 199px !important;}
+.imgUploadBox .uploadBox.advance{
+  width: 490px !important;}

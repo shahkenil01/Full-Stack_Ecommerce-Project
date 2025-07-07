@@ -57,6 +57,7 @@ const favoriteRoutes = require('./routes/favorite');
 const reviewRoutes = require('./routes/review');
 const cashfreeRoute = require('./routes/cashfree');
 const homeBannerRoutes = require('./routes/homeBanner');
+const searchRoutes = require('./routes/search');
 
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
@@ -71,7 +72,8 @@ app.use("/api/orders", orderRoutes);
 app.use('/api/favorite', favoriteRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use('/api/cashfree', cashfreeRoute);
-app.use('/api/homeBanner', homeBannerRoutes); 
+app.use('/api/homeBanner', homeBannerRoutes);
+app.use('/api/search', searchRoutes)
 
 // ✅ DB Connection & Server
 mongoose.connect(process.env.CONNECTION_STRING, {

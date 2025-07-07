@@ -1613,3 +1613,73 @@ section.section.myAccountPage{
 .closeicon {
   padding: 1px !important;
   font-size: 20px !important;}
+
+.searchDropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 100;
+  max-height: 305px;
+  overflow-y: auto;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;}
+.resultRow {
+  display: flex;
+  gap: 12px;
+  padding: 10px 15px;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  cursor: auto;}
+.searchDropdown .resultRow:hover {
+  background: #f1f1f1;}
+.resultRow img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;}
+.resultRow h4 {
+  color: #222;
+  font-size: 13px;
+  font-weight: 600;}
+.resultRow h4:hover {
+  color: rgb(9, 97, 179);}
+.resultRow span {
+  color: #222;
+  font-size: 14px;}
+
+
+
+.headerSearchWrapper .searchResults {
+  background: #fff;
+  left: 0;
+  max-height: 300px;
+  overflow-y: scroll;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  z-index: 1000;
+}
+.headerSearchWrapper .searchResults .result {
+  border-bottom: 1px solid #0000001a;
+  padding: 5px 15px;
+  width: 100%;
+}
+.headerSearchWrapper .searchResults .result .img {
+  border-radius: 10px;
+  height: 60px;
+  overflow: hidden;
+  width: 60px;
+}
+.headerSearchWrapper .searchResults .result .info {
+  width: 80%;
+}
+.headerSearchWrapper .searchResults .result .info h4 {
+  color: #222;
+  font-size: 13px;
+  font-weight: 600;
+}
+.headerSearchWrapper .searchResults .result .info span {
+  color: #222;
+  font-size: 14px;
+}

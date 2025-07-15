@@ -30,6 +30,7 @@ import ProductsRam from './pages/Products/ProductsRam';
 import ProductsWeight from './pages/Products/ProductsWeight';
 import ProductsSize from './pages/Products/ProductsSize';
 import Orders from './pages/Order';
+import ForgetPassword from './pages/ForgetPassword';
 
 const MyContext = createContext();
 
@@ -160,7 +161,7 @@ function AppWrapper() {
     skipLoaderRoutes.includes(currentPath) ||
     dynamicSkipRoutes.some((path) => currentPath.startsWith(path));
 
-  const hideLayout = ['/login', '/signUp', '/verify-account'].includes(currentPath);
+  const hideLayout = ['/login', '/signUp', '/forgot-password' ,'/verify-account'].includes(currentPath);
 
   return (
     <MyContext.Provider value={values}>
@@ -177,6 +178,7 @@ function AppWrapper() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signUp" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgetPassword />} />
             <Route path="/verify-account" element={<OtpVerify />} />
 
             <Route element={<ProtectedRoute />}>

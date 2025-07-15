@@ -842,6 +842,8 @@ body.dark .css-mmygx2-MuiSelect-select-MuiInputBase-input, body.dark .css-1yxt9m
   font-weight: 600;
   height: 45px;
   padding-left: 40px;}
+.padding {
+  padding-left: 15px !important;}
 .loginSection .loginBox .wrapper .form-group {
   margin-bottom: 18px;}
 .loginSection .loginBox .wrapper .form-group.focus .icon svg{

@@ -48,6 +48,12 @@ const OtpVerify = () => {
     return () => clearInterval(interval);
   }, [timer]);
 
+  useEffect(() => {
+    if (otp.length === 6) {
+      handleVerify(new Event("submit"));
+    }
+  }, [otp]);
+
   const handleVerify = async (e) => {
     e.preventDefault();
     setLoading(true);

@@ -91,7 +91,7 @@ const SignIn = () => {
               <TextField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} variant="standard" className="w-100" autoComplete="off"/>
             </div>
 
-            <a href="/" className="border-effect cursor txt">Forgot Password?</a>
+            <a href="/forget-password" className="border-effect cursor txt">Forgot Password?</a>
 
             <div className="d-flex align-items-center mt-3 mb-3">
               <Button type="submit" className="btn-blue col btn-lg btn-big bg-blue" disabled={loading} style={{ height: "45px"}}>

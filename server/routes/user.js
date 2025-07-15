@@ -264,4 +264,68 @@ router.post('/verify-otp', (req, res) => {
   res.status(200).json({ msg: "OTP verified successfully" });
 });
 
+router.post('/request-password-reset', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ msg: "Email is required" });
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ msg: "No user found with this email" });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  try {
+    await sendOTPEmail(email, otp, "reset");
+    pendingOtps[email] = { otp, createdAt: Date.now() };
+    return res.status(200).json({ msg: "OTP sent for password reset" });
+  } catch (err) {
+    return res.status(500).json({ msg: "Failed to send OTP", error: err.message });
+  }
+});
+
+// 🔐 Verify OTP for Reset
+router.post('/verify-reset-otp', (req, res) => {
+  const { email, otp } = req.body;
+  const record = pendingOtps[email];
+
+  if (!record) return res.status(400).json({ msg: "No OTP found for this email." });
+  if (record.otp !== otp) return res.status(400).json({ msg: "Invalid OTP" });
+
+  const otpAge = Date.now() - record.createdAt;
+  if (otpAge > 5 * 60 * 1000) return res.status(400).json({ msg: "OTP expired" });
+
+  // 🟢 Mark OTP as verified
+  pendingOtps[email].verified = true;
+
+  return res.status(200).json({ msg: "OTP verified. You can reset your password." });
+});
+
+// 🔐 Reset Password
+router.post('/reset-password', async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res.status(400).json({ msg: "Email and new password required" });
+  }
+
+  const record = pendingOtps[email];
+  if (!record || !record.verified) {
+    return res.status(403).json({ msg: "OTP not verified for this email" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    delete pendingOtps[email];
+
+    return res.status(200).json({ msg: "Password changed successfully" });
+  } catch (err) {
+    return res.status(500).json({ msg: "Something went wrong", error: err.message });
+  }
+});
+
 module.exports = router;

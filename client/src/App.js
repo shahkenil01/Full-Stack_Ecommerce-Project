@@ -21,6 +21,7 @@ import OrderStatus from './Pages/Order/OrderStatus';
 import AllOrders from './Pages/Order/AllOrders';
 import MyAccount from './Pages/MyAccount';
 import Search from './Pages/Search';
+import ForgetPassword from './Pages/ForgetPassword';
 
 const MyContext = createContext();
 
@@ -159,6 +160,7 @@ function App() {
           <Route exact={true} path="/signUp" element={<SignUp />} />
           <Route exact={true} path="/verifyOTP" element={<OtpVerify />} />
           <Route exact={true} path="/search" element={<Search />} />
+          <Route exact={true} path="/forget-password" element={<ForgetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
 

@@ -4,10 +4,34 @@ const Favorite = require("../models/favorite");
 
 router.post("/add", async (req, res) => {
   try {
+    const { productId, userEmail } = req.body;
+
+    if (!productId || !userEmail) {
+      return res.status(400).json({ message: "productId and userEmail required" });
+    }
+
+    const existing = await Favorite.findOne({ productId, userEmail });
+
+    if (existing) {
+      return res.status(200).json({
+        message: "Already in favourites",
+        favorite: existing,
+      });
+    }
+
     const favorite = new Favorite(req.body);
     const saved = await favorite.save();
-    res.status(201).json(saved);
+
+    res.status(201).json({
+      message: "Added",
+      favorite: saved,
+    });
+
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(200).json({ message: "Already in favourites" });
+    }
+
     res.status(500).json({ message: error.message });
   }
 });

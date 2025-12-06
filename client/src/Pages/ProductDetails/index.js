@@ -186,6 +186,7 @@ const ProductDetails = () =>{
         e.preventDefault();
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         const userName = userInfo?.name;
+        const token = localStorage.getItem("userToken");
         if (!userName) {
             enqueueSnackbar("Login required to post a review", { variant: "error" });
             return;
@@ -199,7 +200,7 @@ const ProductDetails = () =>{
             };
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/reviews/add`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`, },
                 body: JSON.stringify(payload),
             });
 
@@ -454,9 +455,8 @@ const ProductDetails = () =>{
                                             </div>
                                         </div>
 
-                                        <br/>
                                         <div className='form-group'>
-                                            <Button type='submit' className='btn-blue btn-lg btn-big btn-round'>Submit Review</Button>
+                                            <Button type='submit' className='btn-blue-show btn-blue btn-lg btn-big btn-round'>Submit Review</Button>
                                         </div>
                                     </form>
                                 </div>

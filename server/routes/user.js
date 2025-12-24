@@ -8,6 +8,8 @@ const Cart = require('../models/Cart');
 const verifyToken = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 const sendOTPEmail = require('../utils/sendOTP');
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const pendingOtps = {};
 
@@ -325,6 +327,53 @@ router.post('/reset-password', async (req, res) => {
     return res.status(200).json({ msg: "Password changed successfully" });
   } catch (err) {
     return res.status(500).json({ msg: "Something went wrong", error: err.message });
+  }
+});
+
+router.post("/google-precheck", async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ msg: "Google token missing" });
+  }
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture } = payload;
+
+    const existingUser = await User.findOne({ email });
+
+    // 🟢 User already exists → normal login
+    if (existingUser) {
+      const jwtToken = jwt.sign(
+        { id: existingUser._id, email: existingUser.email, role: existingUser.role },
+        process.env.JSON_WEB_TOKEN_SECRET_KEY,
+        { expiresIn: "1h" }
+      );
+
+      return res.status(200).json({
+        existingUser: true,
+        user: existingUser,
+        token: jwtToken,
+      });
+    }
+
+    // 🔵 New Google user → send prefill data
+    return res.status(200).json({
+      existingUser: false,
+      prefill: {
+        name,
+        email,
+      },
+    });
+
+  } catch (err) {
+    return res.status(401).json({ msg: "Invalid Google token" });
   }
 });
 

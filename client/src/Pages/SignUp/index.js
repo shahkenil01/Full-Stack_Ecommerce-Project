@@ -29,6 +29,18 @@ const SignUp = () => {
     context.setisHeaderFooterShow(false);
   }, [context]);
 
+  useEffect(() => {
+    const googleData = localStorage.getItem("googlePrefill");
+    if (googleData) {
+      const parsed = JSON.parse(googleData);
+      setFormData(prev => ({
+        ...prev,
+        name: parsed.name || "",
+        email: parsed.email || ""
+      }));
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);

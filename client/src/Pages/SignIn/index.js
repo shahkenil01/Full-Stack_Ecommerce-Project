@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { MyContext } from "../../App";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import images from '../../assets/images.js';
 import { postData } from "../../utils/api";
+import { GoogleLogin } from "@react-oauth/google";
 
 const SignIn = () => {
   const context = useContext(MyContext);
@@ -14,6 +15,8 @@ const SignIn = () => {
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+
+  const googleBtnRef = useRef(null);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -24,11 +27,7 @@ const SignIn = () => {
     const { email, password } = formData;
 
     if (!email || !password) {
-      const missing = [];
-      if (!email) missing.push("Email");
-      if (!password) missing.push("Password");
-
-      enqueueSnackbar(`Please fill: ${missing.join(", ")}`, { variant: "error" });
+      enqueueSnackbar(`Please fill all fields`, { variant: "error" });
       return;
     }
 
@@ -41,13 +40,7 @@ const SignIn = () => {
       enqueueSnackbar("Login successful!", { variant: "success" });
 
       localStorage.setItem("userToken", data.token);
-      localStorage.setItem("userInfo", JSON.stringify({
-        _id: data.user._id,  
-        name: data.user.name,
-        email: data.user.email,
-        phone: data.user.phone
-      }));
-
+      localStorage.setItem("userInfo", JSON.stringify(data.user));
       context.setUser(data.user);
       context.setIsLogin(true);
 
@@ -85,10 +78,10 @@ const SignIn = () => {
           <form className="mt-3" onSubmit={handleLogin}>
             <h2 className="mb-4">Sign In</h2>
             <div className="form-group">
-              <TextField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} variant="standard" className="w-100" autoComplete="off"/>
+              <TextField label="Email" name="email" value={formData.email} onChange={handleChange} variant="standard" className="w-100" />
             </div>
             <div className="form-group">
-              <TextField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} variant="standard" className="w-100" autoComplete="off"/>
+              <TextField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} variant="standard" className="w-100" />
             </div>
 
             <a href="/forget-password" className="border-effect cursor txt">Forgot Password?</a>
@@ -104,9 +97,40 @@ const SignIn = () => {
 
             <h6 className="mt-4 text-center font-weight-bold">Or continue with social account</h6>
 
-            <Button className="loginWithGoogle mt-2 w-100" variant="outlined">
+            <Button className="loginWithGoogle mt-2 w-100" variant="outlined"
+              onClick={() => {
+                const btn = googleBtnRef.current.querySelector('div[role="button"]');
+                if (btn) btn.click();
+              }}
+            >
               <img src={images.Google_Icons} alt="Google" /> Sign In with Google
             </Button>
+
+            {/* --- HIDDEN ORIGINAL GOOGLE LOGIN --- */}
+            <div style={{ display: 'none' }} ref={googleBtnRef}>
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    const res = await postData("/api/user/google-precheck", {
+                      token: credentialResponse.credential,
+                    });
+                    if (res.existingUser) {
+                      localStorage.setItem("userToken", res.token);
+                      localStorage.setItem("userInfo", JSON.stringify(res.user));
+                      context.setUser(res.user);
+                      context.setIsLogin(true);
+                      navigate("/", { replace: true });
+                    } else {
+                      localStorage.setItem("googlePrefill", JSON.stringify(res.prefill));
+                      navigate("/signUp", { replace: true });
+                    }
+                  } catch (err) {
+                    enqueueSnackbar("Google login failed", { variant: "error" });
+                  }
+                }}
+                onError={() => enqueueSnackbar("Google login cancelled", { variant: "error" })}
+              />
+            </div>
           </form>
         </div>
       </div>

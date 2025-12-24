@@ -1,4 +1,4 @@
-import { useState, useContext} from 'react';
+import { useState, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { RiLockPasswordFill } from "react-icons/ri";
 import { IoMdEye, IoMdEyeOff} from "react-icons/io";
@@ -9,18 +9,22 @@ import pattern from '../../assets/images/pattern.webp';
 import Google_Icons from '../../assets/images/Google_Icons.png';
 import { useSnackbar } from 'notistack';
 import { MyContext } from '../../App';
+import { GoogleLogin } from "@react-oauth/google";
+import { postData } from "../../utils/api";
 
-const Login = ()=>{
+const Login = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [inputIndex, setInputIndex] = useState(null);
-  const [isShowPassword, setIsShowPassword] = useState(false);
-
-  const focusInput=(index)=>{ setInputIndex(index); }
-
-  const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const context = useContext(MyContext);
+
+  const [inputIndex, setInputIndex] = useState(null);
+  const [isShowPassword, setIsShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+
+  const googleBtnRef = useRef(null);
+
+  const focusInput = (index) => setInputIndex(index);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,35 +34,33 @@ const Login = ()=>{
     e.preventDefault();
     const { email, password } = formData;
 
-    const missing = [];
-    if (!email.trim()) missing.push("email");
-    if (!password.trim()) missing.push("password");
-
-    if (missing.length > 0) {
-      enqueueSnackbar(`Please fill: ${missing.join(', ')}`, { variant: 'error' });
+    if (!email || !password) {
+      enqueueSnackbar("Please fill email & password", { variant: "error" });
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await postData("/api/user/signin", { email, password });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Login failed");
+      if (!res?.token) throw new Error("Login failed");
 
-      localStorage.setItem("userInfo", JSON.stringify(data.user));
-      localStorage.setItem("userToken", data.token);
-      context.setUser(data.user);
+      // 🔴 ADMIN CHECK
+      if (res.user.role !== "admin") {
+        enqueueSnackbar("Admin access denied", { variant: "error" });
+        return;
+      }
+
+      localStorage.setItem("userToken", res.token);
+      localStorage.setItem("userInfo", JSON.stringify(res.user));
+      context.setUser(res.user);
       context.setIsLogin(true);
-      enqueueSnackbar("Login successful!", { variant: 'success' });
+
+      enqueueSnackbar("Admin login successful", { variant: "success" });
       navigate("/", { replace: true });
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: 'error' });
+      enqueueSnackbar(err.message || "Login failed", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -76,26 +78,38 @@ const Login = ()=>{
 
           <div className='wrapper mt-3 card border'>
             <form onSubmit={handleSubmit}>
-              <div className={`form-group position-relative ${inputIndex===0 && 'focus'}`}>
-                <span className='icon'><MdEmail/></span>
-                <input type='email' name='email' value={formData.email} onChange={handleChange} className='form-control' placeholder='enter your email' 
-                  onFocus={()=>focusInput(0)}
-                  onBlur={()=>setInputIndex(null)} autoFocus/>
+
+              {/* EMAIL */}
+              <div className={`form-group position-relative ${inputIndex === 0 && 'focus'}`}>
+                <span className='icon'><MdEmail /></span>
+                <input
+                  type='email'
+                  name='email'
+                  className='form-control'
+                  placeholder='enter admin email'
+                  value={formData.email}
+                  onChange={handleChange}
+                  onFocus={() => focusInput(0)}
+                  onBlur={() => setInputIndex(null)}
+                />
               </div>
 
-              <div className={`form-group position-relative ${inputIndex===1 && 'focus'}`}>
-                <span className='icon'><RiLockPasswordFill/></span>
-                <input className="form-control" placeholder="enter your password" 
-                  type={isShowPassword ? 'text' : 'password'} name='password' value={formData.password} onChange={handleChange}
+              {/* PASSWORD */}
+              <div className={`form-group position-relative ${inputIndex === 1 && 'focus'}`}>
+                <span className='icon'><RiLockPasswordFill /></span>
+                <input
+                  className="form-control"
+                  placeholder="enter password"
+                  type={isShowPassword ? 'text' : 'password'}
+                  name='password'
+                  value={formData.password}
+                  onChange={handleChange}
                   onFocus={() => focusInput(1)}
-                  onBlur={(e) => {
-                    if (!e.relatedTarget || !e.relatedTarget.classList.contains('toggleShowPassword')) {
-                      setInputIndex(null);
-                    }
-                  }}/>
+                  onBlur={() => setInputIndex(null)}
+                />
 
                 {inputIndex === 1 && (
-                  <span className="toggleShowPassword" tabIndex="0"
+                  <span className="toggleShowPassword"
                     onMouseDown={(e) => {
                       e.preventDefault();
                       setIsShowPassword(!isShowPassword);
@@ -113,6 +127,7 @@ const Login = ()=>{
 
               <div className='form-group text-center mb-0'>
                 <Link to={'/forgot-password'} className='link'>FORGOT PASSWORD</Link>
+              </div>
 
               <div className="d-flex align-items-center justify-content-center or mt-3 mb-3">
                 <span className="line"></span>
@@ -120,10 +135,52 @@ const Login = ()=>{
                 <span className="line"></span>
               </div>
 
-              <Button variant='outlined' className="w-100 btn-lg btn-big loginWithGoogle">
-                <img src={Google_Icons} width="25px" alt='Icon'/> &nbsp; Sign In with Google
+              <Button variant='outlined' className="w-100 btn-lg btn-big loginWithGoogle"
+                onClick={() => {
+                  const btn = googleBtnRef.current.querySelector('div[role="button"]');
+                  if (btn) btn.click();
+                }}
+              >
+                <img src={Google_Icons} width="25px" alt='Google' /> &nbsp;
+                Sign In with Google
               </Button>
 
+              {/* HIDDEN GOOGLE LOGIN */}
+              <div style={{ display: 'none' }} ref={googleBtnRef}>
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    try {
+                      const res = await postData("/api/user/google-precheck", {
+                        token: credentialResponse.credential,
+                      });
+
+                      // 🔴 ADMIN CHECK
+                      if (res.existingUser) {
+
+                      if (res.user.role !== "admin") {
+                        enqueueSnackbar("Admin access denied", { variant: "error" });
+                        return;
+                      }
+                    
+                      localStorage.setItem("userToken", res.token);
+                      localStorage.setItem("userInfo", JSON.stringify(res.user));
+                      context.setUser(res.user);
+                      context.setIsLogin(true);
+
+                      enqueueSnackbar("Admin login successful", { variant: "success" });
+                      navigate("/", { replace: true });
+                      return;
+                    }
+
+                    localStorage.setItem("googlePrefill", JSON.stringify(res.prefill));
+                    navigate("/signUp", { replace: true });
+
+                    } catch {
+                      enqueueSnackbar("Google login failed", { variant: "error" });
+                    }
+                  }}
+                  onError={() => enqueueSnackbar("Google login cancelled", { variant: "error" })}
+                />
               </div>
             </form> 
           </div>

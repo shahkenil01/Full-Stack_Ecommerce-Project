@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MdEmail } from "react-icons/md";
 import { TiHome } from "react-icons/ti";
@@ -31,6 +31,19 @@ const SignUp = () => {
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  useEffect(() => {
+    const googleData = localStorage.getItem("googlePrefill");
+
+    if (googleData) {
+      const parsed = JSON.parse(googleData);
+      setFormData(prev => ({
+        ...prev,
+        name: parsed.name || "",
+        email: parsed.email || ""
+      }));
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

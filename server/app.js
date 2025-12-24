@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors({
   origin: [
     'https://e-commerce-best.netlify.app', // client
-    'https://e-commerce-admin-master.netlify.app', // admin
+    'https://e-commerce-best-admin.netlify.app', // admin
     'http://localhost:3000', // localhost admin
     'http://localhost:3005' // localhost client
   ],

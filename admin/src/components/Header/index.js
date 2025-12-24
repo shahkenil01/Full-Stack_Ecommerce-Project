@@ -227,7 +227,7 @@ const Header = () => {
                 :
               <div className="myAccWrapper">
                 <Button className="myAcc d-flex align-items-center" onClick={handleOpenMyAccDrop}>
-                  <UserAvatarImgComponent img={'https://mironcoder-hotash.netlify.app/images/avatar/01.webp'}/>
+                  <UserAvatarImgComponent img={context?.user?.image || context?.user?.avatar} name={context?.user?.name} />
 
                   <div className="userInfo">
                     <h4>{context?.user?.name || "User"}</h4>

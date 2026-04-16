@@ -1,12 +1,18 @@
 import axios from "axios";
 
-export const handlePayment = async ({ amount, email, phoneNumber, token, enqueueSnackbar }) => {
+export const handlePayment = async ({ amount, email, phoneNumber, token, cartItems, formFields, enqueueSnackbar }) => {
   if (!window.Cashfree) {
-    enqueueSnackbar("❌ Cashfree SDK not loaded", { variant: "error" });
+    enqueueSnackbar("Cashfree SDK not loaded", { variant: "error" });
     return;
   }
 
   try {
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/save-temp`, {
+      token,
+      cartItems,
+      formFields,
+    });
+
     const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/cashfree/create-order`, {
       amount,
       email,
@@ -28,7 +34,7 @@ export const handlePayment = async ({ amount, email, phoneNumber, token, enqueue
 
   } catch (error) {
     enqueueSnackbar(
-      "❌ Payment Failed: " + (error?.response?.data?.error || error.message),
+      "Payment Failed: " + (error?.response?.data?.error || error.message),
       { variant: "error" }
     );
   }

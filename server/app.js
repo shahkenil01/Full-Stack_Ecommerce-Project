@@ -4,10 +4,9 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const TempOrder = require('./models/tempOrder'); // ✅ import model
+const TempOrder = require('./models/tempOrder');
 const PORT = process.env.PORT || 4000;
 
-// ✅ CORS
 app.use(cors({
   origin: [
     'https://e-commerce-best.netlify.app', // client
@@ -19,10 +18,8 @@ app.use(cors({
 }));
 app.options('*', cors());
 
-// ✅ Middleware
 app.use(bodyParser.json());
 
-// ✅ TEMP SAVE route (important)
 app.post("/save-temp", async (req, res) => {
   try {
     const { token, cartItems, formFields } = req.body;
@@ -42,7 +39,6 @@ app.post("/save-temp", async (req, res) => {
   }
 });
 
-// ✅ All Routes
 const categoryRoutes = require('./routes/categories');
 const subCatSchema = require('./routes/subCat');
 const productRoutes = require('./routes/products');
@@ -75,7 +71,6 @@ app.use('/api/cashfree', cashfreeRoute);
 app.use('/api/homeBanner', homeBannerRoutes);
 app.use('/api/search', searchRoutes)
 
-// ✅ DB Connection & Server
 mongoose.connect(process.env.CONNECTION_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

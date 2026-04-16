@@ -30,23 +30,23 @@ const CheckoutForm = () => {
   const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const [formFields, setFormFields] = useState({
-    fullName:"",
-    country:"",
-    streetAddressLine1:"",
-    streetAddressLine2:"",
-    city:"",
-    state:"",
-    zipCode:"",
-    phoneNumber:"",
+    fullName: "",
+    country: "",
+    streetAddressLine1: "",
+    streetAddressLine2: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    phoneNumber: "",
     email: user?.email || ""
-  })
+  });
 
-  const onChangeInput=(e)=>{
-    setFormFields(()=>({
+  const onChangeInput = (e) => {
+    setFormFields(() => ({
       ...formFields,
-      [e.target.name]:e.target.value
-    }))
-  }
+      [e.target.name]: e.target.value
+    }));
+  };
 
   const checkout = async (e) => {
     e.preventDefault();
@@ -63,19 +63,18 @@ const CheckoutForm = () => {
     if (Object.keys(newErrors).length === 0) {
       const orderToken = "ot_" + Date.now();
       try {
-      const orderPayload = { cartItems, formFields };
-      localStorage.setItem(`order_${orderToken}`, JSON.stringify(orderPayload));
-
-      await handlePayment({
-        amount: totalAmount,
-        email: formFields.email,
-        phoneNumber: formFields.phoneNumber,
-        token: orderToken,
-        enqueueSnackbar,
-      });
-    } catch (err) {
-      enqueueSnackbar("Something went wrong during payment", { variant: "error" });
-    }
+        await handlePayment({
+          amount: totalAmount,
+          email: formFields.email,
+          phoneNumber: formFields.phoneNumber,
+          token: orderToken,
+          cartItems,
+          formFields,
+          enqueueSnackbar,
+        });
+      } catch (err) {
+        enqueueSnackbar("Something went wrong during payment", { variant: "error" });
+      }
     } else {
       enqueueSnackbar("Please fill all required fields", { variant: "error" });
     }
@@ -92,7 +91,7 @@ const CheckoutForm = () => {
               <div className="row mt-3">
                 <div className="col-md-6">
                   <div className="form-group">
-                    <TextField label="Full Name *" variant="outlined" className="w-100" size="small" name="fullName"  onChange={onChangeInput}/>
+                    <TextField label="Full Name *" variant="outlined" className="w-100" size="small" name="fullName" onChange={onChangeInput} />
                   </div>
                 </div>
                 <div className="col-md-6">

@@ -30,7 +30,7 @@ function verifyWebhookSignature(postData, signature, secretKey) {
 
 router.post("/create-order", async (req, res) => {
   try {
-    const { email, phoneNumber, amount, token } = req.body;
+    const { email, phoneNumber, amount, token, name } = req.body;
     if (!email || !phoneNumber || !amount || !token) {
       return res.status(400).json({ error: "Missing required fields or payload" });
     }
@@ -43,7 +43,7 @@ router.post("/create-order", async (req, res) => {
         customer_id: cleanCustomerId,
         customer_email: email,
         customer_phone: phoneNumber,
-        customer_name: "Guest User"
+        customer_name: name ||"Guest User"
       },
       order_amount: amount,
       order_currency: "INR",

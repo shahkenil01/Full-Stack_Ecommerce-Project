@@ -1,22 +1,22 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MyContext } from "../../App";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import images from "../../assets/images";
-import { useSnackbar } from "notistack";
-import OtpInput from "../../Components/OtpBox";
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MyContext } from '../../App';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import images from '../../assets/images';
+import { useSnackbar } from 'notistack';
+import OtpInput from '../../Components/OtpBox';
 
 const ForgetPassword = () => {
   const { setisHeaderFooterShow } = useContext(MyContext);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [newPass, setNewPass] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
-  const [step, setStep] = useState(1); 
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -26,33 +26,34 @@ const ForgetPassword = () => {
 
   useEffect(() => {
     if (step === 2 && otp.length === 6) {
-      handleVerifyOtp(new Event("submit"));
+      handleVerifyOtp(new Event('submit'));
     }
   }, [otp, step]);
 
   const backend = process.env.REACT_APP_BACKEND_URL;
-  const postData = async (url = "", body = {}) => {
+  const postData = async (url = '', body = {}) => {
     const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.msg || "Something went wrong");
+    if (!res.ok) throw new Error(data.msg || 'Something went wrong');
     return data;
   };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!email) return enqueueSnackbar("Please enter your email", { variant: "error" });
+    if (!email)
+      return enqueueSnackbar('Please enter your email', { variant: 'error' });
 
     try {
       setLoading(true);
       await postData(`${backend}/api/user/request-password-reset`, { email });
-      enqueueSnackbar("OTP sent to your email", { variant: "success" });
+      enqueueSnackbar('OTP sent to your email', { variant: 'success' });
       setStep(2);
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      enqueueSnackbar(err.message, { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -60,15 +61,16 @@ const ForgetPassword = () => {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if (otp.length !== 6) return enqueueSnackbar("Invalid OTP", { variant: "error" });
+    if (otp.length !== 6)
+      return enqueueSnackbar('Invalid OTP', { variant: 'error' });
 
     try {
       setLoading(true);
       await postData(`${backend}/api/user/verify-reset-otp`, { email, otp });
-      enqueueSnackbar("OTP verified", { variant: "success" });
+      enqueueSnackbar('OTP verified', { variant: 'success' });
       setStep(3);
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      enqueueSnackbar(err.message, { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -76,27 +78,31 @@ const ForgetPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!newPass || !confirmPass) return enqueueSnackbar("Fill all password fields", { variant: "error" });
-    if (newPass !== confirmPass) return enqueueSnackbar("Passwords do not match", { variant: "error" });
+    if (!newPass || !confirmPass)
+      return enqueueSnackbar('Fill all password fields', { variant: 'error' });
+    if (newPass !== confirmPass)
+      return enqueueSnackbar('Passwords do not match', { variant: 'error' });
 
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword: newPass }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/reset-password`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, newPassword: newPass }),
+        },
+      );
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.msg || "Reset failed");
+      if (!res.ok) throw new Error(data.msg || 'Reset failed');
 
-      enqueueSnackbar("Password changed successfully", { variant: "success" });
-      navigate("/signIn", { replace: true });
-
+      enqueueSnackbar('Password changed successfully', { variant: 'success' });
+      navigate('/signIn', { replace: true });
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      enqueueSnackbar(err.message, { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -116,9 +122,16 @@ const ForgetPassword = () => {
             <img src={images.logo} alt="logo" />
           </div>
 
-          <form className="mt-3" onSubmit={
-            step === 1 ? handleSendOtp : step === 2 ? handleVerifyOtp : handleResetPassword
-          }>
+          <form
+            className="mt-3"
+            onSubmit={
+              step === 1
+                ? handleSendOtp
+                : step === 2
+                  ? handleVerifyOtp
+                  : handleResetPassword
+            }
+          >
             <h2 className="mb-4 text-center">Forgot Password</h2>
 
             {step === 1 && (
@@ -173,16 +186,16 @@ const ForgetPassword = () => {
                 type="submit"
                 className="btn-blue col btn-lg btn-big bg-blue"
                 disabled={loading}
-                style={{ height: "45px" }}
+                style={{ height: '45px' }}
               >
                 {loading ? (
                   <span className="dot-loader"></span>
                 ) : step === 1 ? (
-                  "Send OTP"
+                  'Send OTP'
                 ) : step === 2 ? (
-                  "Verify OTP"
+                  'Verify OTP'
                 ) : (
-                  "Reset Password"
+                  'Reset Password'
                 )}
               </Button>
             </div>

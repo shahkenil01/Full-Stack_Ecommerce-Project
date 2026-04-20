@@ -1,20 +1,20 @@
-import { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import Logo from "../../assets/images/logo.png";
-import patern from "../../assets/images/pattern.webp";
+import { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import Logo from '../../assets/images/logo.png';
+import patern from '../../assets/images/pattern.webp';
 import { useSnackbar } from 'notistack';
-import { MyContext } from "../../App";
-import OtpBox from "../../components/OtpBox";
+import { MyContext } from '../../App';
+import OtpBox from '../../components/OtpBox';
 
 const VerifyAccount = () => {
   const [loading, setLoading] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(30);
   const [resending, setResending] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const email = localStorage.getItem("pendingEmail");
+  const email = localStorage.getItem('pendingEmail');
 
   const { setIsLogin, setUser } = useContext(MyContext);
 
@@ -32,11 +32,11 @@ const VerifyAccount = () => {
   }, [resending]);
 
   useEffect(() => {
-    const email = localStorage.getItem("pendingEmail");
-    const userData = localStorage.getItem("pendingUserData");
+    const email = localStorage.getItem('pendingEmail');
+    const userData = localStorage.getItem('pendingUserData');
 
     if (!email || !userData) {
-      navigate("/signup", { replace: true });
+      navigate('/signup', { replace: true });
     }
   }, []);
 
@@ -47,43 +47,48 @@ const VerifyAccount = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/verify-otp`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp }),
+        },
+      );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Verification failed");
+      if (!res.ok) throw new Error(data.msg || 'Verification failed');
 
-      enqueueSnackbar("OTP Verified Successfully!", { variant: "success" });
+      enqueueSnackbar('OTP Verified Successfully!', { variant: 'success' });
 
-      const userData = JSON.parse(localStorage.getItem("pendingUserData"));
-      if (!userData) throw new Error("Missing user data for signup");
+      const userData = JSON.parse(localStorage.getItem('pendingUserData'));
+      if (!userData) throw new Error('Missing user data for signup');
 
-      const signupRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      });
+      const signupRes = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/signup`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData),
+        },
+      );
 
       const signupData = await signupRes.json();
-      if (!signupRes.ok) throw new Error(signupData.msg || "Signup failed");
+      if (!signupRes.ok) throw new Error(signupData.msg || 'Signup failed');
 
-      enqueueSnackbar("Account created successfully!", { variant: "success" });
+      enqueueSnackbar('Account created successfully!', { variant: 'success' });
 
-      localStorage.setItem("userToken", signupData.token);
-      localStorage.setItem("userInfo", JSON.stringify(signupData.user));
+      localStorage.setItem('userToken', signupData.token);
+      localStorage.setItem('userInfo', JSON.stringify(signupData.user));
       setIsLogin(true);
       setUser(signupData.user);
 
-      localStorage.removeItem("pendingEmail");
-      localStorage.removeItem("pendingUserData");
+      localStorage.removeItem('pendingEmail');
+      localStorage.removeItem('pendingUserData');
 
-      navigate("/", { replace: true });
-
+      navigate('/', { replace: true });
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      enqueueSnackbar(err.message, { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -93,18 +98,21 @@ const VerifyAccount = () => {
     try {
       setResending(true);
       setTimer(30);
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/request-otp`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        },
+      );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Failed to resend OTP");
+      if (!res.ok) throw new Error(data.msg || 'Failed to resend OTP');
 
-      enqueueSnackbar("OTP resent to your email!", { variant: "info" });
+      enqueueSnackbar('OTP resent to your email!', { variant: 'info' });
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      enqueueSnackbar(err.message, { variant: 'error' });
     }
   };
 
@@ -120,14 +128,28 @@ const VerifyAccount = () => {
 
           <div className="wrapper mt-3 card border text-center">
             <form onSubmit={verify}>
-              <img src="https://fullstack-ecommerce-add-admin.netlify.app/shield.png" width="80px" />
-              <p className="text-center mt-3"> OTP has been sent to <b>{email || "your@email.com"}</b> </p>
+              <img
+                src="https://fullstack-ecommerce-add-admin.netlify.app/shield.png"
+                width="80px"
+              />
+              <p className="text-center mt-3">
+                {' '}
+                OTP has been sent to <b>{email || 'your@email.com'}</b>{' '}
+              </p>
 
               <OtpBox length={6} onChange={handleOtpChange} />
 
               <div className="form-group mt-3 row">
-                <Button type="submit" className="btn-blue btn-lg w-100 btn-big" style={{ height: "45px"}}>
-                  {loading ? <span className="dot-loader"></span> : "Verify OTP"}
+                <Button
+                  type="submit"
+                  className="btn-blue btn-lg w-100 btn-big"
+                  style={{ height: '45px' }}
+                >
+                  {loading ? (
+                    <span className="dot-loader"></span>
+                  ) : (
+                    'Verify OTP'
+                  )}
                 </Button>
               </div>
             </form>
@@ -137,7 +159,13 @@ const VerifyAccount = () => {
             {timer > 0 ? (
               <span className="text-muted">Resend OTP in {timer}s</span>
             ) : (
-              <Button className="btn-blue btn-lg w-100 btn-big" onClick={resendOtp}> Resend OTP </Button>
+              <Button
+                className="btn-blue btn-lg w-100 btn-big"
+                onClick={resendOtp}
+              >
+                {' '}
+                Resend OTP{' '}
+              </Button>
             )}
           </div>
         </div>

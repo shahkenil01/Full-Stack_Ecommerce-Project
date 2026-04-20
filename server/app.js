@@ -7,35 +7,37 @@ const mongoose = require('mongoose');
 const TempOrder = require('./models/tempOrder');
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({
-  origin: [
-    'https://e-commerce-best.netlify.app', // client
-    'https://e-commerce-best-admin.netlify.app', // admin
-    'http://localhost:3000', // localhost admin
-    'http://localhost:3005' // localhost client
-  ],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      'https://e-commerce-best.netlify.app', // client
+      'https://e-commerce-best-admin.netlify.app', // admin
+      'http://localhost:3000', // localhost admin
+      'http://localhost:3005', // localhost client
+    ],
+    credentials: true,
+  }),
+);
 app.options('*', cors());
 
 app.use(bodyParser.json());
 
-app.post("/save-temp", async (req, res) => {
+app.post('/save-temp', async (req, res) => {
   try {
     const { token, cartItems, formFields } = req.body;
     if (!token || !cartItems || !formFields) {
-      return res.status(400).json({ error: "Missing token/cart/form" });
+      return res.status(400).json({ error: 'Missing token/cart/form' });
     }
 
     await TempOrder.findOneAndUpdate(
       { token },
       { cartItems, formFields },
-      { upsert: true }
+      { upsert: true },
     );
 
-    res.status(200).json({ msg: "saved to db" });
+    res.status(200).json({ msg: 'saved to db' });
   } catch (e) {
-    res.status(500).json({ error: "failed to save temp" });
+    res.status(500).json({ error: 'failed to save temp' });
   }
 });
 
@@ -48,7 +50,7 @@ const productSizeRoutes = require('./routes/productSize');
 const uploadRoutes = require('./routes/upload');
 const userRoutes = require('./routes/user');
 const cartRoutes = require('./routes/Cart');
-const orderRoutes = require("./routes/order");
+const orderRoutes = require('./routes/order');
 const favoriteRoutes = require('./routes/favorite');
 const reviewRoutes = require('./routes/review');
 const cashfreeRoute = require('./routes/cashfree');
@@ -62,19 +64,20 @@ app.use('/api/rams', productRamRoutes);
 app.use('/api/weights', productWeightRoutes);
 app.use('/api/sizes', productSizeRoutes);
 app.use('/api/cloudinary', uploadRoutes);
-app.use('/api/User', userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/cart', cartRoutes);
-app.use("/api/orders", orderRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/api/favorite', favoriteRoutes);
-app.use("/api/reviews", reviewRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.use('/api/cashfree', cashfreeRoute);
 app.use('/api/homeBanner', homeBannerRoutes);
-app.use('/api/search', searchRoutes)
+app.use('/api/search', searchRoutes);
 
-mongoose.connect(process.env.CONNECTION_STRING, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose
+  .connect(process.env.CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log('Database Connection is ready...');
     app.listen(PORT, () => {

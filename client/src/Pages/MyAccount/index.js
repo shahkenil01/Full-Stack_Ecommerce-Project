@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Tabs, Tab, Box, Button, TextField } from '@mui/material';
-import { MdOutlineCloudUpload } from "react-icons/md";
+import { MdOutlineCloudUpload } from 'react-icons/md';
 import { MyContext } from '../../App';
 import { useSnackbar } from 'notistack';
 
@@ -45,11 +45,14 @@ const MyAccount = () => {
     e.preventDefault();
     try {
       const userId = user?._id || user?.id;
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/User/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${userId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profileData),
+        },
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.msg || 'Failed to update');
 
@@ -67,7 +70,9 @@ const MyAccount = () => {
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      enqueueSnackbar('New and confirm passwords do not match', { variant: 'error' });
+      enqueueSnackbar('New and confirm passwords do not match', {
+        variant: 'error',
+      });
       return;
     }
 
@@ -79,16 +84,23 @@ const MyAccount = () => {
 
     try {
       const userId = user?._id || user?.id;
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/User/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: passwordData.newPassword }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/${userId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: passwordData.newPassword }),
+        },
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.msg || 'Password update failed');
 
       enqueueSnackbar('Password updated successfully', { variant: 'success' });
-      setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswordData({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     } catch (err) {
       enqueueSnackbar(err.message, { variant: 'error' });
     }
@@ -96,14 +108,17 @@ const MyAccount = () => {
 
   const compareOldPassword = async (password) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/User/signin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: profileData.email, password }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/signin`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: profileData.email, password }),
+        },
+      );
       return res.status === 200;
     } catch (err) {
-      console.error("Password match check failed:", err);
+      console.error('Password match check failed:', err);
       return false;
     }
   };
@@ -114,7 +129,11 @@ const MyAccount = () => {
 
         <div className="myAccBox card border-0">
           <Box className="css-1gsv261">
-            <Tabs value={tabIndex} onChange={handleTabChange} TabIndicatorProps={{ className: 'MuiTabs-indicator' }} >
+            <Tabs
+              value={tabIndex}
+              onChange={handleTabChange}
+              TabIndicatorProps={{ className: 'MuiTabs-indicator' }}
+            >
               <Tab label="Edit Profile" />
               <Tab label="Change Password" />
             </Tabs>
@@ -128,10 +147,18 @@ const MyAccount = () => {
                   <div className="col-md-3">
                     <div className="userImage d-flex align-items-center justify-content-center">
                       <div className="overlay d-flex align-items-center justify-content-center">
-                        <label htmlFor="fileUpload" style={{ cursor: 'pointer' }}>
+                        <label
+                          htmlFor="fileUpload"
+                          style={{ cursor: 'pointer' }}
+                        >
                           <MdOutlineCloudUpload />
                         </label>
-                        <input type="file" id="fileUpload" name="images" style={{ display: 'none' }} />
+                        <input
+                          type="file"
+                          id="fileUpload"
+                          name="images"
+                          style={{ display: 'none' }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -140,25 +167,50 @@ const MyAccount = () => {
                     <div className="row">
                       <div className="col-md-6">
                         <div className="form-group">
-                          <TextField name="name" label="Name" variant="outlined" value={profileData.name} onChange={handleProfileChange} className="w-100" />
+                          <TextField
+                            name="name"
+                            label="Name"
+                            variant="outlined"
+                            value={profileData.name}
+                            onChange={handleProfileChange}
+                            className="w-100"
+                          />
                         </div>
                       </div>
 
                       <div className="col-md-6">
                         <div className="form-group">
-                          <TextField name="email" label="Email" variant="outlined" value={profileData.email} disabled className="w-100" />
+                          <TextField
+                            name="email"
+                            label="Email"
+                            variant="outlined"
+                            value={profileData.email}
+                            disabled
+                            className="w-100"
+                          />
                         </div>
                       </div>
 
                       <div className="col-md-6">
                         <div className="form-group">
-                          <TextField name="phone" label="Phone" variant="outlined" value={profileData.phone} onChange={handleProfileChange} className="w-100" />
+                          <TextField
+                            name="phone"
+                            label="Phone"
+                            variant="outlined"
+                            value={profileData.phone}
+                            onChange={handleProfileChange}
+                            className="w-100"
+                          />
                         </div>
                       </div>
                     </div>
 
                     <div className="form-group">
-                      <Button type="submit" className="btn-blue bg-red btn-lg btn-big" variant="contained" >
+                      <Button
+                        type="submit"
+                        className="btn-blue bg-red btn-lg btn-big"
+                        variant="contained"
+                      >
                         Save
                       </Button>
                     </div>
@@ -176,25 +228,50 @@ const MyAccount = () => {
                     <div className="row">
                       <div className="col-md-4">
                         <div className="form-group">
-                          <TextField name="oldPassword" label="Old Password" type="password" value={passwordData.oldPassword} onChange={handlePasswordChange} className="w-100" />
+                          <TextField
+                            name="oldPassword"
+                            label="Old Password"
+                            type="password"
+                            value={passwordData.oldPassword}
+                            onChange={handlePasswordChange}
+                            className="w-100"
+                          />
                         </div>
                       </div>
 
                       <div className="col-md-4">
                         <div className="form-group">
-                          <TextField name="newPassword" label="New Password" type="password" value={passwordData.newPassword} onChange={handlePasswordChange} className="w-100" />
+                          <TextField
+                            name="newPassword"
+                            label="New Password"
+                            type="password"
+                            value={passwordData.newPassword}
+                            onChange={handlePasswordChange}
+                            className="w-100"
+                          />
                         </div>
                       </div>
 
                       <div className="col-md-4">
                         <div className="form-group">
-                          <TextField name="confirmPassword" label="Confirm Password" type="password" value={passwordData.confirmPassword} onChange={handlePasswordChange} className="w-100" />
+                          <TextField
+                            name="confirmPassword"
+                            label="Confirm Password"
+                            type="password"
+                            value={passwordData.confirmPassword}
+                            onChange={handlePasswordChange}
+                            className="w-100"
+                          />
                         </div>
                       </div>
                     </div>
 
                     <div className="form-group">
-                      <Button type="submit" className="btn-blue bg-red btn-lg btn-big" variant="contained" >
+                      <Button
+                        type="submit"
+                        className="btn-blue bg-red btn-lg btn-big"
+                        variant="contained"
+                      >
                         Save
                       </Button>
                     </div>

@@ -1,8 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = process.env.NODE_ENV === "development"
-    ? process.env.REACT_APP_BACKEND_URL
-    : "https://full-stack-ecommerce-project-u0om.onrender.com";// https://full-stack-ecommerce-project-u0om.onrender.com, full-stack-best-production.up.railway.app, https://savory-jumpy-gym.glitch.me
+const BASE_URL = process.env.REACT_APP_BACKEND_URL || "https://full-stack-ecommerce-project-u0om.onrender.com"; 
+// https://full-stack-ecommerce-project-u0om.onrender.com, 
+// full-stack-best-production.up.railway.app, 
+// https://savory-jumpy-gym.glitch.me
 
 const axiosInstance = axios.create({ baseURL: BASE_URL });
 

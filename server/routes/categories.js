@@ -113,7 +113,7 @@ router.post('/create', verifyToken, isAdmin, async (req, res) => {
 
   if (!category) {
     return res.status(500).json({
-      error: err,
+      error: "Failed to create category",
       success: false
     });
   }

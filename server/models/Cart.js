@@ -11,5 +11,6 @@ const cartSchema = new mongoose.Schema({
   userEmail: { type: String, required: true },
 });
 
-module.exports = mongoose.model('Cart', cartSchema);
-exports.cartSchema = cartSchema;
+const Cart = mongoose.model('Cart', cartSchema);
+module.exports = Cart;
+module.exports.cartSchema = cartSchema;

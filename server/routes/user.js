@@ -203,7 +203,7 @@ router.get('/get/count', verifyToken, isAdmin, async (req, res) => {
 });
 
 // Update User Info
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ msg: 'Invalid User ID format' });
   }
@@ -284,7 +284,7 @@ router.post('/request-password-reset', async (req, res) => {
   }
 });
 
-// 🔐 Verify OTP for Reset
+// Verify OTP for Reset
 router.post('/verify-reset-otp', (req, res) => {
   const { email, otp } = req.body;
   const record = pendingOtps[email];
@@ -301,7 +301,7 @@ router.post('/verify-reset-otp', (req, res) => {
   return res.status(200).json({ msg: "OTP verified. You can reset your password." });
 });
 
-// 🔐 Reset Password
+// Reset Password
 router.post('/reset-password', async (req, res) => {
   const { email, newPassword } = req.body;
 

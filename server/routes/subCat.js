@@ -14,7 +14,7 @@ router.post('/create', verifyToken, isAdmin, async (req, res) => {
 
   if (!subCat) {
     return res.status(500).json({
-      error: err,
+      error: "Failed to create sub category",
       success: false
     });
   }
@@ -64,7 +64,7 @@ router.get('/by-category/:categoryId', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const subCat = await SubCategory.findByIdAndUpdate(
       req.params.id,

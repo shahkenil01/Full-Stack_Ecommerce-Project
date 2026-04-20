@@ -52,7 +52,8 @@ router.post('/signup', async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password,10);
 
-    const userRole = role && ['admin', 'client'].includes(role) ? role : 'client';
+    //const userRole = role && ['admin', 'client'].includes(role) ? role : 'client';
+    const userRole = 'client';
 
     const result = await User.create({
       name:name,

@@ -73,7 +73,7 @@ export const putData = async (url, formData, token) => {
     console.error("PUT error:", error);
     const msg = error?.response?.data?.msg || error?.response?.data?.message || "Something went wrong";
     enqueueSnackbar(msg, { variant: "error" });
-    return { success: false, message: msg };;
+    return { success: false, message: msg };
   }
 };
 

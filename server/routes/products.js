@@ -65,7 +65,9 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     if (product.images && product.images.length > 0) {
       for (const imageUrl of product.images) {
         if (imageUrl.includes('res.cloudinary.com')) {
-          const publicId = imageUrl.split('/').pop().split('.')[0];
+          const uploadIndex = imageUrl.indexOf('/upload/');
+          const publicIdWithExt = imageUrl.substring(uploadIndex + 8).replace(/^v\d+\//, '');
+          const publicId = publicIdWithExt.replace(/\.[^.]+$/, '');
           await cloudinary.uploader.destroy(publicId);
         }
       }
@@ -106,8 +108,9 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
     // ─── 2) Delete only those removed from Cloudinary ───────────────────────
     for (const url of toDelete) {
       if (typeof url === 'string' && url.includes('res.cloudinary.com')) {
-        const parts = url.split('/');
-        const publicId = parts.pop().split('.')[0];
+        const uploadIndex = url.indexOf('/upload/');
+        const publicIdWithExt = url.substring(uploadIndex + 8).replace(/^v\d+\//, '');
+        const publicId = publicIdWithExt.replace(/\.[^.]+$/, '');
         await cloudinary.uploader.destroy(publicId);
       }
     }

@@ -222,8 +222,9 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     if (category.images && category.images.length > 0) {
       for (const url of category.images) {
         const parts = url.split('/');
-        const publicIdWithExtension = parts[parts.length - 1];
-        const publicId = publicIdWithExtension.split('.')[0];
+        const uploadIndex = url.indexOf('/upload/');
+        const publicIdWithExt = url.substring(uploadIndex + 8).replace(/^v\d+\//, '');
+        const publicId = publicIdWithExt.replace(/\.[^.]+$/, '');
         await cloudinary.uploader.destroy(publicId);
       }
     }

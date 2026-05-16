@@ -57,6 +57,7 @@ const cashfreeRoute = require('./routes/cashfree');
 const homeBannerRoutes = require('./routes/homeBanner');
 const searchRoutes = require('./routes/search');
 
+
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/subCat`, subCatSchema);
 app.use(`/api/products`, productRoutes);

@@ -60,13 +60,52 @@ const SignUp = () => {
       return;
     }
 
+    if (name.trim().length < 3) {
+      enqueueSnackbar('Name must be at least 3 characters', {
+        variant: 'error',
+      });
+      setLoading(false);
+      return;
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+
+    if (!phoneRegex.test(phone)) {
+      enqueueSnackbar('Phone number must be 10 digits', {
+        variant: 'error',
+      });
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      enqueueSnackbar('Please enter valid email', {
+        variant: 'error',
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      enqueueSnackbar('Password must be at least 6 characters', {
+        variant: 'error',
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const checkEmail = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/user/check-email`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({
+            email,
+            type: 'signup',
+          }),
         },
       );
 
@@ -78,7 +117,10 @@ const SignUp = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({
+            email,
+            type: 'signup',
+          }),
         },
       );
 
@@ -128,6 +170,7 @@ const SignUp = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    inputProps={{ maxLength: 30 }}
                   />
                 </div>
               </div>
@@ -141,7 +184,14 @@ const SignUp = () => {
                     className="w-100"
                     name="phone"
                     value={formData.phone}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+
+                      setFormData((prev) => ({
+                        ...prev,
+                        phone: value,
+                      }));
+                    }}
                   />
                 </div>
               </div>

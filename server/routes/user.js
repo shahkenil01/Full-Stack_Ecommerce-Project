@@ -14,7 +14,6 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const pendingOtps = {};
 
-
 // POST: Check if email already exists
 router.post('/check-email', async (req, res) => {
   const { email } = req.body;
@@ -38,10 +37,17 @@ router.post('/check-email', async (req, res) => {
   });
 });
 
-
 // POST SignUp
 router.post('/signup', async (req, res) => {
   const { name, phone, email, password } = req.body;
+
+  const record = pendingOtps[email];
+
+  if (!record || !record.verified) {
+    return res.status(403).json({
+      msg: "OTP not verified"
+    });
+  }
 
   const missingFields = [];
 
@@ -62,6 +68,14 @@ router.post('/signup', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         msg: "User already exist"
+      });
+    }
+
+    const existingPhone = await User.findOne({ phone });
+
+    if (existingPhone) {
+      return res.status(400).json({
+        msg: "Phone number already exists"
       });
     }
 
@@ -87,6 +101,8 @@ router.post('/signup', async (req, res) => {
       }
     );
 
+    delete pendingOtps[email];
+
     res.status(200).json({
       success: true,
       user: result,
@@ -94,15 +110,25 @@ router.post('/signup', async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Signup Error:", error);
+    if (error.code === 11000) {
+      if (error.keyPattern?.email) {
+        return res.status(400).json({
+          msg: "Email already exists"
+        });
+      }
+
+      if (error.keyPattern?.phone) {
+        return res.status(400).json({
+          msg: "Phone number already exists"
+        });
+      }
+    }
 
     res.status(500).json({
-      msg: "something went wrong",
-      error: error.message
+      msg: "Something went wrong"
     });
   }
 });
-
 
 // POST SignIn
 router.post('/signin', async (req, res) => {
@@ -163,14 +189,12 @@ router.post('/signin', async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);
 
     res.status(500).json({
       msg: "somthing went wrong"
     });
   }
 });
-
 
 // Clear Cart
 router.delete('/clear-cart', verifyToken, async (req, res) => {
@@ -200,7 +224,6 @@ router.delete('/clear-cart', verifyToken, async (req, res) => {
   }
 });
 
-
 // Get All Users
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
@@ -221,7 +244,6 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
     });
   }
 });
-
 
 // Protected Route
 router.get('/me', verifyToken, async (req, res) => {
@@ -244,17 +266,16 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
-
 // Request OTP
 router.post('/request-otp', async (req, res) => {
-  const { email } = req.body;
+  const { email, type } = req.body;
 
   const otp = Math.floor(
     100000 + Math.random() * 900000
   ).toString();
 
   try {
-    await sendOTPEmail(email, otp);
+    await sendOTPEmail(email, otp, type);
 
     pendingOtps[email] = {
       otp,
@@ -271,7 +292,6 @@ router.post('/request-otp', async (req, res) => {
     });
   }
 });
-
 
 // Verify OTP
 router.post('/verify-otp', (req, res) => {
@@ -299,13 +319,12 @@ router.post('/verify-otp', (req, res) => {
     });
   }
 
-  delete pendingOtps[email];
+  pendingOtps[email].verified = true;
 
   res.status(200).json({
     msg: "OTP verified successfully"
   });
 });
-
 
 // Request Password Reset
 router.post('/request-password-reset', async (req, res) => {
@@ -342,15 +361,12 @@ router.post('/request-password-reset', async (req, res) => {
     });
 
   } catch (err) {
-    console.error("RESET OTP ERROR:", err);
-
     return res.status(500).json({
       msg: "Failed to send OTP",
       error: err.message
     });
   }
 });
-
 
 // Verify Reset OTP
 router.post('/verify-reset-otp', (req, res) => {
@@ -384,7 +400,6 @@ router.post('/verify-reset-otp', (req, res) => {
     msg: "OTP verified. You can reset your password."
   });
 });
-
 
 // Reset Password
 router.post('/reset-password', async (req, res) => {
@@ -432,7 +447,6 @@ router.post('/reset-password', async (req, res) => {
     });
   }
 });
-
 
 // Google Login
 router.post("/google-precheck", async (req, res) => {
@@ -491,7 +505,6 @@ router.post("/google-precheck", async (req, res) => {
   }
 });
 
-
 // Get User by ID
 router.get('/:id', async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -518,7 +531,6 @@ router.get('/:id', async (req, res) => {
     });
   }
 });
-
 
 // Update User
 router.put('/:id', verifyToken, async (req, res) => {
@@ -563,7 +575,6 @@ router.put('/:id', verifyToken, async (req, res) => {
   }
 });
 
-
 // Delete User
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -593,7 +604,6 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     });
   }
 });
-
 
 // Count Users
 router.get('/get/count', verifyToken, isAdmin, async (req, res) => {

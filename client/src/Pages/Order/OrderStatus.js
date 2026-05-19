@@ -16,13 +16,18 @@ const OrderStatus = () => {
 
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
-  const paymentResult = params.get("paid");
+  const paymentResult = params.get("paid") ||
+    params.get("order_status");
 
-  useEffect(() => {
-    if (!token || paymentResult !== "true") {
-      navigate("/orders");
-      return;
-    }
+  useEffect(() => { if ( !token || (
+      paymentResult !== "true" &&
+      paymentResult !== "SUCCESS" &&
+      paymentResult !== "PAID"
+    )
+  ) {
+    navigate("/orders");
+    return;
+  }
 
     const saveAndProcessOrder = async () => {
       if (!token || !user?._id || hasSavedRef.current) return;
@@ -44,31 +49,16 @@ const OrderStatus = () => {
             formFields,
           });
 
-          await new Promise((r) => setTimeout(r, 3000));
-
-          let attempts = 0;
-          while (attempts < 10) {
-            const res = await axios.get(
-              `${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`
-            );
-            if (Array.isArray(res.data) && res.data.length > 0) {
-              const latest = res.data[0];
-              setPaymentMethod(latest.paymentMethod || "Online");
-              setStatus("success");
-              break;
-            }
-            await new Promise((r) => setTimeout(r, 1500));
-            attempts++;
-          }
-
-          if (attempts === 10) {
-            setStatus("pending");
-            setError("Payment confirmation is taking longer than expected. Your order may still process.");
-          }
+          setPaymentMethod("Online");
+          setStatus("success");
 
           localStorage.removeItem(`order_${token}`);
           localStorage.removeItem(`cf_order_${token}`);
           setCartItems([]);
+        }
+        else {
+          setPaymentMethod("Online");
+          setStatus("success");
         }
       } catch (err) {
         console.error("Order processing failed:", err.message);
@@ -191,7 +181,7 @@ const OrderStatus = () => {
       <>
         <style>{keyframes}</style>
         <div style={styles.page}>
-          <div style={{ width: 60, height: 60, border: "4px solid #eee", borderTop: "4px solid #111", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: "1.5rem" }} />
+          <div style={{ width: 60, height: 60, border: "4px solid #eee", borderTop: "4px solid #111", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: "1.5rem", }} />
           <h2 style={{ ...styles.title, animation: "none" }}>Processing your order...</h2>
           <p style={{ ...styles.subtitle, animation: "none" }}>
             We're confirming your payment. Please don't close this tab.

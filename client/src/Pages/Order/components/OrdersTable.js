@@ -22,18 +22,15 @@ const OrdersTable = () => {
     setLoading(true);
     axios
       .get(`${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`)
-      .then((res) => setOrders(res.data.sort((a, b) => new Date(b.date) - new Date(a.date))))
-      .catch((err) => console.error("❌ Failed to fetch orders:", err.message))
+      .then((res) => setOrders( [...res.data].sort( (a, b) => new Date(b.date) - new Date(a.date) )))
+      .catch((err) => console.error("Failed to fetch orders:", err.message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     if (!user?.email) return;
+
     fetchOrders();
-    const interval = setInterval(() => {
-      fetchOrders();
-    }, 1000);
-    return () => clearInterval(interval);
   }, [user]);
 
   const handleModalClose = () => {

@@ -29,9 +29,7 @@ export const TrackingModal = ({ open, onClose, orderId, orderDate }) => {
     if (!open || !orderId) return;
 
     fetchOrder();
-    const interval = setInterval(fetchOrder, 1000);
-
-    return () => clearInterval(interval);
+    return () => {};
   }, [orderId, open]);
 
   if (!order) return null;

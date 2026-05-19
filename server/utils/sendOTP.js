@@ -1,20 +1,28 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 
-const sendOTPEmail = async (email, otp, type = "signup") => {
+const sendOTPEmail = async (email, otp, type = 'signup') => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: 'gmail',
     auth: {
       user: process.env.MAIL_USERNAME,
       pass: process.env.MAIL_PASSWORD,
+
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     },
   });
 
-  const subject = type === "reset"
-    ? "Reset Your Hotash Password"
-    : "Your Hotash OTP Verification Code";
+  await transporter.verify();
+  console.log('SMTP Ready');
+
+  const subject =
+    type === 'reset'
+      ? 'Reset Your Hotash Password'
+      : 'Your Hotash OTP Verification Code';
 
   const html =
-    type === "reset"
+    type === 'reset'
       ? `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px;">
           <div style="background-color: #dc3545; padding: 20px; color: white; text-align: center;">

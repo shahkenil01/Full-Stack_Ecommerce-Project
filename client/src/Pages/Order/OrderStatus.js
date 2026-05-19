@@ -25,37 +25,51 @@ const OrderStatus = () => {
     }
 
     const saveAndProcessOrder = async () => {
-      if (!token || !user?.email || hasSavedRef.current) return;
+      if (!token || !user?._id || hasSavedRef.current) return;
       hasSavedRef.current = true;
 
       try {
-        await new Promise((r) => setTimeout(r, 3000));
+        const raw = localStorage.getItem(`order_${token}`);
+        if (raw) {
+          const stored = JSON.parse(raw);
+          const cart = stored?.cartItems || [];
+          const formFields = stored?.formFields || {};
+          const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+          setTotalAmount(total);
+          setOrderRef(token.slice(3, 9).toUpperCase());
 
-        let attempts = 0;
-        while (attempts < 10) {
-          const res = await axios.get(
-            `${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`
-          );
+          await axios.post(`${process.env.REACT_APP_BACKEND_URL}/save-temp`, {
+            token,
+            cartItems: cart,
+            formFields,
+          });
 
-          if (Array.isArray(res.data) && res.data.length > 0) {
-            const latest = res.data[0];
-            setPaymentMethod(latest.paymentMethod || "Online");
-            setTotalAmount(latest.totalAmount || 0);
-            setOrderRef(latest._id.slice(-6).toUpperCase());
-            setStatus("success");
+          await new Promise((r) => setTimeout(r, 3000));
 
-            localStorage.removeItem(`cf_order_${token}`);
-            setCartItems([]);
-            return;
+          let attempts = 0;
+          while (attempts < 10) {
+            const res = await axios.get(
+              `${process.env.REACT_APP_BACKEND_URL}/api/orders/user/${user.email}`
+            );
+            if (Array.isArray(res.data) && res.data.length > 0) {
+              const latest = res.data[0];
+              setPaymentMethod(latest.paymentMethod || "Online");
+              setStatus("success");
+              break;
+            }
+            await new Promise((r) => setTimeout(r, 1500));
+            attempts++;
           }
 
-          await new Promise((r) => setTimeout(r, 2000));
-          attempts++;
+          if (attempts === 10) {
+            setStatus("pending");
+            setError("Payment confirmation is taking longer than expected. Your order may still process.");
+          }
+
+          localStorage.removeItem(`order_${token}`);
+          localStorage.removeItem(`cf_order_${token}`);
+          setCartItems([]);
         }
-
-        setStatus("pending");
-        setError("Payment confirmation is taking longer than expected. Your order may still process.");
-
       } catch (err) {
         console.error("Order processing failed:", err.message);
         setStatus("error");

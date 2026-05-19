@@ -1,5 +1,7 @@
-import OrdersPage from "./OrdersPage";
+import OrdersTable from "./components/OrdersTable";
 
-const AllOrders = () => <OrdersPage />;
+const AllOrders = () => {
+  return <OrdersTable />;
+};
 
 export default AllOrders;

@@ -8,9 +8,9 @@ const sendOTPEmail = async (email, otp, type = 'signup') => {
       pass: process.env.MAIL_PASSWORD,
     },
 
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 
   console.log('SMTP Ready');
@@ -60,7 +60,13 @@ const sendOTPEmail = async (email, otp, type = 'signup') => {
     html,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('MAIL SENT', info.response);
+  } catch (err) {
+    console.log('MAIL ERROR', err);
+    throw err;
+  }
 };
 
 module.exports = sendOTPEmail;

@@ -6,14 +6,13 @@ const sendOTPEmail = async (email, otp, type = 'signup') => {
     auth: {
       user: process.env.MAIL_USERNAME,
       pass: process.env.MAIL_PASSWORD,
+    },
 
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 10000,
-    },
   });
 
-  await transporter.verify();
   console.log('SMTP Ready');
 
   const subject =

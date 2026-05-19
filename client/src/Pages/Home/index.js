@@ -63,7 +63,7 @@ const Home = () => {
 
         const numbered = products.map((item, index) => ({
             ...item,
-            displayNumber: index + 1
+            displayNumber: item.indexNumber
         }));
 
         return allowedNumbers
@@ -95,7 +95,7 @@ const Home = () => {
             if (Array.isArray(res)) {
                 const numbered = res.map((item, index) => ({
                     ...item,
-                    displayNumber: index + 1
+                    displayNumber: item.indexNumber
                 }));
 
                 const allowedNumbers = [45, 22, 2, 5, 7, 10, 12, 14, 16, 18, 20, 24, 26, 28, 30];

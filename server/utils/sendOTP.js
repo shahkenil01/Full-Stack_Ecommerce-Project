@@ -10,6 +10,14 @@ const sendOTPEmail = async (email, otp, type = 'signup') => {
       user: process.env.BREVO_USER,
       pass: process.env.BREVO_PASS,
     },
+
+    tls: {
+      rejectUnauthorized: false,
+    },
+
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
   });
 
   const subject =

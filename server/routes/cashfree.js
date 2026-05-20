@@ -21,10 +21,10 @@ async function findTempOrderWithRetry(token, retries = 8, delayMs = 1000) {
 
 function verifyWebhookSignature(postData, signature, secretKey) {
   const generatedSignature = crypto
-    .createHmac('sha256', secretKey)
+    .createHmac("sha256", secretKey)
     .update(postData)
-    .digest('base64');
-  
+    .digest("base64");
+
   return generatedSignature === signature;
 }
 
@@ -43,17 +43,17 @@ router.post("/create-order", async (req, res) => {
         customer_id: cleanCustomerId,
         customer_email: email,
         customer_phone: phoneNumber,
-        customer_name: name ||"Guest User"
+        customer_name: name || "Guest User",
       },
       order_amount: amount,
       order_currency: "INR",
       order_id: orderId,
       order_meta: {
-        return_url: `${process.env.FRONTEND_URL}/order?paid=true&token=${token}`
+        return_url: `${process.env.FRONTEND_URL}/order?paid=true&token=${token}`,
       },
       order_tags: {
-        token: token
-      }
+        token: token,
+      },
     };
 
     const headers = {
@@ -76,99 +76,108 @@ router.post("/create-order", async (req, res) => {
   }
 });
 
-// ✅ Webhook Handler Route
-router.post('/webhook', async (req, res) => {
+// Webhook Handler Route
+router.post("/webhook", async (req, res) => {
   try {
     const { type, data } = req.body;
 
-    // 1. Check if this is a payment success event
-    if (type !== 'PAYMENT_SUCCESS_WEBHOOK') {
-      return res.status(200).json({ status: 'ignored', reason: 'Not a payment event' });
+    // 1. Sirf payment success events handle karo
+    if (type !== "PAYMENT_SUCCESS_WEBHOOK") {
+      return res.status(200).json({ status: "ignored", reason: "Not a payment event" });
     }
 
-    // 2. Extract required data
+    // 2. Required data extract karo
     const { order, payment } = data;
     const token = order?.order_tags?.token;
     const paymentId = payment?.cf_payment_id;
     const orderId = order?.order_id;
 
     if (!token || !paymentId || !orderId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        received: { token, paymentId, orderId }
+      return res.status(400).json({
+        error: "Missing required fields",
+        received: { token, paymentId, orderId },
       });
     }
 
-    // 3. Find temporary order (simulating DB lookup)
+    // 3. TempOrder dhundo DB mein
     const tempOrder = await findTempOrderWithRetry(token, 8, 1000);
 
     if (!tempOrder) {
-      return res.status(400).json({ 
-        error: 'Order not found',
-        token
+      return res.status(400).json({
+        error: "Order not found",
+        token,
       });
     }
 
-    // 4. Format products for new order
-    const formattedProducts = tempOrder.cartItems.map(item => ({
+    // 4. Products format karo
+    const formattedProducts = tempOrder.cartItems.map((item) => ({
       productId: item._id || item.productId,
       name: item.name || item.productTitle,
       image: item.images?.[0] || item.image,
       quantity: item.quantity,
       price: item.price,
-      subtotal: item.price * item.quantity
+      subtotal: item.price * item.quantity,
     }));
 
-    // 5. Create new order
     const newOrder = new Order({
       paymentId,
       orderId,
       paymentMethod: getPaymentMethod(payment.payment_method),
       products: formattedProducts,
-      name: tempOrder.formFields?.fullName || 'Guest',
-      phone: tempOrder.formFields?.phoneNumber || '0000000000',
-      email: tempOrder.formFields?.email || 'noemail@example.com',
+      name: tempOrder.formFields?.fullName || "Guest",
+      phone: tempOrder.formFields?.phoneNumber || "0000000000",
+      email: tempOrder.formFields?.email || "noemail@example.com",
       address: [
         tempOrder.formFields?.streetAddressLine1,
-        tempOrder.formFields?.streetAddressLine2
-      ].filter(Boolean).join(', '),
-      city: tempOrder.formFields?.city || '',
-      state: tempOrder.formFields?.state || '',
-      zipCode: tempOrder.formFields?.zipCode || '',
-      country: tempOrder.formFields?.country || '',
+        tempOrder.formFields?.streetAddressLine2,
+      ]
+        .filter(Boolean)
+        .join(", "),
+      city: tempOrder.formFields?.city || "",
+      state: tempOrder.formFields?.state || "",
+      zipCode: tempOrder.formFields?.zipCode || "",
+      country: tempOrder.formFields?.country || "",
       totalAmount: payment.payment_amount || order.order_amount || 0,
     });
 
-    // 6. Save order and clean up
+    // 6. Order save karo
     await newOrder.save();
-    await TempOrder.deleteOne({ token });
-    await Cart.deleteMany({ userEmail: tempOrder.formFields?.email });
 
-    return res.status(200).json({ 
+    // 7. TempOrder delete karo
+    await TempOrder.deleteOne({ token });
+
+    // ✅ Fix: email validate karo PEHLE Cart delete karo
+    // Agar email missing/null ho toh Cart.deleteMany({}) ban jaata tha = sabke carts gone 💀
+    const userEmail = tempOrder.formFields?.email;
+    if (userEmail && typeof userEmail === "string" && userEmail.trim() !== "") {
+      await Cart.deleteMany({ userEmail: userEmail.trim() });
+    } else {
+      console.warn(`[Webhook] Cart not cleared — email missing for token: ${token}`);
+    }
+
+    return res.status(200).json({
       success: true,
       orderId: newOrder._id,
-      paymentId
+      paymentId,
     });
-
   } catch (error) {
-    console.error('Payment processing failed:', error);
-    return res.status(500).json({ 
-      error: 'Internal server error',
-      details: error.message 
+    console.error("Payment processing failed:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+      details: error.message,
     });
   }
 });
 
-// Helper function to determine payment method
 function getPaymentMethod(paymentMethod) {
-  if (!paymentMethod) return 'Unknown';
-  
-  if (paymentMethod.card) return 'Credit/Debit Card';
-  if (paymentMethod.upi) return 'UPI';
-  if (paymentMethod.netbanking) return 'Net Banking';
-  if (paymentMethod.wallet) return 'Mobile Wallet';
-  
-  return 'Cashfree Payment';
+  if (!paymentMethod) return "Unknown";
+
+  if (paymentMethod.card) return "Credit/Debit Card";
+  if (paymentMethod.upi) return "UPI";
+  if (paymentMethod.netbanking) return "Net Banking";
+  if (paymentMethod.wallet) return "Mobile Wallet";
+
+  return "Cashfree Payment";
 }
 
 module.exports = router;

@@ -38,6 +38,7 @@ function App() {
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Country list fetch
   useEffect(() => {
     getCountry('https://countriesnow.space/api/v0.1/countries/');
   }, []);
@@ -48,34 +49,66 @@ function App() {
     });
   };
 
+  // ✅ Fix — Dono duplicate useEffect merge kar diye ek mein
+  // Pehle: 2 alag effects the dono [] dependency ke saath
+  //   Effect #1 — localStorage se cart set karta tha
+  //   Effect #2 — user + isLogin DOBARA set karta tha (duplicate) + DB se cart fetch karta tha
+  // Problem: dono async hain, DB fetch baad mein complete hoti thi aur localStorage
+  //   wali cart ko overwrite kar deti thi — inconsistent state on load
+  // Fix: ek hi effect, seedha DB se cart lo (fresh data), localStorage fallback sirf
+  //   agar fetch fail ho
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
-    const storedCart = localStorage.getItem("cartItems");
-    if (userInfo) {
-      setUser(JSON.parse(userInfo));
-      setIsLogin(true);
-      
-        if (storedCart) {
-        try {
-          const parsed = JSON.parse(storedCart);
-          if (Array.isArray(parsed)) {
-            setCartItems(parsed);
+    if (!userInfo) return;
+
+    const parsedUser = JSON.parse(userInfo);
+    setUser(parsedUser);
+    setIsLogin(true);
+
+    // DB se fresh cart fetch karo
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/user/${parsedUser.email}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          // DB mein cart hai — use karo aur localStorage sync karo
+          setCartItems(data);
+          localStorage.setItem("cartItems", JSON.stringify(data));
+        } else {
+          // DB empty hai — localStorage fallback try karo
+          const storedCart = localStorage.getItem("cartItems");
+          if (storedCart) {
+            try {
+              const parsed = JSON.parse(storedCart);
+              if (Array.isArray(parsed)) setCartItems(parsed);
+            } catch (err) {
+              console.error("Failed to parse stored cart:", err);
+            }
           }
-        } catch (err) {
-          console.error("Failed to parse stored cart:", err);
         }
-      }
-    }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user cart:", err);
+        // Network error — localStorage se fallback
+        const storedCart = localStorage.getItem("cartItems");
+        if (storedCart) {
+          try {
+            const parsed = JSON.parse(storedCart);
+            if (Array.isArray(parsed)) setCartItems(parsed);
+          } catch (err2) {
+            console.error("Failed to parse stored cart:", err2);
+          }
+        }
+      });
   }, []);
 
   const addToCart = (product, quantity = 1) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find(item =>
-        item.productId === product._id || item._id === product._id
+      const existingItem = prevItems.find(
+        (item) => item.productId === product._id || item._id === product._id
       );
       if (existingItem) {
-        return prevItems.map(item =>
-          (item.productId === product._id || item._id === product._id)
+        return prevItems.map((item) =>
+          item.productId === product._id || item._id === product._id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
@@ -84,38 +117,19 @@ function App() {
       }
     });
   };
+
   const updateCartQuantity = (productId, newQty) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        (item.productId === productId || item._id === productId)
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.productId === productId || item._id === productId
           ? { ...item, quantity: newQty }
           : item
       )
     );
   };
-  
-  useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      const parsedUser = JSON.parse(userInfo);
-      setUser(parsedUser);
-      setIsLogin(true);
-
-      localStorage.removeItem("saveOrder");
-
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/cart/user/${parsedUser.email}`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            setCartItems(data);
-          }
-        })
-        .catch(err => console.error("Failed to fetch user cart:", err));
-    }
-  }, []);
 
   const removeFromCart = (productId) => {
-    setCartItems(prev => prev.filter(item => item._id !== productId));
+    setCartItems((prev) => prev.filter((item) => item._id !== productId));
   };
 
   const values = {

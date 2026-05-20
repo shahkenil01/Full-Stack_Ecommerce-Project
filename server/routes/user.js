@@ -9,12 +9,10 @@ const verifyToken = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 const sendOTPEmail = require('../utils/sendOTP');
 const { OAuth2Client } = require("google-auth-library");
+const OtpRecord = require('../models/OtpRecord');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const pendingOtps = {};
-
-// POST: Check if email already exists
 router.post('/check-email', async (req, res) => {
   const { email } = req.body;
 
@@ -27,30 +25,23 @@ router.post('/check-email', async (req, res) => {
   });
 
   if (existingUser) {
-    return res.status(400).json({
-      msg: 'User already exists'
-    });
+    return res.status(400).json({ msg: 'User already exists' });
   }
 
-  return res.status(200).json({
-    msg: 'Email is available'
-  });
+  return res.status(200).json({ msg: 'Email is available' });
 });
 
 // POST SignUp
 router.post('/signup', async (req, res) => {
   const { name, phone, email, password } = req.body;
 
-  const record = pendingOtps[email];
+  const record = await OtpRecord.findOne({ email });
 
   if (!record || !record.verified) {
-    return res.status(403).json({
-      msg: "OTP not verified"
-    });
+    return res.status(403).json({ msg: "OTP not verified" });
   }
 
   const missingFields = [];
-
   if (!name) missingFields.push("name");
   if (!email) missingFields.push("email");
   if (!password) missingFields.push("password");
@@ -64,19 +55,13 @@ router.post('/signup', async (req, res) => {
 
   try {
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
-      return res.status(400).json({
-        msg: "User already exist"
-      });
+      return res.status(400).json({ msg: "User already exist" });
     }
 
     const existingPhone = await User.findOne({ phone });
-
     if (existingPhone) {
-      return res.status(400).json({
-        msg: "Phone number already exists"
-      });
+      return res.status(400).json({ msg: "Phone number already exists" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -90,43 +75,26 @@ router.post('/signup', async (req, res) => {
     });
 
     const token = jwt.sign(
-      {
-        email: result.email,
-        id: result._id.toString(),
-        role: result.role
-      },
+      { email: result.email, id: result._id.toString(), role: result.role },
       process.env.JSON_WEB_TOKEN_SECRET_KEY,
-      {
-        expiresIn: '1h'
-      }
+      { expiresIn: '1h' }
     );
 
-    delete pendingOtps[email];
+    // ✅ Fix — signup ke baad OTP record DB se delete karo
+    await OtpRecord.deleteOne({ email });
 
-    res.status(200).json({
-      success: true,
-      user: result,
-      token
-    });
+    res.status(200).json({ success: true, user: result, token });
 
   } catch (error) {
     if (error.code === 11000) {
       if (error.keyPattern?.email) {
-        return res.status(400).json({
-          msg: "Email already exists"
-        });
+        return res.status(400).json({ msg: "Email already exists" });
       }
-
       if (error.keyPattern?.phone) {
-        return res.status(400).json({
-          msg: "Phone number already exists"
-        });
+        return res.status(400).json({ msg: "Phone number already exists" });
       }
     }
-
-    res.status(500).json({
-      msg: "Something went wrong"
-    });
+    res.status(500).json({ msg: "Something went wrong" });
   }
 });
 
@@ -135,50 +103,30 @@ router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
 
   const missing = [];
-
   if (!email) missing.push('email');
   if (!password) missing.push('password');
 
   if (missing.length > 0) {
-    return res.status(400).json({
-      msg: `Please fill: ${missing.join(', ')}`
-    });
+    return res.status(400).json({ msg: `Please fill: ${missing.join(', ')}` });
   }
 
   try {
     const existingUser = await User.findOne({ email });
-
     if (!existingUser) {
-      return res.status(404).json({
-        msg: "User not found. Please SignUp."
-      });
+      return res.status(404).json({ msg: "User not found. Please SignUp." });
     }
 
-    const matchPassword = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
-
+    const matchPassword = await bcrypt.compare(password, existingUser.password);
     if (!matchPassword) {
-      return res.status(400).json({
-        msg: "Incorrect password"
-      });
+      return res.status(400).json({ msg: "Incorrect password" });
     }
 
-    const userCart = await Cart.find({
-      userEmail: existingUser.email
-    });
+    const userCart = await Cart.find({ userEmail: existingUser.email });
 
     const token = jwt.sign(
-      {
-        email: existingUser.email,
-        id: existingUser._id.toString(),
-        role: existingUser.role
-      },
+      { email: existingUser.email, id: existingUser._id.toString(), role: existingUser.role },
       process.env.JSON_WEB_TOKEN_SECRET_KEY,
-      {
-        expiresIn: '1h'
-      }
+      { expiresIn: '1h' }
     );
 
     res.status(200).json({
@@ -189,10 +137,7 @@ router.post('/signin', async (req, res) => {
     });
 
   } catch (error) {
-
-    res.status(500).json({
-      msg: "somthing went wrong"
-    });
+    res.status(500).json({ msg: "somthing went wrong" });
   }
 });
 
@@ -200,16 +145,11 @@ router.post('/signin', async (req, res) => {
 router.delete('/clear-cart', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-
     if (!user) {
-      return res.status(404).json({
-        msg: 'User not found'
-      });
+      return res.status(404).json({ msg: 'User not found' });
     }
 
-    const result = await Cart.deleteMany({
-      userEmail: user.email
-    });
+    const result = await Cart.deleteMany({ userEmail: user.email });
 
     return res.status(200).json({
       msg: "Cart cleared",
@@ -228,20 +168,12 @@ router.delete('/clear-cart', verifyToken, async (req, res) => {
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {
     const userList = await User.find();
-
     if (userList.length === 0) {
-      return res.status(404).json({
-        msg: 'No users found'
-      });
+      return res.status(404).json({ msg: 'No users found' });
     }
-
     return res.status(200).json(userList);
-
   } catch (error) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
 
@@ -249,20 +181,12 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
 router.get('/me', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-
     if (!user) {
-      return res.status(404).json({
-        msg: 'User not found'
-      });
+      return res.status(404).json({ msg: 'User not found' });
     }
-
     res.status(200).json(user);
-
   } catch (error) {
-    res.status(500).json({
-      msg: 'Internal Server Error',
-      error: error.message
-    });
+    res.status(500).json({ msg: 'Internal Server Error', error: error.message });
   }
 });
 
@@ -270,60 +194,54 @@ router.get('/me', verifyToken, async (req, res) => {
 router.post('/request-otp', async (req, res) => {
   const { email, type } = req.body;
 
-  const otp = Math.floor(
-    100000 + Math.random() * 900000
-  ).toString();
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
     await sendOTPEmail(email, otp, type);
 
-    pendingOtps[email] = {
-      otp,
-      createdAt: Date.now()
-    };
+    // ✅ Fix — in-memory object ki jagah DB mein upsert karo
+    // Pehle: pendingOtps[email] = { otp, createdAt: Date.now() }
+    // Ab: findOneAndUpdate with upsert — agar pehle se record ho (resend case) toh update karo
+    await OtpRecord.findOneAndUpdate(
+      { email },
+      { otp, verified: false, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
 
-    res.status(200).json({
-      msg: "OTP sent to email."
-    });
+    res.status(200).json({ msg: "OTP sent to email." });
 
   } catch (error) {
-    res.status(500).json({
-      msg: "Failed to send OTP."
-    });
+    res.status(500).json({ msg: "Failed to send OTP." });
   }
 });
 
 // Verify OTP
-router.post('/verify-otp', (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   const { email, otp } = req.body;
 
-  const record = pendingOtps[email];
+  // ✅ Fix — DB se check karo
+  const record = await OtpRecord.findOne({ email });
 
   if (!record) {
-    return res.status(400).json({
-      msg: "No OTP found for this email."
-    });
+    return res.status(400).json({ msg: "No OTP found for this email." });
   }
 
   if (record.otp !== otp) {
-    return res.status(400).json({
-      msg: "Invalid OTP"
-    });
+    return res.status(400).json({ msg: "Invalid OTP" });
   }
 
-  const otpAge = Date.now() - record.createdAt;
-
+  // TTL handle karta hai expiry — agar document exist karta hai toh valid hai
+  // But createdAt check bhi rakhte hain extra safety ke liye
+  const otpAge = Date.now() - new Date(record.createdAt).getTime();
   if (otpAge > 5 * 60 * 1000) {
-    return res.status(400).json({
-      msg: "OTP expired"
-    });
+    await OtpRecord.deleteOne({ email }); // expired record clean karo
+    return res.status(400).json({ msg: "OTP expired" });
   }
 
-  pendingOtps[email].verified = true;
+  // ✅ Fix — DB mein verified: true set karo
+  await OtpRecord.findOneAndUpdate({ email }, { verified: true });
 
-  res.status(200).json({
-    msg: "OTP verified successfully"
-  });
+  res.status(200).json({ msg: "OTP verified successfully" });
 });
 
 // Request Password Reset
@@ -332,73 +250,56 @@ router.post('/request-password-reset', async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({
-        msg: "Email is required"
-      });
+      return res.status(400).json({ msg: "Email is required" });
     }
 
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(404).json({
-        msg: "No user found with this email"
-      });
+      return res.status(404).json({ msg: "No user found with this email" });
     }
 
-    const otp = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await sendOTPEmail(email, otp, "reset");
 
-    pendingOtps[email] = {
-      otp,
-      createdAt: Date.now()
-    };
+    // ✅ Fix — DB mein upsert karo
+    await OtpRecord.findOneAndUpdate(
+      { email },
+      { otp, verified: false, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
 
-    return res.status(200).json({
-      msg: "OTP sent for password reset"
-    });
+    return res.status(200).json({ msg: "OTP sent for password reset" });
 
   } catch (err) {
-    return res.status(500).json({
-      msg: "Failed to send OTP",
-      error: err.message
-    });
+    return res.status(500).json({ msg: "Failed to send OTP", error: err.message });
   }
 });
 
 // Verify Reset OTP
-router.post('/verify-reset-otp', (req, res) => {
+router.post('/verify-reset-otp', async (req, res) => {
   const { email, otp } = req.body;
 
-  const record = pendingOtps[email];
+  // ✅ Fix — DB se check karo
+  const record = await OtpRecord.findOne({ email });
 
   if (!record) {
-    return res.status(400).json({
-      msg: "No OTP found for this email."
-    });
+    return res.status(400).json({ msg: "No OTP found for this email." });
   }
 
   if (record.otp !== otp) {
-    return res.status(400).json({
-      msg: "Invalid OTP"
-    });
+    return res.status(400).json({ msg: "Invalid OTP" });
   }
 
-  const otpAge = Date.now() - record.createdAt;
-
+  const otpAge = Date.now() - new Date(record.createdAt).getTime();
   if (otpAge > 5 * 60 * 1000) {
-    return res.status(400).json({
-      msg: "OTP expired"
-    });
+    await OtpRecord.deleteOne({ email });
+    return res.status(400).json({ msg: "OTP expired" });
   }
 
-  pendingOtps[email].verified = true;
+  await OtpRecord.findOneAndUpdate({ email }, { verified: true });
 
-  return res.status(200).json({
-    msg: "OTP verified. You can reset your password."
-  });
+  return res.status(200).json({ msg: "OTP verified. You can reset your password." });
 });
 
 // Reset Password
@@ -406,45 +307,33 @@ router.post('/reset-password', async (req, res) => {
   const { email, newPassword } = req.body;
 
   if (!email || !newPassword) {
-    return res.status(400).json({
-      msg: "Email and new password required"
-    });
+    return res.status(400).json({ msg: "Email and new password required" });
   }
 
-  const record = pendingOtps[email];
+  // ✅ Fix — DB se check karo
+  const record = await OtpRecord.findOne({ email });
 
   if (!record || !record.verified) {
-    return res.status(403).json({
-      msg: "OTP not verified for this email"
-    });
+    return res.status(403).json({ msg: "OTP not verified for this email" });
   }
 
   try {
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(404).json({
-        msg: "User not found"
-      });
+      return res.status(404).json({ msg: "User not found" });
     }
 
     const hashed = await bcrypt.hash(newPassword, 10);
-
     user.password = hashed;
-
     await user.save();
 
-    delete pendingOtps[email];
+    // ✅ Fix — password reset ke baad OTP record delete karo
+    await OtpRecord.deleteOne({ email });
 
-    return res.status(200).json({
-      msg: "Password changed successfully"
-    });
+    return res.status(200).json({ msg: "Password changed successfully" });
 
   } catch (err) {
-    return res.status(500).json({
-      msg: "Something went wrong",
-      error: err.message
-    });
+    return res.status(500).json({ msg: "Something went wrong", error: err.message });
   }
 });
 
@@ -453,9 +342,7 @@ router.post("/google-precheck", async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
-    return res.status(400).json({
-      msg: "Google token missing"
-    });
+    return res.status(400).json({ msg: "Google token missing" });
   }
 
   try {
@@ -465,22 +352,15 @@ router.post("/google-precheck", async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-
     const { email, name } = payload;
 
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       const jwtToken = jwt.sign(
-        {
-          id: existingUser._id,
-          email: existingUser.email,
-          role: existingUser.role
-        },
+        { id: existingUser._id, email: existingUser.email, role: existingUser.role },
         process.env.JSON_WEB_TOKEN_SECRET_KEY,
-        {
-          expiresIn: "1h"
-        }
+        { expiresIn: "1h" }
       );
 
       return res.status(200).json({
@@ -492,63 +372,43 @@ router.post("/google-precheck", async (req, res) => {
 
     return res.status(200).json({
       existingUser: false,
-      prefill: {
-        name,
-        email,
-      },
+      prefill: { name, email },
     });
 
   } catch (err) {
-    return res.status(401).json({
-      msg: "Invalid Google token"
-    });
+    return res.status(401).json({ msg: "Invalid Google token" });
   }
 });
 
 // Get User by ID
 router.get('/:id', async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
-      msg: 'Invalid User ID format'
-    });
+    return res.status(400).json({ msg: 'Invalid User ID format' });
   }
 
   try {
     const user = await User.findById(req.params.id);
-
     if (!user) {
-      return res.status(404).json({
-        msg: 'The user with the given ID was not found'
-      });
+      return res.status(404).json({ msg: 'The user with the given ID was not found' });
     }
-
     return res.status(200).json(user);
-
   } catch (error) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
 
 // Update User
 router.put('/:id', verifyToken, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
-      msg: 'Invalid User ID format'
-    });
+    return res.status(400).json({ msg: 'Invalid User ID format' });
   }
 
   const { name, phone, email, password } = req.body;
 
   try {
     const existingUser = await User.findById(req.params.id);
-
     if (!existingUser) {
-      return res.status(404).json({
-        msg: 'User not found'
-      });
+      return res.status(404).json({ msg: 'User not found' });
     }
 
     if (name) existingUser.name = name;
@@ -568,40 +428,24 @@ router.put('/:id', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
 
 // Delete User
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
-      msg: 'Invalid User ID format'
-    });
+    return res.status(400).json({ msg: 'Invalid User ID format' });
   }
 
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
-
     if (!deletedUser) {
-      return res.status(404).json({
-        msg: 'The user with the given ID was not found'
-      });
+      return res.status(404).json({ msg: 'The user with the given ID was not found' });
     }
-
-    return res.status(200).json({
-      msg: 'User deleted successfully',
-      user: deletedUser
-    });
-
+    return res.status(200).json({ msg: 'User deleted successfully', user: deletedUser });
   } catch (error) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
 
@@ -609,16 +453,9 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
 router.get('/get/count', verifyToken, isAdmin, async (req, res) => {
   try {
     const userCount = await User.countDocuments();
-
-    return res.status(200).json({
-      count: userCount
-    });
-
+    return res.status(200).json({ count: userCount });
   } catch (error) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-      error: error.message
-    });
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
 

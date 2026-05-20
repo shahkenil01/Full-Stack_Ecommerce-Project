@@ -1,82 +1,95 @@
-import { useState, useContext, useEffect } from "react";
-import { TextField, Button } from "@mui/material";
-import { IoBagCheckOutline } from "react-icons/io5";
-import { MyContext } from "../../App";
-import { handlePayment } from "../../utils/handlePayment";
-import { useNavigate } from "react-router-dom";
-import { useSnackbar } from "notistack";
+import { useState, useContext, useEffect } from 'react';
+import { TextField, Button } from '@mui/material';
+import { IoBagCheckOutline } from 'react-icons/io5';
+import { MyContext } from '../../App';
+import { handlePayment } from '../../utils/handlePayment';
+import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 const CheckoutForm = () => {
-
-  const { cartItems } = useContext(MyContext);
-  const { user } = useContext(MyContext);
+  const { cartItems, user } = useContext(MyContext);
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
-  const truncateChars = (text, limit = 20) => {
-    if (!text) return "";
-    return text.length > limit ? text.slice(0, limit) + "..." : text;
-  };
+  const [formFields, setFormFields] = useState({
+    fullName: '',
+    country: '',
+    streetAddressLine1: '',
+    streetAddressLine2: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    phoneNumber: '',
+    email: user?.email || '',
+  });
 
+  // Email auto-fill from localStorage on mount
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     if (userInfo?.email) {
-      setFormFields(prev => ({
-        ...prev,
-        email: userInfo.email
-      }));
+      setFormFields((prev) => ({ ...prev, email: userInfo.email }));
     }
   }, []);
 
-  const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const truncateChars = (text, limit = 20) => {
+    if (!text) return '';
+    return text.length > limit ? text.slice(0, limit) + '...' : text;
+  };
 
-  const [formFields, setFormFields] = useState({
-    fullName: "",
-    country: "",
-    streetAddressLine1: "",
-    streetAddressLine2: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    phoneNumber: "",
-    email: user?.email || ""
-  });
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + parseFloat(item.price) * item.quantity,
+    0,
+  );
+  const gstRate = 0.12;
+  const gstAmount = parseFloat((subtotal * gstRate).toFixed(2));
+  const deliveryCharge = subtotal >= 1000 ? 0 : 45;
+
+  const grandTotal = parseFloat(
+    (subtotal + gstAmount + deliveryCharge).toFixed(2),
+  );
 
   const onChangeInput = (e) => {
-    setFormFields(() => ({
-      ...formFields,
-      [e.target.name]: e.target.value
-    }));
+    setFormFields((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const checkout = async (e) => {
     e.preventDefault();
 
-    const requiredFields = ["fullName", "country", "streetAddressLine1", "city", "state", "zipCode", "phoneNumber", "email"];
-    const newErrors = {};
+    const requiredFields = [
+      'fullName',
+      'country',
+      'streetAddressLine1',
+      'city',
+      'state',
+      'zipCode',
+      'phoneNumber',
+      'email',
+    ];
 
-    requiredFields.forEach((field) => {
-      if (!formFields[field].trim()) {
-        newErrors[field] = true;
-      }
-    });
+    const hasErrors = requiredFields.some((field) => !formFields[field].trim());
 
-    if (Object.keys(newErrors).length === 0) {
-      const orderToken = "ot_" + Date.now();
-      try {
-        await handlePayment({
-          amount: totalAmount,
-          email: formFields.email,
-          phoneNumber: formFields.phoneNumber,
-          token: orderToken,
-          cartItems,
-          formFields,
-          enqueueSnackbar,
-        });
-      } catch (err) {
-        enqueueSnackbar("Something went wrong during payment", { variant: "error" });
-      }
-    } else {
-      enqueueSnackbar("Please fill all required fields", { variant: "error" });
+    if (hasErrors) {
+      enqueueSnackbar('Please fill all required fields', { variant: 'error' });
+      return;
+    }
+
+    const orderToken = 'ot_' + Date.now();
+
+    try {
+      await handlePayment({
+        amount: grandTotal,
+        email: formFields.email,
+        phoneNumber: formFields.phoneNumber,
+        name: formFields.fullName,
+        token: orderToken,
+        cartItems,
+        formFields,
+        enqueueSnackbar,
+      });
+    } catch (err) {
+      enqueueSnackbar('Something went wrong during payment', {
+        variant: 'error',
+      });
     }
   };
 
@@ -169,14 +182,38 @@ const CheckoutForm = () => {
                       {cartItems.map((item, index) => (
                         <tr key={index}>
                           <td>
-                            {truncateChars(item.productTitle || item.name, 20)} <b>× {item.quantity}</b>
+                            {truncateChars(item.productTitle || item.name, 20)}{' '}
+                            <b>× {item.quantity}</b>
                           </td>
-                          <td>₹ {item.price * item.quantity}</td>
+                          <td>
+                            ₹
+                            {(parseFloat(item.price) * item.quantity).toFixed(
+                              2,
+                            )}
+                          </td>
                         </tr>
                       ))}
                       <tr>
                         <td>Subtotal</td>
-                        <td>₹{totalAmount}</td>
+                        <td>₹{subtotal.toFixed(2)}</td>
+                      </tr>
+                      <tr>
+                        <td>GST ({gstRate * 100}%)</td>
+                        <td>₹{gstAmount}</td>
+                      </tr>
+                      <tr>
+                        <td>Delivery</td>
+                        <td>
+                          {deliveryCharge > 0 ? `₹${deliveryCharge}` : 'Free'}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <b>Total</b>
+                        </td>
+                        <td>
+                          <b>₹{grandTotal}</b>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
